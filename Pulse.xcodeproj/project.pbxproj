@@ -116,7 +116,6 @@
 		0CB63A1D2974A5EB00525165 /* ConsoleSearchSuggestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A1C2974A5EB00525165 /* ConsoleSearchSuggestionView.swift */; };
 		0CB63A212974A62700525165 /* ConsoleSearchOccurrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A202974A62700525165 /* ConsoleSearchOccurrence.swift */; };
 		0CB63A232974A64500525165 /* ConsoleSearchOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A222974A64500525165 /* ConsoleSearchOperation.swift */; };
-		0CB63A25297592D400525165 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A24297592D400525165 /* Parser.swift */; };
 		0CB63A2729759D2E00525165 /* ConsoleSearchToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A2629759D2E00525165 /* ConsoleSearchToken.swift */; };
 		0CB63A292975A94D00525165 /* ConsoleSearchTokenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A282975A94D00525165 /* ConsoleSearchTokenTests.swift */; };
 		0CB63A2C2975C40100525165 /* ConsoleSearchFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A2A2975C3C700525165 /* ConsoleSearchFilter.swift */; };
@@ -573,7 +572,6 @@
 		0CB63A1C2974A5EB00525165 /* ConsoleSearchSuggestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestionView.swift; sourceTree = "<group>"; };
 		0CB63A202974A62700525165 /* ConsoleSearchOccurrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchOccurrence.swift; sourceTree = "<group>"; };
 		0CB63A222974A64500525165 /* ConsoleSearchOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchOperation.swift; sourceTree = "<group>"; };
-		0CB63A24297592D400525165 /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
 		0CB63A2629759D2E00525165 /* ConsoleSearchToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchToken.swift; sourceTree = "<group>"; };
 		0CB63A282975A94D00525165 /* ConsoleSearchTokenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTokenTests.swift; sourceTree = "<group>"; };
 		0CB63A2A2975C3C700525165 /* ConsoleSearchFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchFilter.swift; sourceTree = "<group>"; };
@@ -1189,7 +1187,6 @@
 				0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */,
 				0C63A37E297A02AD00F6A6A5 /* StringSearchOptions.swift */,
 				0CF0D581296F189500EED9D4 /* Regex.swift */,
-				0CB63A24297592D400525165 /* Parser.swift */,
 				0CF0D584296F189500EED9D4 /* WatchConnectivityService-ios.swift */,
 				0C29F39629FE7F97006CC996 /* WatchConnectivityService-watchOS.swift */,
 				0CF0D587296F189500EED9D4 /* DecodingErrorsPreviews.swift */,
@@ -2053,7 +2050,6 @@
 				0CF0D64A296F189600EED9D4 /* ConsoleSection.swift in Sources */,
 				0CB63A132973A12300525165 /* ConsoleSearchListContentView.swift in Sources */,
 				0CB63A2C2975C40100525165 /* ConsoleSearchFilter.swift in Sources */,
-				0CB63A25297592D400525165 /* Parser.swift in Sources */,
 				0CB63A2729759D2E00525165 /* ConsoleSearchToken.swift in Sources */,
 				0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */,
 				0CF0D661296F189600EED9D4 /* NetworkInspectorTransferInfoView.swift in Sources */,
