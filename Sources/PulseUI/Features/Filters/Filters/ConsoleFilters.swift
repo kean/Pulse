@@ -4,8 +4,6 @@
 
 import Foundation
 import Pulse
-import CoreData
-import Combine
 
 /// Filter the logs displayed in the console.
 struct ConsoleFilters: Hashable {
