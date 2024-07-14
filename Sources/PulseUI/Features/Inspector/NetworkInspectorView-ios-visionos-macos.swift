@@ -9,7 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 15, visionOS 1, macOS 13, *)
 struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
 
@@ -101,7 +101,7 @@ struct NetworkInspectorView: View {
 }
 
 #if DEBUG
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 15, visionOS 1, macOS 13, *)
 struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
         Group {

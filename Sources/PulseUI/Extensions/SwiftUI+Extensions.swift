@@ -94,17 +94,6 @@ extension Backport {
 #endif
     }
 
-#if os(macOS)
-    @ViewBuilder
-    func hideListContentBackground() -> some View {
-        if #available(macOS 13, *) {
-            self.content.scrollContentBackground(.hidden)
-        } else {
-            self.content
-        }
-    }
-#endif
-
     enum PresentationDetent {
         case large
         case medium
