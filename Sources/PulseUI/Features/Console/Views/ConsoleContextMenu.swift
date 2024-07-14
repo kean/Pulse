@@ -24,7 +24,6 @@ struct ConsoleContextMenu: View {
 #if os(iOS) || os(visionOS)
             Section {
                 ConsoleSortByMenu()
-                ConsoleGroupByMenu()
             }
 #endif
             Section {

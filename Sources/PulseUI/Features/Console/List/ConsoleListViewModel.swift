@@ -135,7 +135,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         guard isViewVisible else { return }
 
         entities = dataSource.entities
-        sections = dataSource.sections
 #if os(iOS) || os(visionOS) || os(macOS)
         refreshVisibleEntities()
 #endif
@@ -144,7 +143,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
 
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
         entities = dataSource.entities
-        sections = dataSource.sections
 #if os(iOS) || os(visionOS) || os(macOS)
         if scrollPosition == .nearTop {
             refreshVisibleEntities()

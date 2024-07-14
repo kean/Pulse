@@ -113,11 +113,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     var entities: [NSManagedObject] {
         controller.fetchedObjects ?? []
     }
-    
-    var sections: [NSFetchedResultsSectionInfo]? {
-        controller.sectionNameKeyPath == nil ? nil : controller.sections
-    }
-    
+
     // MARK: NSFetchedResultsControllerDelegate
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {

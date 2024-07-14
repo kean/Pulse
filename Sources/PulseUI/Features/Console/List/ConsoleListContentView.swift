@@ -20,18 +20,7 @@ struct ConsoleListContentView: View {
             }
         }
 #endif
-
-#if os(iOS) || os(macOS) || os(visionOS)
-        if let sections = viewModel.sections, !sections.isEmpty {
-            ForEach(sections, id: \.name) {
-                ConsoleListGroupedSectionView(section: $0, viewModel: viewModel)
-            }
-        } else {
-            plainView
-        }
-#else
         plainView
-#endif
     }
 
     @ViewBuilder
