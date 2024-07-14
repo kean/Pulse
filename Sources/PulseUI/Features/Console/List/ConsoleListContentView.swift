@@ -13,7 +13,7 @@ struct ConsoleListContentView: View {
 
     var body: some View {
 #if os(iOS) || os(visionOS)
-        if !viewModel.pins.isEmpty, !viewModel.isShowingFocusedEntities {
+        if !viewModel.pins.isEmpty {
             ConsoleListPinsSectionView(viewModel: viewModel)
             if !viewModel.entities.isEmpty {
                 PlainListGroupSeparator()
@@ -45,7 +45,7 @@ struct ConsoleListContentView: View {
 
     @ViewBuilder
     private var footerView: some View {
-        if let session = viewModel.previousSession, !viewModel.isShowingFocusedEntities {
+        if let session = viewModel.previousSession {
             Button(action: { viewModel.buttonShowPreviousSessionTapped(for: session) }) {
                 Text("Show Previous Session")
                     .font(.subheadline)

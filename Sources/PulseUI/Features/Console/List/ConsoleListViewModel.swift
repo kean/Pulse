@@ -31,10 +31,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         }
     }
 
-    var isShowingFocusedEntities: Bool {
-        filters.options.focus != nil
-    }
-
     @Published private(set) var previousSession: LoggerSessionEntity?
 
     let events = PassthroughSubject<ConsoleUpdateEvent, Never>()
@@ -101,10 +97,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         filtersCancellable = filters.$options.sink { [weak self] in
             self?.dataSource?.predicate = $0
         }
-    }
-
-    func focus(on entities: [NSManagedObject]) {
-        filters.options.focus = NSPredicate(format: "self IN %@", entities)
     }
 
     func buttonShowPreviousSessionTapped(for session: LoggerSessionEntity) {

@@ -29,7 +29,6 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         var filters = ConsoleFilters()
         var isOnlyErrors = false
         var predicate: NSPredicate?
-        var focus: NSPredicate?
     }
 
     var predicate: PredicateOptions = .init() {
@@ -136,7 +135,6 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         let predicates = [
             _makePredicate(mode, options.filters, options.isOnlyErrors),
             options.predicate,
-            options.focus,
             filter
         ].compactMap { $0 }
         switch predicates.count {
