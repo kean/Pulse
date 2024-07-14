@@ -210,18 +210,16 @@ final class TextRendererJSON {
 
     // MARK: Error
 
+    /// - note: Pulse Pro
+    static var makeErrorAttributes: ((Error) -> [NSAttributedString.Key: Any])?
+
     func makeErrorAttributes() -> [NSAttributedString.Key: Any] {
         guard let error = error else {
             return [:]
         }
-#if PULSE_STANDALONE_APP
-        return [
-            .decodingError: error,
-            .underlineColor: UXColor.red,
-            .underlineStyle: RichTextViewUnderlyingStyle.error.rawValue,
-            .cursor: NSCursor.pointingHand
-        ]
-#else
+        if let closure = TextRendererJSON.makeErrorAttributes {
+            return closure(error)
+        }
         return [
             .backgroundColor: options.color == .monochrome ? UXColor.label : UXColor.red,
             .foregroundColor: UXColor.white,
@@ -238,7 +236,6 @@ final class TextRendererJSON {
             }(),
             .underlineColor: UXColor.clear
         ]
-#endif
     }
 }
 
