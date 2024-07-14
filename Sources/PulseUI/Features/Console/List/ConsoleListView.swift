@@ -125,13 +125,6 @@ private struct _ConsoleListView: View {
     @Environment(\.isSearching) private var isSearching
 
     var body: some View {
-        content.onChange(of: isSearching) {
-            searchViewModel.isSearchActive = $0
-        }
-    }
-
-    @ViewBuilder
-    private var content: some View {
         VStack(spacing: 0) {
             List {
                 if isSearching {

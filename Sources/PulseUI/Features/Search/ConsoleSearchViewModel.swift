@@ -20,17 +20,6 @@ final class ConsoleSearchBarViewModel: ObservableObject {
 
 @available(iOS 15, visionOS 1.0, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
-    var isSearchActive: Bool = false {
-        didSet {
-            guard oldValue != isSearchActive else { return }
-            if !isSearchActive {
-                searchService.clearCache()
-                operation?.cancel()
-                operation = nil
-            }
-        }
-    }
-
     @Published var options: StringSearchOptions = .default
     @Published var scopes: Set<ConsoleSearchScope> = []
 
@@ -184,9 +173,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     private func checkForNewSearchMatches(for entities: [NSManagedObject]) {
-        guard isSearchActive else {
-            return // Off-screen
-        }
         guard operation == nil && refreshResultsOperation == nil else {
             return // Let's wait until the next refresh
         }
