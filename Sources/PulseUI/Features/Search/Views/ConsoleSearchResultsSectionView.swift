@@ -101,24 +101,12 @@ struct ConsoleSearchResultView: View {
     @ViewBuilder
     private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
         switch occurrence.scope {
-        case .originalRequestHeaders:
-            makeHeadersDetails(title: "Request Headers", headers: task.originalRequest?.headers)
-        case .currentRequestHeaders:
-            makeHeadersDetails(title: "Request Headers", headers: task.currentRequest?.headers)
         case .requestBody:
             NetworkInspectorRequestBodyView(viewModel: .init(task: task))
-        case .responseHeaders:
-            makeHeadersDetails(title: "Response Headers", headers: task.response?.headers)
         case .responseBody:
             NetworkInspectorResponseBodyView(viewModel: .init(task: task))
         case .url, .message, .metadata:
             EmptyView()
-        }
-    }
-
-    private static func makeHeadersDetails(title: String, headers: [String: String]?) -> some View {
-        NetworkDetailsView(title: title) {
-            KeyValueSectionViewModel.makeHeaders(title: title, headers: headers)
         }
     }
 }

@@ -139,21 +139,9 @@ final class ConsoleSearchOperation {
                         occurrences += ConsoleSearchOperation.search(url, parameters, scope)
                     }
                 }
-            case .originalRequestHeaders:
-                if let headers = task.originalRequest?.httpHeaders {
-                    occurrences += ConsoleSearchOperation.search(headers, parameters, scope)
-                }
-            case .currentRequestHeaders:
-                if let headers = task.currentRequest?.httpHeaders {
-                    occurrences += ConsoleSearchOperation.search(headers, parameters, scope)
-                }
             case .requestBody:
                 if let string = task.requestBody.flatMap(service.getBodyString) {
                     occurrences += ConsoleSearchOperation.search(string, parameters, scope)
-                }
-            case .responseHeaders:
-                if let headers = task.response?.httpHeaders {
-                    occurrences += ConsoleSearchOperation.search(headers, parameters, scope)
                 }
             case .responseBody:
                 if let string = task.responseBody.flatMap(service.getBodyString) {
