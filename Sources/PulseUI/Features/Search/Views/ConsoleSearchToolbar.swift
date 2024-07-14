@@ -38,46 +38,11 @@ struct ConsoleSearchToolbar: View {
                 ConsoleSearchContextMenu()
             }
 #else
-            HStack {
-                ConsoleSearchStringOptionsView(viewModel: viewModel)
-            }
+        StringSearchOptionsMenu(options: $viewModel.options)
+            .fixedSize()
 #endif
     }
 }
-
-#if os(macOS)
-struct ConsoleSearchStringOptionsView: View {
-    @ObservedObject var viewModel: ConsoleSearchViewModel
-
-    var body: some View {
-        HStack {
-            Picker("Kind", selection: $viewModel.options.kind) {
-                ForEach(StringSearchOptions.Kind.allCases, id: \.self) {
-                    Text($0.rawValue).tag($0)
-                }
-            }
-            .padding(.leading, -4)
-            if let rules = viewModel.options.allEligibleMatchingRules() {
-                Picker("Matching Rule", selection: $viewModel.options.rule) {
-                    ForEach(rules, id: \.self) {
-                        Text($0.rawValue).tag($0)
-                    }
-                }
-            }
-            Picker("Case Sensitivity", selection: $viewModel.options.caseSensitivity) {
-                ForEach(StringSearchOptions.CaseSensitivity.allCases, id: \.self) {
-                    Text($0.rawValue).tag($0)
-                }
-            }
-        }
-        .opacity(0.8)
-        .buttonStyle(.borderless)
-        .pickerStyle(.menu)
-        .menuStyle(.borderlessButton)
-        .labelsHidden()
-    }
-}
-#endif
 
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchScopesPicker: View {
