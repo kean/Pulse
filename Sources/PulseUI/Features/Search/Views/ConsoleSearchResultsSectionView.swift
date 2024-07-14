@@ -19,19 +19,11 @@ struct ConsoleSearchResultView: View {
 
     var body: some View {
         ConsoleEntityCell(entity: viewModel.entity)
-#if os(macOS)
-            .tag(ConsoleSelectedItem.entity(viewModel.entity.objectID))
-#endif
         let occurrences = Array(viewModel.occurrences).filter { $0.scope.isDisplayedInResults }
         ForEach(occurrences.prefix(limit)) { item in
-#if os(macOS)
-            makeCell(for: item)
-                .tag(ConsoleSelectedItem.occurrence(viewModel.entity.objectID, item))
-#else
             NavigationLink(destination: ConsoleSearchResultView.makeDestination(for: item, entity: viewModel.entity).injecting(environment)) {
                 makeCell(for: item)
             }
-#endif
         }
         if occurrences.count > limit {
             let total = occurrences.count > ConsoleSearchMatch.limit ? "\(ConsoleSearchMatch.limit)+" : "\(occurrences.count)"

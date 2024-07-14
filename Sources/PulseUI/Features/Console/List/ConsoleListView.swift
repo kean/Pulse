@@ -120,29 +120,20 @@ private struct _ConsoleListView: View {
     @EnvironmentObject private var listViewModel: ConsoleListViewModel
     @EnvironmentObject private var searchViewModel: ConsoleSearchViewModel
 
-    @State private var selectedObjectID: NSManagedObjectID? // Has to use for Table
-    @State private var selection: ConsoleSelectedItem?
     @State private var shareItems: ShareItems?
 
     @Environment(\.isSearching) private var isSearching
 
     var body: some View {
-        content
-            .onChange(of: selectedObjectID) {
-                environment.router.selection = $0.map(ConsoleSelectedItem.entity)
-            }
-            .onChange(of: selection) {
-                environment.router.selection = $0
-            }
-            .onChange(of: isSearching) {
-                searchViewModel.isSearchActive = $0
-            }
+        content.onChange(of: isSearching) {
+            searchViewModel.isSearchActive = $0
+        }
     }
 
     @ViewBuilder
     private var content: some View {
         VStack(spacing: 0) {
-            List(selection: $selection) {
+            List {
                 if isSearching {
                     ConsoleSearchListContentView()
                 } else {
