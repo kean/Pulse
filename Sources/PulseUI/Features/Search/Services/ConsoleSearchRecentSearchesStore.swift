@@ -11,17 +11,14 @@ final class ConsoleSearchRecentSearchesStore {
     private let mode: ConsoleMode
 
     private(set) var searches: [ConsoleSearchTerm] = []
-    private(set) var filters: [ConsoleSearchFilter] = []
 
     init(mode: ConsoleMode) {
         self.mode = mode
 
         self.searches = decode([ConsoleSearchTerm].self, from: UserDefaults.standard.string(forKey: searchesKey) ?? "[]") ?? []
-        self.filters = decode([ConsoleSearchFilter].self, from: UserDefaults.standard.string(forKey: filtersKey) ?? "[]") ?? []
     }
 
     private var searchesKey: String { "\(mode.rawValue)-recent-searches" }
-    private var filtersKey: String { "\(mode.rawValue)-recent-filters" }
 
     func saveSearch(_ search: ConsoleSearchTerm) {
         // If the user changes the type o the search, remove the old ones:
@@ -33,9 +30,7 @@ final class ConsoleSearchRecentSearchesStore {
 
     func clearRecentSearches() {
         searches = []
-        filters = []
         saveSearches()
-        saveFilters()
     }
 
     private func saveSearches() {
@@ -43,19 +38,6 @@ final class ConsoleSearchRecentSearchesStore {
             searches.removeLast()
         }
         UserDefaults.standard.set((encode(searches) ?? "[]"), forKey: searchesKey)
-    }
-
-    func saveFilter(_ filter: ConsoleSearchFilter) {
-        filters.removeAll { type(of: $0.filter) == type(of: filter.filter) }
-        filters.insert(filter, at: 0)
-        saveFilters()
-    }
-
-    private func saveFilters() {
-        while filters.count > 20 {
-            filters.removeLast()
-        }
-        UserDefaults.standard.set((encode(filters) ?? "[]"), forKey: filtersKey)
     }
 }
 
