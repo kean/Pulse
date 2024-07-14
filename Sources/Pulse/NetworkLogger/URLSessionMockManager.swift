@@ -4,20 +4,48 @@
 
 import Foundation
 
-// One more option is to add a delay on connection to make sure logger
-// is connected before the app runs.
-final class URLSessionMockManager {
+final class URLSessionMockManager: @unchecked Sendable {
     private var mocks: [UUID: URLSessionMock] = [:]
+
+    // Number of handled requests per mock.
+    private var numberOfHandledRequests: [UUID: Int] = [:]
+    private var mockedTaskIDs: Set<Int> = []
+
+    private let lock = NSLock()
 
     static let shared = URLSessionMockManager()
 
     func getMock(for request: URLRequest) -> URLSessionMock? {
-        mocks.lazy.map(\.value).first {
+        lock.lock()
+        defer { lock.unlock() }
+
+        return mocks.lazy.map(\.value).first {
             $0.isMatch(request)
         }
     }
 
+    func shouldMock(_ request: URLRequest) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+
+        guard let mock = getMock(for: request) else {
+            return false
+        }
+        defer { numberOfHandledRequests[mock.mockID, default: 0] += 1 }
+        let count = numberOfHandledRequests[mock.mockID, default: 0]
+        if count < (mock.skip ?? 0) {
+            return false // Skip the first N requests
+        }
+        if let maxCount = mock.count, count - (mock.skip ?? 0) >= maxCount {
+            return false // Mock for N number of times
+        }
+        return RemoteLogger.shared.connectionState == .connected
+    }
+
     func update(_ mocks: [URLSessionMock]) {
+        lock.lock()
+        defer { lock.unlock() }
+
         self.mocks.removeAll()
         for mock in mocks {
             self.mocks[mock.mockID] = mock
@@ -27,9 +55,6 @@ final class URLSessionMockManager {
 
 final class URLSessionMockingProtocol: URLProtocol {
     override func startLoading() {
-        lock.lock()
-        defer { lock.unlock() }
-
         guard let mock = URLSessionMockManager.shared.getMock(for: request) else {
             client?.urlProtocol(self, didFailWithError: URLError(.unknown)) // Should never happen
             return
@@ -70,27 +95,8 @@ final class URLSessionMockingProtocol: URLProtocol {
     }
 
     override class func canInit(with request: URLRequest) -> Bool {
-        lock.lock()
-        defer { lock.unlock() }
-
-        guard let mock = URLSessionMockManager.shared.getMock(for: request) else {
-            return false
-        }
-        defer { numberOfHandledRequests[mock.mockID, default: 0] += 1 }
-        let count = numberOfHandledRequests[mock.mockID, default: 0]
-        if count < (mock.skip ?? 0) {
-            return false // Skip the first N requests
-        }
-        if let maxCount = mock.count, count - (mock.skip ?? 0) >= maxCount {
-            return false // Mock for N number of times
-        }
-        return RemoteLogger.shared.connectionState == .connected
+        URLSessionMockManager.shared.shouldMock(request)
     }
 
     static let requestMockedHeaderName = "X-PulseRequestMocked"
 }
-
-// Number of handled requests per mock.
-private var numberOfHandledRequests: [UUID: Int] = [:]
-private var mockedTaskIDs: Set<Int> = []
-private let lock = NSLock()
