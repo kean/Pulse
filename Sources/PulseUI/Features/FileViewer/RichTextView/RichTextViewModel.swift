@@ -134,10 +134,6 @@ final class RichTextViewModel: ObservableObject {
 
         selectedMatchIndex = 0
         didUpdateCurrentSelectedMatch()
-#if os(macOS)
-        textView?.enclosingScrollView?.verticalRulerView?.needsDisplay = true
-#endif
-
         isSearchingInBackground = false
         searchIfNeeded()
     }

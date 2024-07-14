@@ -87,14 +87,14 @@ struct SessionListView: View {
 
     private func makeHeader(for startDate: Date, sessions: [LoggerSessionEntity]) -> some View {
         HStack {
-            #if os(macOS)
+#if os(macOS)
             PlainListSectionHeaderSeparator(title: sectionTitleFormatter.string(from: startDate) + " (\(sessions.count))")
-            #else
+#else
             (Text(sectionTitleFormatter.string(from: startDate)) +
              Text(" (\(sessions.count))").foregroundColor(.secondary.opacity(0.5)))
             .font(.headline)
             .padding(.vertical, 6)
-            #endif
+#endif
 
 #if os(iOS) || os(visionOS)
             if editMode?.wrappedValue.isEditing ?? false {
