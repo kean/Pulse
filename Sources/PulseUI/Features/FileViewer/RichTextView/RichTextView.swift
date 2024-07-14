@@ -139,7 +139,6 @@ private func makePreviewViewModel() -> RichTextViewModel {
     let string = TextRenderer().render(json: json)
 
     let viewModel = RichTextViewModel(string: string, contentType: "application/json")
-    viewModel.isLineNumberRulerEnabled = true
     viewModel.isFilterEnabled = true
 
     return viewModel

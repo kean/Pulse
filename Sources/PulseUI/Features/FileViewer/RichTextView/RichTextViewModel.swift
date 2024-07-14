@@ -18,7 +18,6 @@ final class RichTextViewModel: ObservableObject {
 
     // Configuration
     @Published var isLinkDetectionEnabled = true
-    var isLineNumberRulerEnabled = false
     var isFilterEnabled = false
     var isToolbarHidden = false
 

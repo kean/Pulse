@@ -33,7 +33,6 @@ final class RichTextViewModel: ObservableObject {
     let attributedString: AttributedString?
 
     var isLinkDetectionEnabled = true
-    var isLineNumberRulerEnabled = false
     var isFilterEnabled = false
 
     var isEmpty: Bool { text.isEmpty }

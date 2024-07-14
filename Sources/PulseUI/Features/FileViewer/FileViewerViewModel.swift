@@ -49,7 +49,6 @@ final class FileViewerViewModel: ObservableObject {
         } else {
             let string = TextRenderer().render(data, contentType: contentType, error: context.error)
             let viewModel = RichTextViewModel(string: string, contentType: contentType)
-            viewModel.isLineNumberRulerEnabled = true
             viewModel.isFilterEnabled = true
             return .other(viewModel)
         }

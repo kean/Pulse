@@ -89,11 +89,6 @@ struct WrappedTextView: NSViewRepresentable {
         scrollView.autohidesScrollers = true
 
         configureTextView(textView)
-        if viewModel.isLineNumberRulerEnabled {
-            scrollView.automaticallyAdjustsContentInsets = false
-            textView.textContainerInset = CGSize(width: 0, height: 10)
-        }
-
         textView.delegate = context.coordinator
 
         textView.attributedText = viewModel.originalText
