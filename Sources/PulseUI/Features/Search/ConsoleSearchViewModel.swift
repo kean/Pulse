@@ -16,7 +16,7 @@ protocol ConsoleEntitiesSource {
 
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
-    @Published var tokens: [ConsoleSearchToken] = []
+    @Published var tokens: [ConsoleSearchTerm] = []
 }
 
 @available(iOS 15, visionOS 1.0, *)
@@ -58,7 +58,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         var tokens = searchBar.tokens
         let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
         if !searchTerm.isEmpty {
-            tokens.append(.term(.init(text: searchTerm, options: options)))
+            tokens.append(.init(text: searchTerm, options: options))
         }
         return ConsoleSearchParameters(tokens: tokens, scopes: scopes)
     }
@@ -268,13 +268,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         updateSearchTokens()
     }
 
-    private func apply(_ token: ConsoleSearchToken) {
-        switch token {
-        case .term(let term):
-            searchBar.text = term.text
-            options = term.options
-            recents.saveSearch(term)
-        }
+    private func apply(_ term: ConsoleSearchTerm) {
+        searchBar.text = term.text
+        options = term.options
+        recents.saveSearch(term)
     }
 
     func onSubmitSearch() {
@@ -347,12 +344,8 @@ struct ConsoleSearchParameters: Equatable, Hashable {
     var scopes: [ConsoleSearchScope] = []
     var terms: [ConsoleSearchTerm] = []
 
-    init(tokens: [ConsoleSearchToken], scopes: Set<ConsoleSearchScope>) {
-        for token in tokens {
-            switch token {
-            case .term(let string): self.terms.append(string)
-            }
-        }
+    init(tokens: [ConsoleSearchTerm], scopes: Set<ConsoleSearchScope>) {
+        self.terms = tokens
         self.scopes = Array(scopes)
     }
 

@@ -116,8 +116,6 @@
 		0CB63A1D2974A5EB00525165 /* ConsoleSearchSuggestionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A1C2974A5EB00525165 /* ConsoleSearchSuggestionView.swift */; };
 		0CB63A212974A62700525165 /* ConsoleSearchOccurrence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A202974A62700525165 /* ConsoleSearchOccurrence.swift */; };
 		0CB63A232974A64500525165 /* ConsoleSearchOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A222974A64500525165 /* ConsoleSearchOperation.swift */; };
-		0CB63A2729759D2E00525165 /* ConsoleSearchToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A2629759D2E00525165 /* ConsoleSearchToken.swift */; };
-		0CB63A292975A94D00525165 /* ConsoleSearchTokenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A282975A94D00525165 /* ConsoleSearchTokenTests.swift */; };
 		0CB63A2F2975C43D00525165 /* ConsoleSearchScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A2D2975C40F00525165 /* ConsoleSearchScope.swift */; };
 		0CBEF6A629DF69EB00132FB3 /* ConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */; };
 		0CC0130E2A2D26BA00A6DF0B /* RemoteLoggerErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC0130D2A2D26BA00A6DF0B /* RemoteLoggerErrorView.swift */; };
@@ -570,8 +568,6 @@
 		0CB63A1C2974A5EB00525165 /* ConsoleSearchSuggestionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestionView.swift; sourceTree = "<group>"; };
 		0CB63A202974A62700525165 /* ConsoleSearchOccurrence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchOccurrence.swift; sourceTree = "<group>"; };
 		0CB63A222974A64500525165 /* ConsoleSearchOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchOperation.swift; sourceTree = "<group>"; };
-		0CB63A2629759D2E00525165 /* ConsoleSearchToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchToken.swift; sourceTree = "<group>"; };
-		0CB63A282975A94D00525165 /* ConsoleSearchTokenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTokenTests.swift; sourceTree = "<group>"; };
 		0CB63A2D2975C40F00525165 /* ConsoleSearchScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchScope.swift; sourceTree = "<group>"; };
 		0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleView.swift; sourceTree = "<group>"; };
 		0CC0130D2A2D26BA00A6DF0B /* RemoteLoggerErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerErrorView.swift; sourceTree = "<group>"; };
@@ -1037,7 +1033,6 @@
 			children = (
 				0CB63A202974A62700525165 /* ConsoleSearchOccurrence.swift */,
 				0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */,
-				0CB63A2629759D2E00525165 /* ConsoleSearchToken.swift */,
 				0CB63A2D2975C40F00525165 /* ConsoleSearchScope.swift */,
 				0C63A3772979FE3A00F6A6A5 /* ConsoleSearchTerm.swift */,
 				0CB63A222974A64500525165 /* ConsoleSearchOperation.swift */,
@@ -1428,7 +1423,6 @@
 				0CF0D6C8296F18FD00EED9D4 /* ConsoleViewModelTests.swift */,
 				0CECF6402996E761000F9CCD /* ConsoleDataSourceTests.swift */,
 				0C0352D829943F86008CDEF8 /* ConsoleListViewModelTests.swift */,
-				0CB63A282975A94D00525165 /* ConsoleSearchTokenTests.swift */,
 				0C63A389297A44B300F6A6A5 /* StringSearchOptionsTests.swift */,
 				0C94239329B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift */,
 				0C7A0E01297CE71400B4B69D /* FormattersTests.swift */,
@@ -2043,7 +2037,6 @@
 				0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios-visionos-macos.swift in Sources */,
 				0CF0D64A296F189600EED9D4 /* ConsoleSection.swift in Sources */,
 				0CB63A132973A12300525165 /* ConsoleSearchListContentView.swift in Sources */,
-				0CB63A2729759D2E00525165 /* ConsoleSearchToken.swift in Sources */,
 				0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */,
 				0CF0D661296F189600EED9D4 /* NetworkInspectorTransferInfoView.swift in Sources */,
 				0CF0D663296F189600EED9D4 /* NetworkInspectorTransactionView.swift in Sources */,
@@ -2153,7 +2146,6 @@
 				0C0352DC29948290008CDEF8 /* Helpers.swift in Sources */,
 				0C0352D929943F86008CDEF8 /* ConsoleListViewModelTests.swift in Sources */,
 				0CF0D6CB296F18FD00EED9D4 /* ConsoleViewModelTests.swift in Sources */,
-				0CB63A292975A94D00525165 /* ConsoleSearchTokenTests.swift in Sources */,
 				0C94239429B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift in Sources */,
 				0CECF6412996E761000F9CCD /* ConsoleDataSourceTests.swift in Sources */,
 				0CF0D6CA296F18FD00EED9D4 /* TextRendererTests.swift in Sources */,

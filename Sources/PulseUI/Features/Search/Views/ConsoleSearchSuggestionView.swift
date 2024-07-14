@@ -17,12 +17,9 @@ struct ConsoleSearchSuggestionView: View {
     var body: some View {
         Button(action: action) {
             HStack {
-                if case .apply(let token) = suggestion.action {
-                    switch token {
-                    case .term:
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.accentColor)
-                    }
+                if case .apply = suggestion.action {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.accentColor)
                 } else {
                     Image(systemName: "line.3.horizontal.decrease.circle")
                         .foregroundColor(.secondary)

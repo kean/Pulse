@@ -57,7 +57,7 @@ final class ConsoleNetworkSearchSuggestionsService {
         ConsoleSearchSuggestion(text: {
             AttributedString("\(term.options.title) ") { $0.foregroundColor = .primary } +
             AttributedString(term.text) { $0.foregroundColor = .accentColor }
-        }(), action: .apply(.term(term)))
+        }(), action: .apply(term))
     }
 }
 
@@ -68,7 +68,7 @@ struct ConsoleSearchSuggestion: Identifiable {
     var action: Action
 
     enum Action {
-        case apply(ConsoleSearchToken)
+        case apply(ConsoleSearchTerm)
         case autocomplete(String)
     }
 }

@@ -53,11 +53,7 @@ private struct _InternalConsoleListView: View {
             _ConsoleListView()
                 .environment(\.defaultMinListRowHeight, 8)
                 .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
-                    if let image = $0.systemImage {
-                        Label($0.title, systemImage: image)
-                    } else {
-                        Text($0.title)
-                    }
+                    Text($0.text)
                 })
 #if os(macOS)
                 .searchSuggestions {

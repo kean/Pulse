@@ -4,7 +4,9 @@
 
 import Foundation
 
-struct ConsoleSearchTerm: Hashable, Codable {
+struct ConsoleSearchTerm: Identifiable, Hashable, Codable {
+    var id: ConsoleSearchTerm { self }
+
     var text: String
     var options: StringSearchOptions
 }
