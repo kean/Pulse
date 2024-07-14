@@ -200,7 +200,7 @@ enum ContextMenu {
                     UXPasteboard.general.string = String(data: data, encoding: .utf8)
                     runHapticFeedback()
                 }) {
-                    Label("Copy Request", systemImage:"arrow.up.circle")
+                    Label("Copy Request", systemImage: "arrow.up.circle")
                 }
             }
             if task.responseBodySize > 0 {
@@ -263,7 +263,7 @@ struct StringSearchOptionsMenu: View {
 struct OpenOnMacOverlay: View {
     let entity: NSManagedObject
     @ObservedObject var logger: RemoteLogger = .shared
-    
+
     var body: some View {
         if logger.isOpenOnMacSupported {
             HStack {
@@ -287,7 +287,7 @@ struct OpenOnMacOverlay: View {
 struct ButtonOpenOnMac: View {
     let entity: NSManagedObject
     @ObservedObject var logger: RemoteLogger = .shared
-    
+
     var body: some View {
         if logger.isOpenOnMacSupported {
             Section {

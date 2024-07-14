@@ -91,7 +91,7 @@ private func makeTimingRows(transaction: NetworkTransactionMetricsEntity, taskIn
         // Scheduling Section
 
         if let fetchStartDate = timing.fetchStartDate, let endDate = earliestEventDate,
-           endDate.timeIntervalSince(fetchStartDate) > 0.001  {
+           endDate.timeIntervalSince(fetchStartDate) > 0.001 {
             scheduling.append(makeRow(title: "Queued", color: .systemGray4, from: fetchStartDate, to: endDate))
         }
 

@@ -15,7 +15,7 @@ struct NetworkInspectorTransactionView: View {
             contents
         }
     }
-    
+
     @ViewBuilder
     private var contents: some View {
         NetworkRequestStatusCell(viewModel: viewModel.statusViewModel)
@@ -33,7 +33,7 @@ struct NetworkInspectorTransactionView: View {
         }
         NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
     }
-    
+
     @available(iOS 15, visionOS 1.0, *)
     private func transferSizeView(size: NetworkInspectorTransferInfoViewModel) -> some View {
         let font = TextHelper().font(style: .init(role: .subheadline, style: .monospacedDigital, width: .condensed))

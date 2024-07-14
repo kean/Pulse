@@ -70,4 +70,3 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     }
 }
 #endif
-

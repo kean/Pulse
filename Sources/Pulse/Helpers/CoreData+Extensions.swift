@@ -11,7 +11,7 @@ extension NSManagedObjectContext {
         return try fetch(request)
     }
 
-    func fetch<T: NSManagedObject, Value>(_ entity: T.Type, sortedBy keyPath: KeyPath<T, Value>, ascending: Bool = true,  _ configure: (NSFetchRequest<T>) -> Void = { _ in }) throws -> [T] {
+    func fetch<T: NSManagedObject, Value>(_ entity: T.Type, sortedBy keyPath: KeyPath<T, Value>, ascending: Bool = true, _ configure: (NSFetchRequest<T>) -> Void = { _ in }) throws -> [T] {
         try fetch(entity) {
             $0.sortDescriptors = [NSSortDescriptor(keyPath: keyPath, ascending: ascending)]
         }

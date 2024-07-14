@@ -57,7 +57,7 @@ private func makePredicates(for criteria: ConsoleFilters.Messages) -> [NSPredica
     if criteria.logLevels.levels.count != LoggerStore.Level.allCases.count {
         predicates.append(NSPredicate(format: "level IN %@", Array(criteria.logLevels.levels.map { $0.rawValue })))
     }
-     
+
     if let focusedLabel = criteria.labels.focused {
         predicates.append(NSPredicate(format: "label == %@", focusedLabel))
     } else if !criteria.labels.hidden.isEmpty {
@@ -69,13 +69,13 @@ private func makePredicates(for criteria: ConsoleFilters.Messages) -> [NSPredica
 
 private func makePredicates(for criteria: ConsoleFilters.Network) -> [NSPredicate] {
     var predicates = [NSPredicate]()
-    
+
     if let focusedHost = criteria.host.focused {
         predicates.append(NSPredicate(format: "host == %@", focusedHost))
     } else if !criteria.host.hidden.isEmpty {
         predicates.append(NSPredicate(format: "NOT host IN %@", Array(criteria.host.hidden)))
     }
-    
+
     if let focusedURL = criteria.url.focused {
         predicates.append(NSPredicate(format: "url == %@", focusedURL))
     } else if !criteria.url.hidden.isEmpty {

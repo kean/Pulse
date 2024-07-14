@@ -9,10 +9,10 @@ import Foundation
 /// Defines UI configurations to enable/disable elements or change behavior.
 public struct ConsoleConfiguration {
     public static let `default` = ConsoleConfiguration()
-    
+
     let shareStoreOutputs: [ShareStoreOutput]
     let allowRemoteLogging: Bool
-    
+
     /// Creates a new `ConsoleConfiguration`
     /// - Parameter shareStoreOutputs: The available store share outputs. Defaults to `allCases`.
     /// - Parameter allowRemoteLogging: Enable/disable the remote logging option.

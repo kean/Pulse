@@ -79,7 +79,7 @@ extension Backport {
     func presentationDetents(_ detents: Set<PresentationDetent>) -> some View {
 #if os(iOS) || os(visionOS)
         if #available(iOS 16, *) {
-            let detents = detents.map { (detent)-> SwiftUI.PresentationDetent in
+            let detents = detents.map { (detent) -> SwiftUI.PresentationDetent in
                 switch detent {
                 case .large: return .large
                 case .medium: return .medium

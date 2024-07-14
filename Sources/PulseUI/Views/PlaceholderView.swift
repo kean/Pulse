@@ -8,13 +8,13 @@ struct PlaceholderView: View {
     var imageName: String?
     let title: String
     var subtitle: String?
-    
+
 #if os(tvOS)
     private let iconSize: CGFloat = 150
 #else
     private let iconSize: CGFloat = 70
 #endif
-    
+
 #if os(macOS)
     private let maxWidth: CGFloat = .infinity
 #elseif os(tvOS)
@@ -22,7 +22,7 @@ struct PlaceholderView: View {
 #else
     private let maxWidth: CGFloat = 280
 #endif
-    
+
     var body: some View {
         VStack {
             imageName.map(Image.init(systemName:))

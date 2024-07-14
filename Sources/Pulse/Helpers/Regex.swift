@@ -10,10 +10,6 @@ final class Regex {
     struct Options: OptionSet {
         let rawValue: Int
 
-        init(rawValue: Int) {
-            self.rawValue = rawValue
-        }
-
         static let caseInsensitive = Options(rawValue: 1 << 0)
         static let multiline = Options(rawValue: 1 << 1)
         static let dotMatchesLineSeparators = Options(rawValue: 1 << 2)

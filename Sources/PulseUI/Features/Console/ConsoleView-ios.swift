@@ -81,4 +81,3 @@ struct ConsoleView_Previews: PreviewProvider {
 #endif
 
 #endif
-

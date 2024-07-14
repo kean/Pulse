@@ -16,7 +16,7 @@ struct Version: Comparable, Sendable {
         self.minor = minor
         self.patch = patch
     }
-    
+
     var description: String {
         "\(major).\(minor).\(patch)"
     }

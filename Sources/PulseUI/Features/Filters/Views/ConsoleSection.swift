@@ -17,7 +17,7 @@ struct ConsoleSection<Header: View, Content: View>: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 4)
-        },header: {
+        }, header: {
             VStack(spacing: 0) {
                 if !isDividerHidden {
                     Divider()

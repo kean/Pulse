@@ -103,7 +103,7 @@ extension MockTask {
         responseBody: Data(),
         transactions: [
             .init(fetchType: .networkLoad, request: mockDownloadNukeOriginalRequest, response: mockDownloadNukeRedirectResponse, duration: 0.21283),
-            .init(fetchType: .networkLoad, request: mockDownloadNukeCurrentRequest, response: mockDownloadNukeResponse, duration: 4.25254, isReusedConnection: true),
+            .init(fetchType: .networkLoad, request: mockDownloadNukeCurrentRequest, response: mockDownloadNukeResponse, duration: 4.25254, isReusedConnection: true)
         ],
         delay: 3.5
     )
@@ -114,7 +114,7 @@ extension MockTask {
         response: mockUploadPulseResponse,
         responseBody: Data(),
         transactions: [
-            .init(fetchType: .networkLoad, request: mockUploadPulseCurrentRequest, response: mockUploadPulseResponse, duration: 2.21283, isReusedConnection: true),
+            .init(fetchType: .networkLoad, request: mockUploadPulseCurrentRequest, response: mockUploadPulseResponse, duration: 2.21283, isReusedConnection: true)
         ],
         delay: 6.5,
         taskDescription: "upload-pulse-archive"
@@ -127,7 +127,7 @@ extension MockTask {
         transactions: [
             .init(fetchType: .networkLoad, request: mockCreateAPICurrentRequest, response: mockCreateaAPIRedirectResponse, duration: 0.20283),
             .init(fetchType: .localCache, request: mockCreateAPIRedirectRequest, response: mockCreateaAPIResponse, duration: 0.003),
-            .init(fetchType: .networkLoad, request: mockCreateAPIRedirectRequest, response: mockCreateAPIResponseNotChanged, duration: 0.0980, isReusedConnection: true),
+            .init(fetchType: .networkLoad, request: mockCreateAPIRedirectRequest, response: mockCreateAPIResponseNotChanged, duration: 0.0980, isReusedConnection: true)
         ],
         delay: 5.5
     )
@@ -251,7 +251,6 @@ private let mockProfileFailureResponseBody = """
 </html>
 """.data(using: .utf8)!
 
-
 // MARK: - Octocat (GET, Image)
 
 private let mockOctocatOriginalRequest = URLRequest(url: "https://github.com/octocat.png", headers: [
@@ -330,7 +329,7 @@ private let mockCreateaAPIRedirectResponse = HTTPURLResponse(url: "https://githu
 private let mockCreateaAPIResponse = HTTPURLResponse(url: "https://github.com/kean/Get", statusCode: 200, headers: [
     "Content-Type": "text/html; charset=utf-8",
     "Content-Length": "90",
-    "Cache-Control": "no-store",
+    "Cache-Control": "no-store"
 ])
 
 private let mockCreateAPIResponseNotChanged = HTTPURLResponse(url: "https://github.com/kean/Get", statusCode: 304, headers: [
@@ -463,7 +462,7 @@ private let mockDownloadNukeRedirectResponse = HTTPURLResponse(url: "https://cod
     "Location": "https://codeload.github.com/kean/Nuke/zip/tags/11.0.0",
     "Cache-Control": "max-age=0, private",
     "Content-Length": "0",
-    "Content-Security-Policy": "default-src 'none'; base-uri 'self'; block-all-mixed-content; child-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/; connect-src 'self' uploads.github.com objects-origin.githubusercontent.com www.githubstatus.com collector.github.com raw.githubusercontent.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com cdn.optimizely.com logx.optimizely.com/v1/events *.actions.githubusercontent.com wss://*.actions.githubusercontent.com online.visualstudio.com/api/v1/locations github-production-repository-image-32fea6.s3.amazonaws.com github-production-release-asset-2e65be.s3.amazonaws.com",
+    "Content-Security-Policy": "default-src 'none'; base-uri 'self'; block-all-mixed-content; child-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/; connect-src 'self' uploads.github.com objects-origin.githubusercontent.com www.githubstatus.com collector.github.com raw.githubusercontent.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com cdn.optimizely.com logx.optimizely.com/v1/events *.actions.githubusercontent.com wss://*.actions.githubusercontent.com online.visualstudio.com/api/v1/locations github-production-repository-image-32fea6.s3.amazonaws.com github-production-release-asset-2e65be.s3.amazonaws.com"
 ])
 
 private let mockDownloadNukeResponse = HTTPURLResponse(url: "https://codeload.github.com/kean/Nuke/zip/tags/11.0.0", statusCode: 200, headers: [

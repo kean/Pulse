@@ -50,7 +50,7 @@ private struct ConsoleToolbarView: View {
     var body: some View {
         HStack {
             if environment.initialMode == .all {
-                Button(action: { environment.bindingForNetworkMode.wrappedValue.toggle() } ) {
+                Button(action: { environment.bindingForNetworkMode.wrappedValue.toggle() }) {
                     Image(systemName: "arrow.down.circle")
                 }
                 .background(environment.bindingForNetworkMode.wrappedValue ? Rectangle().foregroundColor(.blue).cornerRadius(8) : nil)

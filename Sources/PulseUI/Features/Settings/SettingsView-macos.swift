@@ -32,7 +32,7 @@ struct SettingsView: View {
             } header: {
                 PlainListSectionHeaderSeparator(title: "Store")
             }
-            
+
             Section {
                 HStack {
                     Button("Show in Finder") {
@@ -60,4 +60,3 @@ struct UserSettingsView_Previews: PreviewProvider {
 }
 #endif
 #endif
-

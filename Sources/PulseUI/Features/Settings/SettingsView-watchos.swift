@@ -40,7 +40,7 @@ public struct SettingsView: View {
                 .alert(item: $syncService.error) { error in
                     Alert(title: Text("Transfer Failed"), message: Text(error.error.localizedDescription), dismissButton: .cancel(Text("Ok")))
                 }
-                
+
                 if #available(watchOS 9, *) {
                     Button("Share Store") { isShowingShareView = true }
                 }
@@ -60,7 +60,7 @@ public struct SettingsView: View {
         .sheet(isPresented: $isShowingShareView) {
             if #available(watchOS 9, *) {
                 NavigationView {
-                    ShareStoreView() {
+                    ShareStoreView {
                         isShowingShareView = false
                     }
                 }

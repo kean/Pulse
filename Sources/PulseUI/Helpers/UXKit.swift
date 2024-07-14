@@ -156,14 +156,13 @@ func runHapticFeedback(_ type: VisionHapticFeedabackTypePlaceholder = .success) 
 }
 #endif
 
-
 #if os(macOS)
 extension NSTextView {
     var attributedText: NSAttributedString? {
         get { nil }
         set { textStorage?.setAttributedString(newValue ?? NSAttributedString()) }
     }
-    
+
     var text: String {
         get { string }
         set { string = newValue }

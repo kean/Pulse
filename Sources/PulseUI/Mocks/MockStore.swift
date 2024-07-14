@@ -154,21 +154,21 @@ private func _syncPopulateStore(_ store: LoggerStore) {
     }
 
     let urlSession = URLSession(configuration: .default)
-    
+
     logger(named: "application")
         .log(level: .info, "UIApplication.didFinishLaunching", metadata: [
             "custom-metadata-key": .string("value")
         ])
-    
+
     logger(named: "application")
         .log(level: .info, "UIApplication.willEnterForeground")
-    
+
     logger(named: "session")
         .log(level: .trace, "Instantiated Session")
 
     logger(named: "auth")
         .log(level: .trace, "Instantiated the new login request")
-    
+
     logger(named: "analytics")
         .log(level: .debug, "Will navigate to Dashboard")
 
@@ -227,7 +227,7 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
         if let dataTask = task as? URLSessionDataTask {
             logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
         }
-        
+
         let taskInterval = DateInterval(start: startDate, duration: mockTask.duration)
         let metrics = makeMetrics(for: mockTask, taskInterval: taskInterval)
         logger.logTask(task, didFinishCollecting: metrics)
@@ -345,7 +345,7 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
         let statusCode = (transaction.response as? HTTPURLResponse)?.statusCode
 
         var transferSize = NetworkLogger.TransferSizeInfo()
-        if transaction.fetchType == .networkLoad  {
+        if transaction.fetchType == .networkLoad {
             transferSize.requestHeaderBytesSent = getHeadersEstimatedSize(requestHeaders)
             transferSize.responseHeaderBytesReceived = getHeadersEstimatedSize(responseHeaders)
             if index == task.transactions.endIndex - 1 && statusCode != 304 {

@@ -180,7 +180,7 @@ struct ConsoleSessionCell: View {
         .listRowBackground((editMode?.wrappedValue.isEditing ?? false) ? Color.clear : nil)
 #endif
     }
-    
+
     @ViewBuilder
     private var details: some View {
 #if !os(watchOS)

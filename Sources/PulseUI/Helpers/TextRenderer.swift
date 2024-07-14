@@ -6,7 +6,6 @@ import Foundation
 import Pulse
 import CoreData
 import SwiftUI
-import Pulse
 
 #if os(iOS) || os(visionOS)
 import PDFKit
@@ -441,7 +440,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             RichTextView(viewModel: .init(string: NSAttributedString(string: ShareStoreTask(entities: try! LoggerStore.mock.allMessages(), store: .mock, output: .plainText, completion: { _ in }).share().items[0] as! String)))
                 .previewDisplayName("Task (Plain)")
 
-            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task.orderedTransactions[0]) } ))
+            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task.orderedTransactions[0]) }))
                 .previewDisplayName("Transaction")
 
             RichTextView(viewModel: .init(string: TextRendererHTML(html: String(data: html, encoding: .utf8)!).render()))
@@ -468,7 +467,6 @@ private let task = LoggerStore.preview.entity(for: .login)
 
 struct NetworkContent: OptionSet {
     let rawValue: Int16
-    init(rawValue: Int16) { self.rawValue = rawValue }
 
     static let header = NetworkContent(rawValue: 1 << 0)
     static let largeHeader = NetworkContent(rawValue: 1 << 1)
@@ -501,7 +499,7 @@ struct NetworkContent: OptionSet {
 }
 
 /// Uncomment to run performance tests in the release mode.
-//public enum TextRendererTests {
+// public enum TextRendererTests {
 //    public static func share(_ entities: [NSManagedObject], store: LoggerStore, _ completion: @escaping () -> Void) {
 //       // TODO: rewrite using new convenience API for testing
 //        ShareStoreTask(entities: entities, store: store, output: .plainText) { _ in
@@ -517,9 +515,9 @@ struct NetworkContent: OptionSet {
 //        try TextUtilities.html(from: string)
 //    }
 //
-//#if os(iOS)
+// #if os(iOS)
 //    public static func pdf(from string: NSAttributedString) throws -> Data {
 //        try TextUtilities.pdf(from: string)
 //    }
-//#endif
-//}
+// #endif
+// }

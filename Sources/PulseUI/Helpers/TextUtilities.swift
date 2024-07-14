@@ -106,10 +106,10 @@ enum TextUtilities {
         let data = NSMutableData()
 
         UIGraphicsBeginPDFContextToData(data, paperRect, nil)
-        renderer.prepare(forDrawingPages: NSMakeRange(0, renderer.numberOfPages))
+        renderer.prepare(forDrawingPages: NSRange(location: 0, length: renderer.numberOfPages))
 
         let bounds = UIGraphicsGetPDFContextBounds()
-        for i in 0  ..< renderer.numberOfPages  {
+        for i in 0  ..< renderer.numberOfPages {
             UIGraphicsBeginPDFPage()
             renderer.drawPage(at: i, in: bounds)
         }
@@ -118,7 +118,7 @@ enum TextUtilities {
         return data as Data
     }
 #endif
-    
+
     static func har(from string: NSAttributedString) -> Data {
         string.string.data(using: .utf8) ?? Data()
     }

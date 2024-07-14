@@ -21,7 +21,7 @@ struct ConsoleDomainsSelectionView: View {
             label: { Text($0) }
         )
     }
-}   
+}
 
 private extension ConsoleFiltersViewModel {
     func bindingForHosts(index: LoggerStoreIndex) -> Binding<Set<String>> {

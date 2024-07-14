@@ -37,7 +37,7 @@ import Combine
         saveSharingOptions()
         prepareForSharing()
     }
-    
+
     private func updateForCurrentEnvironment() {
         guard let environment else { return }
         shareStoreOutputs = environment.configuration.shareStoreOutputs.sorted(by: { lhs, rhs in
@@ -51,7 +51,7 @@ import Combine
                 return lhs.rawValue < rhs.rawValue
             }
         })
-        
+
         if !shareStoreOutputs.contains(output), let shareStoreOutput = shareStoreOutputs.first {
             /// Update the selected output to one of the available options.
             output = shareStoreOutput

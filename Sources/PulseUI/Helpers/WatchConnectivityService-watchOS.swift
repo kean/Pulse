@@ -89,7 +89,7 @@ private extension LoggerStore {
                 DispatchQueue.main.async {
                     completion(nil)
                 }
-            }  catch {
+            } catch {
                 DispatchQueue.main.async {
                     completion(error)
                 }

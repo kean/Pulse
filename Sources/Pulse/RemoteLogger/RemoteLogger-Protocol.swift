@@ -38,29 +38,28 @@ extension RemoteLogger {
     }
 
     struct Empty: Codable {
-        init() {}
     }
-    
+
     struct PacketNetworkMessage {
         private struct Manifest: Codable {
             let messageSize: UInt32
             let requestBodySize: UInt32
             let responseBodySize: UInt32
-            
+
             static let size = 12
-            
+
             var totalSize: Int {
                 Manifest.size + Int(messageSize) + Int(requestBodySize) + Int(responseBodySize)
             }
         }
-        
+
         static func encode(_ event: LoggerStore.Event.NetworkTaskCompleted) throws -> Data {
             var contents = [Data]()
-            
+
             var slimEvent = event
             slimEvent.requestBody = nil // Sent separately using binary
             slimEvent.responseBody = nil
-            
+
             let messageData = try JSONEncoder().encode(slimEvent)
             contents.append(messageData)
             if let requestBody = event.requestBody, requestBody.count < Int32.max {
@@ -69,7 +68,7 @@ extension RemoteLogger {
             if let responseBody = event.responseBody, responseBody.count < Int32.max {
                 contents.append(responseBody)
             }
-            
+
             var data = Data()
             data.append(Data(UInt32(messageData.count)))
             data.append(Data(UInt32(event.requestBody?.count ?? 0)))
@@ -79,48 +78,48 @@ extension RemoteLogger {
             }
             return data
         }
-        
+
         static func decode(_ data: Data) throws -> LoggerStore.Event.NetworkTaskCompleted {
             guard data.count >= Manifest.size else {
                 throw PacketParsingError.notEnoughData // Should never happen
             }
-            
+
             let manifest = Manifest(
                 messageSize: UInt32(data.from(0, size: 4)),
                 requestBodySize: UInt32(data.from(4, size: 4)),
                 responseBodySize: UInt32(data.from(8, size: 4))
             )
-            
+
             guard data.count >= manifest.totalSize else {
                 throw PacketParsingError.notEnoughData // This should never happen
             }
-            
+
             let event = try JSONDecoder().decode(
                 LoggerStore.Event.NetworkTaskCompleted.self,
                 from: data.from(Manifest.size, size: Int(manifest.messageSize))
             )
-            
+
             var requestBody: Data?
             if manifest.requestBodySize > 0 {
                 requestBody = data.from(Manifest.size + Int(manifest.messageSize), size: Int(manifest.requestBodySize))
             }
-            
+
             var responseBody: Data?
             if manifest.responseBodySize > 0 {
                 responseBody = data.from(Manifest.size + Int(manifest.messageSize) + Int(manifest.requestBodySize), size: Int(manifest.responseBodySize))
             }
-            
+
             return LoggerStore.Event.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: requestBody, responseBody: responseBody, metrics: event.metrics, label: event.label, taskDescription: event.taskDescription)
         }
     }
-    
+
     struct Message {
         struct Header {
             let id: UInt32
             let options: Options
             let pathSize: UInt32
             let dataSize: UInt32
-            
+
             init?(_ data: Data) {
                 guard data.count >= headerSize else { return nil }
                 self.id = UInt32(data.from(0, size: 4))
@@ -129,25 +128,24 @@ extension RemoteLogger {
                 self.dataSize = UInt32(data.from(9, size: 4))
             }
         }
-        
+
         struct Options: OptionSet {
             let rawValue: UInt8
-            init(rawValue: UInt8) { self.rawValue = rawValue }
 
             static let response = Options(rawValue: 1 << 0)
         }
-        
+
         let id: UInt32
         let options: Options
         let path: Path
         let data: Data
-        
+
         // - id (UInt32)
         // - options (UInt8)
         // - path size (UInt32)
         // - data size (UInt32)
         private static let headerSize = 13
-        
+
         static func encode(_ message: Message) throws -> Data {
             guard let path = try? JSONEncoder().encode(message.path) else {
                 throw URLError(.unknown, userInfo: [:]) // Should never happen
@@ -182,7 +180,7 @@ extension RemoteLogger {
         case notEnoughData
         case unsupportedContentSize
     }
-    
+
     enum Path: Codable {
         case updateMocks
         case getMockedResponse(mockID: UUID)
@@ -194,10 +192,6 @@ extension RemoteLogger {
 
     struct ServerHelloResponse: Codable {
         let version: String
-        
-        init(version: String) {
-            self.version = version
-        }
     }
 }
 

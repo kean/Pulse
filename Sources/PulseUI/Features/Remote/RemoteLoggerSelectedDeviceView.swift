@@ -20,7 +20,7 @@ struct RemoteLoggerSelectedDeviceView: View {
                 makeStatusView(for: logger.connectionState)
             }
             Spacer()
-            if (server?.server.isProtected ?? false) {
+            if server?.server.isProtected ?? false {
                 Image(systemName: "lock.fill")
                     .foregroundColor(.separator)
             }

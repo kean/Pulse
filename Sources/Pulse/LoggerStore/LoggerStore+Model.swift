@@ -90,7 +90,7 @@ extension LoggerStore {
 
         response.properties = [
             Attribute(name: "statusCode", type: .integer16AttributeType),
-            Attribute(name: "httpHeaders", type: .stringAttributeType),
+            Attribute(name: "httpHeaders", type: .stringAttributeType)
         ]
 
         progress.properties = [

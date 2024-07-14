@@ -34,7 +34,7 @@ extension RemoteLogger {
             let isLogEnabled = UserDefaults.standard.bool(forKey: "com.github.kean.pulse.debug")
             self.log = isLogEnabled ? OSLog(subsystem: "com.github.kean.pulse", category: "RemoteLogger") : .disabled
         }
-        
+
         func start(on queue: DispatchQueue) {
             connection.stateUpdateHandler = { [weak self] state in
                 guard let self = self else { return }
@@ -126,7 +126,7 @@ extension RemoteLogger {
                 }
             }
         }
-        
+
         func send(code: UInt8, data: Data) {
             do {
                 let data = try encode(code: code, body: data)
@@ -149,7 +149,7 @@ extension RemoteLogger {
                 os_log("Failed to encode a packet: %{public}@", log: log, type: .error, "\(error)")
             }
         }
-    
+
         func sendMessage<T: Encodable>(path: Path, entity: T, _ completion: ((Data?, Error?) -> Void)? = nil) {
             do {
                 sendMessage(path: path, data: try JSONEncoder().encode(entity), completion)
@@ -157,16 +157,16 @@ extension RemoteLogger {
                 os_log("Failed to send a message: %{public}@", log: log, type: .error, "\(error)")
             }
         }
-        
+
         func sendMessage(path: Path, data: Data? = nil, _ completion: ((Data?, Error?) -> Void)? = nil) {
             let message = Message(id: id, options: [], path: path, data: data ?? Data())
-            
+
             if id == UInt32.max {
                 id = 0
             } else {
                 id += 1
             }
-            
+
             if let completion = completion {
                 let id = message.id
                 handlers[message.id] = completion
@@ -176,7 +176,7 @@ extension RemoteLogger {
                     }
                 }
             }
-            
+
             do {
                 let data = try Message.encode(message)
                 send(code: .message, data: data)
@@ -192,7 +192,7 @@ extension RemoteLogger {
                 os_log("Failed to encode a response: %{public}@", log: log, type: .error, "\(error)")
             }
         }
-        
+
         func sendResponse(for message: Message, data: Data) {
             let message = Message(id: message.id, options: [.response], path: message.path, data: data)
             do {
@@ -202,7 +202,7 @@ extension RemoteLogger {
                 os_log("Failed to encode a response: %{public}@", log: log, type: .error, "\(error)")
             }
         }
-        
+
         func cancel() {
             connection.cancel()
         }

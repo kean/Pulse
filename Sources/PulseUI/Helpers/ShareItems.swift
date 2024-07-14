@@ -17,7 +17,7 @@ public enum ShareStoreOutput: String, RawRepresentable, CaseIterable {
         case .har: return "har"
         }
     }
-    
+
     var interfaceTitle: String {
         switch self {
         case .store: "Pulse"

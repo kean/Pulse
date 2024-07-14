@@ -20,7 +20,7 @@ final class ConsoleFiltersViewModel: ObservableObject {
 
     // TODO: Refactor
     let entities = CurrentValueSubject<[NSManagedObject], Never>([])
-    
+
     init(options: ConsoleDataSource.PredicateOptions) {
         self.options = options
         self.defaultCriteria = options.filters

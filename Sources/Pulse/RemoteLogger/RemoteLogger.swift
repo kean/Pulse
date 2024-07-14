@@ -78,7 +78,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     public enum ConnectionState {
         case disconnected, connecting, connected
     }
-    
+
     public var isOpenOnMacSupported: Bool {
         guard let serverVersion = serverVersion else { return false }
         return serverVersion >= Version(4, 0, 0)
@@ -322,7 +322,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         openConnection(to: server, passcode: passcode)
     }
-    
+
     private func connectionDidTimeout(isProtected: Bool) {
         os_log("Connection did timeout", log: log)
         connectionCompletion?(.failure(self.connectionError ?? .unknown(isProtected: isProtected)))
@@ -406,7 +406,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         }
     }
 
-    // MARK:
+    // MARK: 
 
     /// Returns passcode for the sever with the given name.
     public func getPasscode(forServerNamed name: String) -> String? {
@@ -655,17 +655,16 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             }
         }
     }
-    
+
     // MARK: Details
-    
+
     public func showDetails(for message: LoggerMessageEntity) {
         connection?.sendMessage(path: .openMessageDetails, entity: LoggerStore.Event.MessageCreated(message))
     }
-    
+
     public func showDetails(for task: NetworkTaskEntity) {
         connection?.sendMessage(path: .openTaskDetails, entity: LoggerStore.Event.NetworkTaskCompleted(task))
     }
-
 
     // MARK: Persistence
 

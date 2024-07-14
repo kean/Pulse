@@ -37,7 +37,7 @@ extension ConsoleRouterView {
             .sheet(isPresented: $router.isShowingShareStore) { destinationShareStore }
             .sheet(item: $router.shareItems, content: ShareView.init)
     }
-    
+
     private var destinationFilters: some View {
         NavigationView {
             ConsoleFiltersView()

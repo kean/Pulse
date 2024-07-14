@@ -237,4 +237,3 @@ extension KeyValueSectionViewModel {
 private func formatBytes(_ count: Int64) -> String {
     ByteCountFormatter.string(fromByteCount: count)
 }
-

@@ -153,7 +153,7 @@ final class StoreDetailsViewModel: ObservableObject {
             ("Messages", info.messageCount.description),
             ("Requests", info.taskCount.description),
             ("Blobs Size", ByteCountFormatter.string(fromByteCount: info.blobsSize)),
-            makeDecompressedRow(for: info),
+            makeDecompressedRow(for: info)
         ].compactMap { $0 })
     }
 

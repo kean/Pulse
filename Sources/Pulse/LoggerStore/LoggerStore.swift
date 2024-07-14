@@ -484,7 +484,7 @@ extension LoggerStore {
         entity.response = event.response.map(makeResponse)
         entity.rawMetadata = {
             guard let responseBody = event.responseBody,
-               (responseContentType?.isImage ?? false),
+               responseContentType?.isImage ?? false,
                   let metadata = Graphics.makeMetadata(from: responseBody) else {
                 return nil
             }

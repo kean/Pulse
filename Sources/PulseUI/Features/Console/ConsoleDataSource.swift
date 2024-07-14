@@ -98,17 +98,17 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         try? controller.performFetch()
         delegate?.dataSourceDidRefresh(self)
     }
-    
+
     // MARK: Accessing Entities
-    
+
     var numberOfObjects: Int {
         controller.fetchedObjects?.count ?? 0
     }
-    
+
     func object(at indexPath: IndexPath) -> NSManagedObject {
         controller.object(at: indexPath)
     }
-    
+
     var entities: [NSManagedObject] {
         controller.fetchedObjects ?? []
     }

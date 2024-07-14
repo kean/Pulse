@@ -121,7 +121,7 @@ struct SessionsView: View {
         router.isShowingSessions = false
     }
 #endif
-    
+
 #if os(macOS)
     @ViewBuilder
     private func contextMenu(for selection: Set<UUID>) -> some View {

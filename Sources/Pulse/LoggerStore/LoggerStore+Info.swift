@@ -103,8 +103,8 @@ extension LoggerStore.Info.AppInfo {
 }
 
 private func getAppIcon() -> Data? {
-    guard let icons = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String:Any],
-          let primaryIcons = icons["CFBundlePrimaryIcon"] as? [String:Any],
+    guard let icons = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any],
+          let primaryIcons = icons["CFBundlePrimaryIcon"] as? [String: Any],
           let files = primaryIcons["CFBundleIconFiles"] as? [String],
           let lastIcon = files.last,
           let image = PlatformImage(named: lastIcon),

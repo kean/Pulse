@@ -6,7 +6,6 @@ import Foundation
 import Pulse
 import CoreData
 import SwiftUI
-import Pulse
 
 final class ShareStoreTask {
     private var isCancelled = false
@@ -108,7 +107,7 @@ final class ShareStoreTask {
         }
 
         for objectID in objectIDs {
-            if let object = try? context.existingObject(with: objectID),let task = LoggerEntity(object).task {
+            if let object = try? context.existingObject(with: objectID), let task = LoggerEntity(object).task {
                 if let blob = task.responseBody, jobs[blob.objectID] == nil {
                     enqueueJob(for: blob, error: task.decodingError)
                 }

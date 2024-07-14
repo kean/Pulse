@@ -32,7 +32,7 @@ struct ConsoleMessageMetadataView: View {
             KeyValueSectionViewModel(title: "Details", color: .primary, items: [
                 ("File", message.file.nonEmpty),
                 ("Function", message.function.nonEmpty),
-                ("Line", message.line == 0 ? nil : "\(message.line)"),
+                ("Line", message.line == 0 ? nil : "\(message.line)")
             ]),
             KeyValueSectionViewModel(title: "Metadata", color: .indigo, items: metadataItems)
         ]

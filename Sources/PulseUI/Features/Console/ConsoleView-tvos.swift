@@ -19,7 +19,7 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        GeometryReader { proxy in
+        GeometryReader { _ in
             HStack {
                 List {
                     ConsoleListContentView()

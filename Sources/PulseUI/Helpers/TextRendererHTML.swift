@@ -31,7 +31,7 @@ final class TextRendererHTML {
             NSRange(substring.startIndex..<substring.endIndex, in: html)
         }
         guard let tagRegex = try? Regex("<[^>]*>"),
-              let attributesRegex = try? Regex(#"(\w*?)=(\"\w.*?\")"#) else{
+              let attributesRegex = try? Regex(#"(\w*?)=(\"\w.*?\")"#) else {
             assertionFailure("Invalid regex") // Should never happen
             return string
         }

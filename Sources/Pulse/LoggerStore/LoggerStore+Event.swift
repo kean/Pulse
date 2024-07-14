@@ -35,7 +35,7 @@ extension LoggerStore {
                 self.function = function
                 self.line = line
             }
-            
+
             init(_ entity: LoggerMessageEntity) {
                 self.createdAt = entity.createdAt
                 self.label = entity.label
@@ -116,7 +116,7 @@ extension LoggerStore {
                 self.label = label
                 self.taskDescription = taskDescription
             }
-            
+
             init(_ entity: NetworkTaskEntity) {
                 self.taskId = entity.taskId
                 self.taskType = NetworkLogger.TaskType(rawValue: entity.taskType) ?? .dataTask

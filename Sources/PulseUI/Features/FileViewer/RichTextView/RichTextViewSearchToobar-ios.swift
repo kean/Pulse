@@ -20,7 +20,7 @@ struct RichTextViewSearchToobar: View {
         .padding(12)
         .background(Material.regular)
         .cornerRadius(8)
-        .onReceive(Keyboard.isHidden) { isKeyboardHidden in
+        .onReceive(Keyboard.isHidden) { _ in
             // Show a non-interactive placeholder during animation,
             // then show the actual menu when navigation is settled.
             withAnimation(nil) {
