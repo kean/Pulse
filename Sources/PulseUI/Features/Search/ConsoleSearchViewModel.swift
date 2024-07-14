@@ -83,7 +83,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private let environment: ConsoleEnvironment
     private let store: LoggerStore
     private let index: LoggerStoreIndex
-    private let queue = DispatchQueue(label: "com.github.pulse.console-search-view")
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
 
