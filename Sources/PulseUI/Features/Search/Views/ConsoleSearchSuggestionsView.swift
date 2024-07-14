@@ -43,14 +43,8 @@ struct ConsoleSearchSuggestionsView: View {
             buttonClearSearchHistory
         }
 
-        if !suggestions.searches.isEmpty {
-            // Display filters in a separate section
-            PlainListSectionHeaderSeparator(title: "Filters")
-        }
-
 #if os(iOS) || os(visionOS)
         if viewModel.parameters.isEmpty {
-            PlainListSectionHeaderSeparator(title: "Scopes").padding(.top, 16)
             ConsoleSearchScopesPicker(viewModel: viewModel)
         }
 #endif
