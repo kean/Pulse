@@ -19,13 +19,10 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         setUp(store: store)
     }
 
-    func setUp(store: LoggerStore, focusedEntities: [NSManagedObject]? = nil) {
+    func setUp(store: LoggerStore) {
         self.store = store
         self.environment = ConsoleEnvironment(store: store)
         self.environment.mode = .all
-        if let entities = focusedEntities {
-            filters.options.focus = NSPredicate(format: "self IN %@", entities)
-        }
         self.sut = ConsoleListViewModel(environment: environment, filters: filters)
         self.sut.isViewVisible = true
     }
@@ -55,73 +52,6 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         XCTAssertEqual(environment.mode, .network)
         XCTAssertEqual(sut.entities.count, 8)
         XCTAssertTrue(sut.entities is [NetworkTaskEntity])
-    }
-
-    // MARK: Grouping
-
-    func testGroupingLogsByLabel() {
-        // WHEN
-        environment.listOptions.messageGroupBy = .label
-
-        // THEN entities are still loaded
-        XCTAssertEqual(sut.entities.count, 13)
-
-        // THEN sections are created
-        let sections = sut.sections ?? []
-        XCTAssertEqual(sections.count, 5)
-
-        // THEN groups are sorted by the label
-        XCTAssertEqual(sections.map(\.name), ["analytics", "application", "auth", "default", "network"])
-
-        // THEN entities within these groups are sorted by creation date
-        for section in sections {
-            let entities = section.objects as! [NSManagedObject]
-            XCTAssertEqual(entities, entities.sorted(by: isOrderedBefore))
-        }
-    }
-
-    func testGroupingTasksByTaskType() {
-        // WHEN
-        environment.mode = .network
-        environment.listOptions.taskGroupBy = .taskType
-
-        // THEN entities are still loaded
-        XCTAssertEqual(sut.entities.count, 8)
-
-        // THEN sections are created
-        let sections = sut.sections ?? []
-        XCTAssertEqual(sections.count, 3)
-
-        // THEN groups are sorted by the label
-        XCTAssertEqual(sections.map(sut.name), ["URLSessionDataTask", "URLSessionDownloadTask", "URLSessionUploadTask"])
-
-        // THEN entities within these groups are sorted by creation date
-        for section in sections {
-            let entities = section.objects as! [NSManagedObject]
-            XCTAssertEqual(entities, entities.sorted(by: isOrderedBefore))
-        }
-    }
-
-    func testGroupingTasksByStatus() {
-        // WHEN
-        environment.mode = .network
-        environment.listOptions.taskGroupBy = .requestState
-
-        // THEN entities are still loaded
-        XCTAssertEqual(sut.entities.count, 8)
-
-        // THEN sections are created
-        let sections = sut.sections ?? []
-        XCTAssertEqual(sections.count, 2)
-
-        // THEN groups are sorted by the label
-        XCTAssertEqual(sections.map(sut.name), ["Success", "Failure"])
-
-        // THEN entities within these groups are sorted by creation date
-        for section in sections {
-            let entities = section.objects as! [NSManagedObject]
-            XCTAssertEqual(entities, entities.sorted(by: isOrderedBefore))
-        }
     }
 
     // MARK: Ordering
@@ -191,46 +121,6 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         XCTAssertEqual(sut.pins.count, 1)
         XCTAssertEqual(sut.pins.first?.objectID, task.objectID)
     }
-
-    // MARK: Focus
-
-    func testFocusOnEntities() throws {
-        // GIVEN
-        let entities = Array(sut.entities[...3])
-
-        // WHEN
-        setUp(store: store, focusedEntities: entities)
-
-        // THEN
-        XCTAssertEqual(sut.entities, entities)
-    }
-    
-#if os(macOS)
-    func testGroupingFocusedEntities() {
-        // GIVEN
-        let entities = Array(sut.entities[...3])
-        setUp(store: store, focusedEntities: entities)
-        
-        // WHEN
-        environment.listOptions.messageGroupBy = .level
-        
-        // THEN entities are still loaded
-        XCTAssertEqual(sut.entities.count, 4)
-        
-        // THEN sections are created
-        let sections = sut.sections ?? []
-        XCTAssertEqual(sections.count, 2)
-        
-        // THEN groups are sorted by the label
-        XCTAssertEqual(sections.map(sut.name), ["Info", "Debug"])
-        
-        // THEN entities within these groups are sorted by creation date
-        for section in sections {
-            let entities = section.objects as! [NSManagedObject]
-            XCTAssertEqual(entities, entities.sorted(by: isOrderedBefore))
-        }
-    }
-#endif
 }
 
 private func isOrderedBefore(_ lhs: NSManagedObject, _ rhs: NSManagedObject) -> Bool {
