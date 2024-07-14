@@ -20,9 +20,11 @@ struct ConsoleSearchListContentView: View {
             .listRowSeparator(.hidden, edges: .top)
 #endif
         ConsoleSearchSuggestionsView()
+#if os(iOS) || os(visionOS)
         if viewModel.isNewResultsButtonShown {
             showNewResultsPromptView
         }
+#endif
         ConsoleSearchResultsListContentView()
     }
 

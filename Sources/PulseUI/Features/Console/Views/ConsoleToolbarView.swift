@@ -17,8 +17,7 @@ struct ConsoleToolbarView: View {
 #if os(macOS)
         horizontal
             .padding(.horizontal)
-            .padding(.top, 12)
-            .padding(.bottom, 8)
+            .frame(height: 34, alignment: .center)
 #else
         if #available(iOS 16.0, *) {
             ViewThatFits {

@@ -9,7 +9,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("simplify on macOS")
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchToolbar: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
@@ -23,25 +22,13 @@ struct ConsoleSearchToolbar: View {
                 ProgressView()
                     .padding(.leading, 8)
             }
-#if os(macOS)
-            if viewModel.isNewResultsButtonShown {
-                Button(action: viewModel.buttonShowNewlyAddedSearchResultsTapped) {
-                    Text("Show New Results")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.link)
-                .padding(.leading, 16)
-            }
-#endif
             Spacer()
-
             searchOptionsView
         }
         .buttonStyle(.plain)
 #if os(macOS)
-        .padding(.horizontal, 10)
-        .frame(height: 27, alignment: .center)
+        .padding(.horizontal)
+        .frame(height: 34, alignment: .center)
 #endif
     }
 
