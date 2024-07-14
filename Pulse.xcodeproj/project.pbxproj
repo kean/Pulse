@@ -240,7 +240,7 @@
 		0CF0D67B296F189600EED9D4 /* ConsoleView-tvos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5FC296F189600EED9D4 /* ConsoleView-tvos.swift */; };
 		0CF0D67C296F189600EED9D4 /* ConsoleView-macos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5FD296F189600EED9D4 /* ConsoleView-macos.swift */; };
 		0CF0D67D296F189600EED9D4 /* ConsoleEntityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5FF296F189600EED9D4 /* ConsoleEntityCell.swift */; };
-		0CF0D67F296F189600EED9D4 /* ConsoleContextMenu-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D601296F189600EED9D4 /* ConsoleContextMenu-ios.swift */; };
+		0CF0D67F296F189600EED9D4 /* ConsoleContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D601296F189600EED9D4 /* ConsoleContextMenu.swift */; };
 		0CF0D686296F189600EED9D4 /* ConsoleMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D608296F189600EED9D4 /* ConsoleMessageCell.swift */; };
 		0CF0D687296F189600EED9D4 /* ConsoleTaskCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D609296F189600EED9D4 /* ConsoleTaskCell.swift */; };
 		0CF0D688296F189600EED9D4 /* ConsoleEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D60A296F189600EED9D4 /* ConsoleEnvironment.swift */; };
@@ -699,7 +699,7 @@
 		0CF0D5FC296F189600EED9D4 /* ConsoleView-tvos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleView-tvos.swift"; sourceTree = "<group>"; };
 		0CF0D5FD296F189600EED9D4 /* ConsoleView-macos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleView-macos.swift"; sourceTree = "<group>"; };
 		0CF0D5FF296F189600EED9D4 /* ConsoleEntityCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleEntityCell.swift; sourceTree = "<group>"; };
-		0CF0D601296F189600EED9D4 /* ConsoleContextMenu-ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleContextMenu-ios.swift"; sourceTree = "<group>"; };
+		0CF0D601296F189600EED9D4 /* ConsoleContextMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleContextMenu.swift; sourceTree = "<group>"; };
 		0CF0D608296F189600EED9D4 /* ConsoleMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageCell.swift; sourceTree = "<group>"; };
 		0CF0D609296F189600EED9D4 /* ConsoleTaskCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleTaskCell.swift; sourceTree = "<group>"; };
 		0CF0D60A296F189600EED9D4 /* ConsoleEnvironment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleEnvironment.swift; sourceTree = "<group>"; };
@@ -1399,7 +1399,7 @@
 			isa = PBXGroup;
 			children = (
 				0C7A0DFA297C33F300B4B69D /* ConsoleRouterView.swift */,
-				0CF0D601296F189600EED9D4 /* ConsoleContextMenu-ios.swift */,
+				0CF0D601296F189600EED9D4 /* ConsoleContextMenu.swift */,
 				0CF0D5FF296F189600EED9D4 /* ConsoleEntityCell.swift */,
 				0CF0D608296F189600EED9D4 /* ConsoleMessageCell.swift */,
 				0CF0D609296F189600EED9D4 /* ConsoleTaskCell.swift */,
@@ -2045,7 +2045,7 @@
 				0CF0D631296F189600EED9D4 /* RichTextViewModel.swift in Sources */,
 				0CF0D673296F189600EED9D4 /* NetworkDetailsView.swift in Sources */,
 				0CF0D62B296F189600EED9D4 /* FileViewerViewModel.swift in Sources */,
-				0CF0D67F296F189600EED9D4 /* ConsoleContextMenu-ios.swift in Sources */,
+				0CF0D67F296F189600EED9D4 /* ConsoleContextMenu.swift in Sources */,
 				0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios-visionos-macos.swift in Sources */,
 				0CF0D64A296F189600EED9D4 /* ConsoleSection.swift in Sources */,
 				0CB63A132973A12300525165 /* ConsoleSearchListContentView.swift in Sources */,
