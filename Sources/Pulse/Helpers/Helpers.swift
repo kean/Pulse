@@ -114,15 +114,21 @@ extension URL {
     }
 }
 
-final class WeakLoggerStore {
-    weak var store: LoggerStore?
+public struct LoggerBlogDataStore {
+    public let getDecompressedData: (LoggerBlobHandleEntity) -> Data?
 
-    init(store: LoggerStore?) {
-        self.store = store
+    init(_ store: LoggerStore) {
+        self.getDecompressedData = { [weak store] in
+            store?.getDecompressedData(for: $0)
+        }
+    }
+
+    public init(getDecompressedData: @escaping (LoggerBlobHandleEntity) -> Data?) {
+        self.getDecompressedData = getDecompressedData
     }
 
     /// The key for `NSManagedObjectContext` `userInfo`.
-    static let loggerStoreKey = "com.github.kean.pulse.associated-logger-store"
+    public static let loggerStoreKey = "com.github.kean.pulse.associated-logger-store"
 }
 
 struct TemporaryDirectory {

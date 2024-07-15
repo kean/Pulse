@@ -99,7 +99,6 @@
 		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
-		0CA20FED29E5976700A59180 /* LoggerStoreExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA20FEC29E5976700A59180 /* LoggerStoreExportTests.swift */; };
 		0CA20FEF29E5999700A59180 /* LoggerStoreBaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA20FEE29E5999700A59180 /* LoggerStoreBaseTests.swift */; };
 		0CA2632E2BFA3855003C8E97 /* ConsoleDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA2632D2BFA3855003C8E97 /* ConsoleDelegate.swift */; };
 		0CA32DE729D5E028001712E8 /* NSAttributedString+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA32DE629D5E028001712E8 /* NSAttributedString+Extensions.swift */; };
@@ -549,7 +548,6 @@
 		0C9F04FC2884F34A0035239F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
-		0CA20FEC29E5976700A59180 /* LoggerStoreExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreExportTests.swift; sourceTree = "<group>"; };
 		0CA20FEE29E5999700A59180 /* LoggerStoreBaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreBaseTests.swift; sourceTree = "<group>"; };
 		0CA2632D2BFA3855003C8E97 /* ConsoleDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleDelegate.swift; sourceTree = "<group>"; };
 		0CA32DE629D5E028001712E8 /* NSAttributedString+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedString+Extensions.swift"; sourceTree = "<group>"; };
@@ -1405,7 +1403,6 @@
 				0CF0D69A296F18D200EED9D4 /* RemoteLoggerTests.swift */,
 				0CF0D69B296F18D200EED9D4 /* Helpers.swift */,
 				0CF0D69C296F18D200EED9D4 /* LoggerStoreTests.swift */,
-				0CA20FEC29E5976700A59180 /* LoggerStoreExportTests.swift */,
 				0CA20FEE29E5999700A59180 /* LoggerStoreBaseTests.swift */,
 				0CF0D69D296F18D200EED9D4 /* URLSessionProxyTests.swift */,
 				0CF0D69E296F18D200EED9D4 /* NetworkLoggerTests.swift */,
@@ -2128,7 +2125,6 @@
 				0CA20FEF29E5999700A59180 /* LoggerStoreBaseTests.swift in Sources */,
 				0C11EAB62971DB700059786A /* MockDataTask.swift in Sources */,
 				0C11EAB32971DB700059786A /* LoggerStoreTests.swift in Sources */,
-				0CA20FED29E5976700A59180 /* LoggerStoreExportTests.swift in Sources */,
 				0C11EAB72971DB700059786A /* URLSessionProxyTests.swift in Sources */,
 				0C11EABB2971DB700059786A /* URLSessionProxyDelegateTests.swift in Sources */,
 				0C11EAB92971DB700059786A /* PerformanceTests.swift in Sources */,

@@ -98,9 +98,6 @@ struct ShareStoreView: View {
         Section {
             Picker("Output", selection: $viewModel.output) {
                 ForEach(viewModel.shareStoreOutputs, id: \.rawValue) { shareOutput in
-                    if shareOutput == .package {
-                        Divider()
-                    }
                     Text(shareOutput.interfaceTitle).tag(shareOutput)
                 }
             }

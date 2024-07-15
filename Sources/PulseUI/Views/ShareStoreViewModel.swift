@@ -40,17 +40,7 @@ import Combine
 
     private func updateForCurrentEnvironment() {
         guard let environment else { return }
-        shareStoreOutputs = environment.configuration.shareStoreOutputs.sorted(by: { lhs, rhs in
-            /// Make sure the .package is always last since we show a Divider() in front of it.
-            switch (lhs, rhs) {
-            case (.package, _):
-                return false
-            case (_, .package):
-                return true
-            default:
-                return lhs.rawValue < rhs.rawValue
-            }
-        })
+        shareStoreOutputs = environment.configuration.shareStoreOutputs
 
         if !shareStoreOutputs.contains(output), let shareStoreOutput = shareStoreOutputs.first {
             /// Update the selected output to one of the available options.
@@ -111,9 +101,7 @@ import Combine
     private func prepareForSharing(store: LoggerStore, options: LoggerStore.ExportOptions) async throws -> ShareItems {
         switch output {
         case .store:
-            return try await prepareStoreForSharing(store: store, as: .archive, options: options)
-        case .package:
-            return try await prepareStoreForSharing(store: store, as: .package, options: options)
+            return try await prepareStoreForSharing(store: store, options: options)
         case .text, .html:
             let output: ShareOutput = output == .text ? .plainText : .html
             return try await prepareForSharing(store: store, output: output, options: options)
@@ -122,11 +110,11 @@ import Combine
         }
     }
 
-    private func prepareStoreForSharing(store: LoggerStore, as docType: LoggerStore.DocumentType, options: LoggerStore.ExportOptions) async throws -> ShareItems {
+    private func prepareStoreForSharing(store: LoggerStore, options: LoggerStore.ExportOptions) async throws -> ShareItems {
         let directory = TemporaryDirectory()
 
         let logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).\(output.fileExtension)")
-        try await store.export(to: logsURL, as: docType, options: options)
+        try await store.export(to: logsURL, options: options)
         return ShareItems([logsURL], cleanup: directory.remove)
     }
 

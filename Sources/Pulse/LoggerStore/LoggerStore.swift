@@ -16,9 +16,8 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     /// The URL the store was initialized with.
     public let storeURL: URL
 
-    /// Returns `true` if the store was opened with a Pulse archive (a document
-    /// with `.pulse` extension). The archives are readonly.
-    public let isArchive: Bool
+    @available(*, deprecated, message: "Always returns `false`")
+    public let isArchive: Bool = false
 
     /// The options with which the store was opened with.
     public let options: Options
@@ -44,7 +43,6 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     /// The store version.
     public var version: String { manifest.version.description }
 
-    private let document: PulseDocumentType
     private var isSaveScheduled = false
     private let queue = DispatchQueue(label: "com.github.kean.pulse.logger-store")
     private var manifest: Manifest {
@@ -103,74 +101,55 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
 
     // MARK: Initialization
 
-    /// Initializes the store with the given URL.
-    ///
-    /// There are two types of URLs that the store supports:
-    /// - A package (directory) with a Pulse database (optimized for writing)
-    /// - A document (readonly, archive, optimized to storage and sharing)
+    /// Initializes the store with the given URL. The store needs to be
     ///
     /// The ``LoggerStore/shared`` store is a package optimized for writing. When
-    /// you are ready to share the store, create a Pulse document using ``copy(to:predicate:)`` method. The document format is optimized to use the least
-    /// amount of space possible.
+    /// you are ready to share the store, create a Pulse document using ``copy(to:predicate:)`` 
+    /// method. The document format is optimized to use the least amount of space possible.
     ///
     /// - parameters:
-    ///   - storeURL: The store URL.
+    ///   - storeURL: The store URL that points to a package (directory)
+    ///   with a Pulse database.
     ///   - options: By default, empty. To create a store, use ``Options-swift.struct/create``.
     ///   - configuration: The store configuration specifying size limit, etc.
     public init(storeURL: URL, options: Options = [], configuration: Configuration = .init()) throws {
         var isDirectory: ObjCBool = ObjCBool(false)
         let fileExists = Files.fileExists(atPath: storeURL.path, isDirectory: &isDirectory)
-        guard fileExists || options.contains(.create) else {
+        guard (fileExists && isDirectory.boolValue) || options.contains(.create) else {
             throw LoggerStore.Error.fileDoesntExist
         }
-        self.isArchive = fileExists && !isDirectory.boolValue
+
         self.storeURL = storeURL
+        self.databaseURL = storeURL.appending(filename: databaseFilename)
         self.blobsURL = storeURL.appending(directory: blobsDirectoryName)
         self.manifestURL = storeURL.appending(filename: manifestFilename)
+
         self.options = options
         self.configuration = configuration
 
-        if !isArchive {
-            self.databaseURL = storeURL.appending(filename: databaseFilename)
-            if options.contains(.create) {
-                if !Files.fileExists(atPath: storeURL.path) {
-                    try Files.createDirectory(at: storeURL, withIntermediateDirectories: false)
-                }
-                Files.createDirectoryIfNeeded(at: blobsURL)
-            } else {
-                guard Files.fileExists(atPath: databaseURL.path) else {
-                    throw LoggerStore.Error.storeInvalid
-                }
+        if options.contains(.create) {
+            if !Files.fileExists(atPath: storeURL.path) {
+                try Files.createDirectory(at: storeURL, withIntermediateDirectories: false)
             }
-            if var manifest = Manifest(url: manifestURL) {
-                if manifest.version != .currentStoreVersion {
-                    // Upgrading to a new version of Pulse store
-                    try? LoggerStore.removePreviousStore(at: storeURL)
-                    manifest.version = .currentStoreVersion // Update version, but keep the storeId
-                }
-                self.manifest = manifest
-            } else {
-                if Files.fileExists(atPath: databaseURL.path) {
-                    // Updating from Pulse 1.0 that didn't have a manifest file
-                    try? LoggerStore.removePreviousStore(at: storeURL)
-                }
-                self.manifest = Manifest(storeId: UUID(), version: .currentStoreVersion)
-            }
-            self.document = .package
+            Files.createDirectoryIfNeeded(at: blobsURL)
         } else {
-            let document = try PulseDocument(documentURL: storeURL)
-            let info = try document.open()
-            guard try Version(string: info.storeVersion) >= .minimumSupportedVersion else {
-                throw LoggerStore.Error.unsupportedVersion(version: info.storeVersion, minimumSupportedVersion: Version.minimumSupportedVersion.description)
+            guard Files.fileExists(atPath: databaseURL.path) else {
+                throw LoggerStore.Error.storeInvalid
             }
-            // Extract and decompress _only_ the database. The blobs can be read
-            // directly from the compressed archive on demand.
-            self.databaseURL = URL.temp.appending(filename: info.storeId.uuidString)
-            if !Files.fileExists(atPath: databaseURL.path) {
-                try document.database().decompressed().write(to: databaseURL)
+        }
+        if var manifest = Manifest(url: manifestURL) {
+            if manifest.version != .currentStoreVersion {
+                // Upgrading to a new version of Pulse store
+                try? LoggerStore.removePreviousStore(at: storeURL)
+                manifest.version = .currentStoreVersion // Update version, but keep the storeId
             }
-            self.document = .archive(info, document)
-            self.manifest = .init(storeId: info.storeId, version: try Version(string: info.storeVersion))
+            self.manifest = manifest
+        } else {
+            if Files.fileExists(atPath: databaseURL.path) {
+                // Updating from Pulse 1.0 that didn't have a manifest file
+                try? LoggerStore.removePreviousStore(at: storeURL)
+            }
+            self.manifest = Manifest(storeId: UUID(), version: .currentStoreVersion)
         }
 
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL, options: options)
@@ -189,7 +168,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
 
     private func postInitialization() throws {
         backgroundContext.performAndWait { [context = backgroundContext] in
-            context.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+            context.userInfo[LoggerBlogDataStore.loggerStoreKey] = LoggerBlogDataStore(self)
         }
 
         var createSession = false
@@ -208,7 +187,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
             }
         }
 
-        if !isArchive && !options.contains(.readonly) {
+        if !options.contains(.readonly) {
             try save(manifest)
             if isAutomaticSweepNeeded {
                 DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
@@ -223,7 +202,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         viewContext.automaticallyMergesChangesFromParent = true
         viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
-        viewContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+        viewContext.userInfo[LoggerBlogDataStore.loggerStoreKey] = LoggerBlogDataStore(self)
 
         if createSession {
             let latestSession = try? viewContext.first(LoggerSessionEntity.self) {
@@ -239,7 +218,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     public func newBackgroundContext() -> NSManagedObjectContext {
         let context = container.newBackgroundContext()
         context.performAndWait {
-            context.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+            context.userInfo[LoggerBlogDataStore.loggerStoreKey] = LoggerBlogDataStore(self)
         }
         return context
     }
@@ -250,11 +229,9 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         self.blobsURL = storeURL.appending(directory: blobsDirectoryName)
         self.manifestURL = storeURL.appending(directory: manifestFilename)
         self.databaseURL = storeURL.appending(directory: databaseFilename)
-        self.isArchive = true
         self.container = .inMemoryReadonlyContainer
         self.backgroundContext = container.newBackgroundContext()
         self.manifest = .init(storeId: UUID(), version: .currentStoreVersion)
-        self.document = .package
         self.options = []
         self.configuration = .init()
     }
@@ -714,12 +691,7 @@ extension LoggerStore {
     }
 
     private func getRawData(forKey key: String) -> Data? {
-        switch document {
-        case .package:
-            return try? Data(contentsOf: makeBlobURL(for: key))
-        case let .archive(_, document):
-            return document.getBlob(forKey: key)
-        }
+        try? Data(contentsOf: makeBlobURL(for: key))
     }
 
     private func decompress(_ data: Data) -> Data? {
@@ -729,8 +701,6 @@ extension LoggerStore {
     // MARK: - Performing Changes
 
     private func perform(_ changes: @escaping (NSManagedObjectContext) -> Void) {
-        guard !isArchive else { return }
-
         if options.contains(.synchronous) {
             backgroundContext.performAndWait {
                 changes(backgroundContext)
@@ -814,20 +784,15 @@ extension LoggerStore {
     }
 
     private func _removeAll() {
-        switch document {
-        case .package:
-            try? deleteEntities(for: LoggerMessageEntity.fetchRequest())
-            try? deleteEntities(for: LoggerBlobHandleEntity.fetchRequest())
-            try? deleteEntities(for: LoggerSessionEntity.fetchRequest())
-            saveEntity(for: session, info: .make())
+        try? deleteEntities(for: LoggerMessageEntity.fetchRequest())
+        try? deleteEntities(for: LoggerBlobHandleEntity.fetchRequest())
+        try? deleteEntities(for: LoggerSessionEntity.fetchRequest())
+        saveEntity(for: session, info: .make())
 
-            try? Files.removeItem(at: blobsURL)
-            Files.createDirectoryIfNeeded(at: blobsURL)
+        try? Files.removeItem(at: blobsURL)
+        Files.createDirectoryIfNeeded(at: blobsURL)
 
-            clearMemoryCaches()
-        case .archive:
-            break // Do nothing, readonly
-        }
+        clearMemoryCaches()
     }
 
     private func clearMemoryCaches() {
@@ -860,13 +825,6 @@ extension LoggerStore {
 // MARK: - LoggerStore (Export)
 
 extension LoggerStore {
-    public enum DocumentType: Sendable {
-        /// A package (directory) with a Pulse database (optimized for writing)
-        case package
-        /// A document (readonly, archive, optimized to storage and sharing)
-        case archive
-    }
-
     /// Store export options.
     public struct ExportOptions: @unchecked Sendable {
         /// A predicate describing which messages (``LoggerMessageEntity``) to export.
@@ -887,29 +845,22 @@ extension LoggerStore {
     /// - parameters:
     ///   - targetURL: The destination directory must already exist. If the
     ///   file at the destination URL already exists, throws an error.
-    ///   - documentType: The document type. By default, `.archive`, which is optimized
-    ///   for size and sharing. See ``LoggerStore/DocumentType`` for more info.
     ///   - options: The other sharing options.
     ///
     /// - returns: The information about the created store.
     @discardableResult
-    public func export(to targetURL: URL, as docType: DocumentType = .archive, options: ExportOptions = .init()) async throws -> Info {
+    public func export(to targetURL: URL, options: ExportOptions = .init()) async throws -> Info {
         try await Task.detached(priority: .userInitiated) {
-            try self._export(to: targetURL, as: docType, options: options)
+            try self._export(to: targetURL, options: options)
         }.value
     }
 
     @discardableResult
-    private func _export(to targetURL: URL, as docType: DocumentType, options: ExportOptions) throws -> Info {
+    private func _export(to targetURL: URL, options: ExportOptions) throws -> Info {
         guard !FileManager.default.fileExists(atPath: targetURL.path) else {
             throw LoggerStore.Error.fileAlreadyExists
         }
-        switch docType {
-        case .archive:
-            return try _exportAsArchive(to: targetURL, options: options)
-        case .package:
-            return try _exportAsPackage(to: targetURL, options: options)
-        }
+        return try _exportAsArchive(to: targetURL, options: options)
     }
 
     // MARK: Export as Package
@@ -974,12 +925,7 @@ extension LoggerStore {
         }
         Files.createDirectoryIfNeeded(at: target.blobsURL)
         for key in blobs.map(\.key.hexString) {
-            switch document {
-            case .package:
-                try? Files.copyItem(at: makeBlobURL(for: key), to: target.makeBlobURL(for: key))
-            case let .archive(_, document):
-                try? document.getBlob(forKey: key)?.write(to: target.makeBlobURL(for: key))
-            }
+            try? Files.copyItem(at: makeBlobURL(for: key), to: target.makeBlobURL(for: key))
         }
     }
 
@@ -991,28 +937,18 @@ extension LoggerStore {
             defer { temporary.remove() }
 
             let tempStoreURL = temporary.url.appending(filename: "temp.pulse")
-            try _export(to: tempStoreURL, as: .package, options: options)
+            _ = try _exportAsPackage(to: tempStoreURL, options: options)
 
             let target = try LoggerStore(storeURL: tempStoreURL, options: .readonly)
             defer { try? target.close() }
 
             return try target._exportPackageAsArchive(to: targetURL)
         } else {
-            switch document {
-            case .package:
-                return try _exportPackageAsArchive(to: targetURL)
-            case .archive:
-                try Files.copyItem(at: storeURL, to: targetURL)
-                return try Info.make(storeURL: targetURL)
-            }
+            return try _exportPackageAsArchive(to: targetURL)
         }
     }
 
     private func _exportPackageAsArchive(to targetURL: URL) throws -> Info {
-        if case .archive = document {
-            assertionFailure("Unsupported store type")
-        }
-
         let temporary = TemporaryDirectory()
         defer { temporary.remove() }
 
@@ -1072,7 +1008,7 @@ extension LoggerStore {
 
     @available(*, deprecated, message: "Deprecated") // 3.6
     public func copy(to targetURL: URL, predicate: NSPredicate? = nil) throws -> Info {
-        try _export(to: targetURL, as: .archive, options: .init(predicate: predicate))
+        try _export(to: targetURL, options: .init(predicate: predicate))
     }
 }
 
@@ -1080,7 +1016,7 @@ extension LoggerStore {
 
 extension LoggerStore {
     var isAutomaticSweepNeeded: Bool {
-        guard options.contains(.sweep) && !isArchive else { return false }
+        guard options.contains(.sweep) else { return false }
         guard let lastSweepDate = manifest.lastSweepDate else {
             manifest.lastSweepDate = Date() // No need to run it right away
             return false
@@ -1209,12 +1145,7 @@ extension LoggerStore {
     ///
     /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
     public func info() throws -> Info {
-        switch document {
-        case let .archive(info, _):
-            return info
-        case .package:
-            return try backgroundContext.performAndReturn { try self._info() }
-        }
+        try backgroundContext.performAndReturn { try self._info() }
     }
 
     private func _info() throws -> Info {
@@ -1370,11 +1301,3 @@ let manifestFilename = "manifest.json"
 let databaseFilename = "logs.sqlite"
 let infoFilename = "info.json"
 let blobsDirectoryName = "blobs"
-
-private enum PulseDocumentType {
-    /// A plain directory (aka "package"). If it has a `.pulse` file extension,
-    /// it can be automatically opened by the Pulse apps.
-    case package
-    /// An archive created by exporting the store.
-    case archive(LoggerStore.Info, PulseDocument)
-}

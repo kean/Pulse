@@ -30,7 +30,7 @@ struct ConsoleContextMenu: View {
                 Button(action: { router.isShowingSettings = true }) {
                     Label("Settings", systemImage: "gear")
                 }
-                if !environment.store.isArchive {
+                if !environment.store.options.contains(.readonly) {
                     Button(role: .destructive, action: environment.removeAllLogs) {
                         Label("Remove Logs", systemImage: "trash")
                     }

@@ -7,11 +7,11 @@ import Pulse
 import CoreData
 
 public enum ShareStoreOutput: String, RawRepresentable, CaseIterable {
-    case store, package, text, html, har
+    case store, text, html, har
 
     var fileExtension: String {
         switch self {
-        case .store, .package: return "pulse"
+        case .store: return "pulse"
         case .text: return "txt"
         case .html: return "html"
         case .har: return "har"
@@ -21,7 +21,6 @@ public enum ShareStoreOutput: String, RawRepresentable, CaseIterable {
     var interfaceTitle: String {
         switch self {
         case .store: "Pulse"
-        case .package: "Pulse (Package)"
         case .text: "Plain Text"
         case .html: "HTML"
         case .har: "HAR"

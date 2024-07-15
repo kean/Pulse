@@ -6,7 +6,7 @@ import CoreData
 
 extension LoggerStore {
     /// Returns Core Data model used by the store.
-    static let model: NSManagedObjectModel = {
+    public static let model: NSManagedObjectModel = {
         typealias Entity = NSEntityDescription
         typealias Attribute = NSAttributeDescription
         typealias Relationship = NSRelationshipDescription
