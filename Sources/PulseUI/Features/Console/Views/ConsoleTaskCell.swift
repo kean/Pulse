@@ -60,9 +60,6 @@ struct ConsoleTaskCell: View {
             details
 #endif
             Spacer()
-#if os(iOS) || os(macOS) || os(visionOS)
-            PinView(task: task)
-#endif
 #if !os(watchOS)
             HStack(spacing: 3) {
                 time

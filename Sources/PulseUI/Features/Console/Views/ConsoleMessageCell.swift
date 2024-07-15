@@ -45,9 +45,6 @@ struct ConsoleMessageCell: View {
 #endif
                 .foregroundColor(titleColor)
             Spacer()
-#if os(macOS) || os(iOS) || os(visionOS)
-            PinView(message: message)
-#endif
             HStack(spacing: 3) {
                 Text(ConsoleMessageCell.timeFormatter.string(from: message.createdAt))
                     .lineLimit(1)

@@ -198,7 +198,6 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     private func initializeViewContext(createSession: Bool) {
         viewContext.automaticallyMergesChangesFromParent = true
         viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
-        viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
         viewContext.userInfo[LoggerBlogDataStore.loggerStoreKey] = LoggerBlogDataStore(self)
 
         if createSession {

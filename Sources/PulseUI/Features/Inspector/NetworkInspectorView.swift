@@ -116,7 +116,6 @@ struct NetworkInspectorView: View {
 #else
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
-        PinButton(viewModel: PinButtonViewModel(task), isTextNeeded: false)
         Button(action: { sharedTask = task }) {
             Label("Share", systemImage: "square.and.arrow.up")
         }

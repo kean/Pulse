@@ -38,10 +38,7 @@ private struct _ConsoleMessageCell: View {
 #endif
 
 #if os(iOS) || os(macOS) || os(visionOS)
-        cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
-            PinButton(viewModel: .init(message)).tint(.pink)
-        }
-        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+        cell.swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(action: { shareItems = ShareService.share(message, as: .html) }) {
                 Label("Share", systemImage: "square.and.arrow.up.fill")
             }.tint(.blue)
@@ -79,10 +76,7 @@ private struct _ConsoleTaskCell: View {
 #endif
 
 #if os(iOS) || os(macOS) || os(visionOS)
-        cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
-            PinButton(viewModel: .init(task)).tint(.pink)
-        }
-        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+        cell.swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(action: {
 #if os(iOS) || os(visionOS)
                 shareItems = ShareService.share(task, as: .html, store: store)

@@ -177,7 +177,6 @@
 		0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5A8296F189500EED9D4 /* InfoRow.swift */; };
 		0CF0D637296F189600EED9D4 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AA296F189500EED9D4 /* Checkbox.swift */; };
 		0CF0D638296F189600EED9D4 /* ImageViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AB296F189500EED9D4 /* ImageViewer.swift */; };
-		0CF0D639296F189600EED9D4 /* PinButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AC296F189500EED9D4 /* PinButton.swift */; };
 		0CF0D63A296F189600EED9D4 /* ContextMenus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */; };
 		0CF0D63F296F189600EED9D4 /* ConsoleFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B5296F189500EED9D4 /* ConsoleFiltersView.swift */; };
 		0CF0D640296F189600EED9D4 /* ConsoleFilterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B6296F189500EED9D4 /* ConsoleFilterViewModel.swift */; };
@@ -617,7 +616,6 @@
 		0CF0D5A8296F189500EED9D4 /* InfoRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoRow.swift; sourceTree = "<group>"; };
 		0CF0D5AA296F189500EED9D4 /* Checkbox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Checkbox.swift; sourceTree = "<group>"; };
 		0CF0D5AB296F189500EED9D4 /* ImageViewer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageViewer.swift; sourceTree = "<group>"; };
-		0CF0D5AC296F189500EED9D4 /* PinButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PinButton.swift; sourceTree = "<group>"; };
 		0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextMenus.swift; sourceTree = "<group>"; };
 		0CF0D5AF296F189500EED9D4 /* MockTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTask.swift; sourceTree = "<group>"; };
 		0CF0D5B0296F189500EED9D4 /* MockStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStore.swift; sourceTree = "<group>"; };
@@ -1177,7 +1175,6 @@
 				0CF0D5A8296F189500EED9D4 /* InfoRow.swift */,
 				0CF0D5AA296F189500EED9D4 /* Checkbox.swift */,
 				0CF0D5AB296F189500EED9D4 /* ImageViewer.swift */,
-				0CF0D5AC296F189500EED9D4 /* PinButton.swift */,
 				0CF0D60C296F189600EED9D4 /* PulseUI+UIKit.swift */,
 				0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */,
 				0CFA8CD62C4401FB001A1DCC /* SectionHeaderView.swift */,
@@ -1981,7 +1978,6 @@
 				0CA32DE729D5E028001712E8 /* NSAttributedString+Extensions.swift in Sources */,
 				0CF0D60F296F189600EED9D4 /* UIKit+Extensions.swift in Sources */,
 				0CF0D610296F189600EED9D4 /* SpinnerView.swift in Sources */,
-				0CF0D639296F189600EED9D4 /* PinButton.swift in Sources */,
 				0CB17F1A2978ABBA004E33F4 /* ManagedObjectsCountObserver.swift in Sources */,
 				0CF0D60E296F189600EED9D4 /* TextRenderer.swift in Sources */,
 				0CF0D618296F189600EED9D4 /* DecodingErrorsPreviews.swift in Sources */,

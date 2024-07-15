@@ -49,9 +49,6 @@ enum ContextMenu {
                     Label("Hide", systemImage: "eye.slash")
                 })
             }
-            Section {
-                PinButton(viewModel: .init(message)).tint(.pink)
-            }
 #if os(iOS) || os(visionOS)
             ButtonOpenOnMac(entity: message)
 #endif
@@ -84,11 +81,6 @@ enum ContextMenu {
                 NetworkTaskFilterMenu(task: task)
             }
 #endif
-            if let message = task.message {
-                Section {
-                    PinButton(viewModel: .init(message))
-                }
-            }
 #if os(iOS) || os(visionOS)
             ButtonOpenOnMac(entity: task)
 #endif

@@ -25,7 +25,6 @@ struct ConsoleMessageDetailsView: View {
         NavigationLink(destination: ConsoleMessageMetadataView(message: message)) {
             Image(systemName: "info.circle")
         }
-        PinButton(viewModel: .init(message), isTextNeeded: false)
     }
 #elseif os(watchOS)
     var body: some View {

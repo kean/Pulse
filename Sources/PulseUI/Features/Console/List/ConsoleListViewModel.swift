@@ -104,10 +104,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         refreshPreviousSessionButton(sessions: self.sessions.objects)
     }
 
-    func buttonRemovePinsTapped() {
-        store.pins.removeAllPins()
-    }
-
     private func refreshPreviousSessionButton(sessions: [LoggerSessionEntity]) {
         let selection = filters.criteria.shared.sessions.selection
         let isDisplayingPrefix = sessions.prefix(selection.count).allSatisfy {
