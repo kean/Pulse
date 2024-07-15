@@ -19,27 +19,61 @@ struct NetworkInspectorView: View {
     @EnvironmentObject private var environment: ConsoleEnvironment
     @Environment(\.store) private var store
 
+#if os(iOS) || os(visionOS)
     var body: some View {
         List {
             contents
         }
         .animation(.default, value: task.state)
-#if os(iOS) || os(visionOS)
         .listStyle(.insetGrouped)
         .safeAreaInset(edge: .bottom) {
             OpenOnMacOverlay(entity: task)
         }
         .inlineNavigationTitle(environment.delegate.getShortTitle(for: task))
         .sheet(item: $shareItems, content: ShareView.init)
-#else
-        .listStyle(.sidebar)
-#endif
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
                 trailingNavigationBarItems
             }
         }
     }
+
+    #else
+    var body: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 0) {
+                List {
+                    contents
+                        .listRowSeparator(.hidden)
+                }
+                .animation(.default, value: task.state)
+                .frame(minWidth: 320, maxWidth: 420)
+                
+                Divider()
+                
+                if task.hasMetrics {
+                    metrics
+                        .frame(minWidth: 360, idealWidth: 360, maxWidth: 420)
+                }
+            }
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .automatic) {
+                trailingNavigationBarItems
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var metrics: some View {
+        List {
+            ForEach(task.orderedTransactions, id: \.index) {
+                NetworkInspectorTransactionView(viewModel:  .init(transaction: $0, task: task))
+            }
+        }
+        .listStyle(.inset(alternatesRowBackgrounds: false))
+    }
+    #endif
 
     @ViewBuilder
     private var contents: some View {
