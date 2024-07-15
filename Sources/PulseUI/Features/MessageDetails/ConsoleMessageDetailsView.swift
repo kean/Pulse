@@ -9,12 +9,12 @@ import Pulse
 struct ConsoleMessageDetailsView: View {
     let message: LoggerMessageEntity
 
-#if os(iOS) || os(visionOS)
+#if os(iOS) || os(visionOS) || os(macOS)
     var body: some View {
         contents
-            .navigationBarTitle("", displayMode: .inline)
+            .inlineNavigationTitle("")
             .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .automatic) {
                     trailingNavigationBarItems
                 }
             }
@@ -41,10 +41,6 @@ struct ConsoleMessageDetailsView: View {
 #elseif os(tvOS)
     var body: some View {
         contents
-    }
-#elseif os(macOS)
-    var body: some View {
-        RichTextView(viewModel: makeTextViewModel())
     }
 #endif
 
