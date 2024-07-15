@@ -44,7 +44,8 @@ final class WatchConnectivityService: NSObject, ObservableObject {
 }
 
 private func makeImportedStoreURL() -> URL {
-    LoggerStore.logsURL.appendingPathComponent("import.pulse")
+    fatalError("not implemented")
+    // LoggerStore.logsURL.appendingPathComponent("import.pulse")
 }
 
 extension LoggerStore {

@@ -168,35 +168,6 @@ extension PlainListSectionHeader where Content == Text {
 }
 
 @available(iOS 15, visionOS 1.0, *)
-struct PlainListExpandableSectionHeader<Destination: View>: View {
-    let title: String
-    let count: Int
-    @ViewBuilder let destination: () -> Destination
-    var isSeeAllHidden = false
-
-    var body: some View {
-        PlainListSectionHeader {
-            HStack(alignment: .bottom, spacing: 0) {
-                Text(title)
-                    .foregroundColor(.secondary)
-                    .font(.subheadline.weight(.medium))
-                +
-                Text(" (\(count))")
-                    .foregroundColor(.secondary.opacity(0.7))
-                    .font(.subheadline.weight(.medium).monospacedDigit())
-                if !isSeeAllHidden {
-                    Spacer()
-                    Text("Show All")
-                        .foregroundColor(.accentColor)
-                        .font(.subheadline)
-                        .background(NavigationLink("", destination: destination).opacity(0))
-                }
-            }
-        }
-    }
-}
-
-@available(iOS 15, visionOS 1.0, *)
 struct PlainListSeeAllView: View {
     let count: Int
 

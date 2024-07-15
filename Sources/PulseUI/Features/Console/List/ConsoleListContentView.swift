@@ -12,14 +12,6 @@ struct ConsoleListContentView: View {
     @EnvironmentObject var viewModel: ConsoleListViewModel
 
     var body: some View {
-#if os(iOS) || os(visionOS)
-        if !viewModel.pins.isEmpty {
-            ConsoleListPinsSectionView(viewModel: viewModel)
-            if !viewModel.entities.isEmpty {
-                PlainListGroupSeparator()
-            }
-        }
-#endif
         plainView
     }
 

@@ -94,7 +94,6 @@ struct NetworkInspectorView: View {
 #if os(iOS) || os(visionOS)
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
-        PinButton(viewModel: PinButtonViewModel(task), isTextNeeded: false)
         Menu(content: {
             AttributedStringShareMenu(shareItems: $shareItems) {
                 TextRenderer(options: .sharing).make {

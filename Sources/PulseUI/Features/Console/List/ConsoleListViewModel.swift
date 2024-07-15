@@ -14,7 +14,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
 #else
     var visibleEntities: [NSManagedObject] { entities }
 #endif
-    @Published private(set) var pins: [NSManagedObject] = []
     @Published private(set) var entities: [NSManagedObject] = []
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
 
@@ -46,7 +45,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     private let environment: ConsoleEnvironment
     private let filters: ConsoleFiltersViewModel
     private let sessions: ManagedObjectsObserver<LoggerSessionEntity>
-    private let pinsObserver: ManagedObjectsObserver<LoggerMessageEntity>
     private var dataSource: ConsoleDataSource?
     private var cancellables: [AnyCancellable] = []
     private var filtersCancellable: AnyCancellable?
@@ -57,7 +55,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         self.mode = environment.mode
         self.filters = filters
         self.sessions = .sessions(for: store.viewContext)
-        self.pinsObserver = .pins(for: store.viewContext)
 
         $entities.sink { [weak self] in
             self?.filters.entities.send($0)
@@ -65,13 +62,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
 
         sessions.$objects.dropFirst().sink { [weak self] in
             self?.refreshPreviousSessionButton(sessions: $0)
-        }.store(in: &cancellables)
-
-        pinsObserver.$objects.dropFirst().sink { [weak self] pins in
-            guard let self = self else { return }
-            withAnimation {
-                self.pins = filter(pins: pins, mode: self.mode)
-            }
         }.store(in: &cancellables)
 
         environment.$listOptions.dropFirst().sink { [weak self] in
@@ -85,7 +75,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
 
     private func didUpdateMode(_ mode: ConsoleMode) {
         self.mode = mode
-        pins = filter(pins: pinsObserver.objects, mode: mode)
         if isViewVisible {
             resetDataSource(options: environment.listOptions)
         }
@@ -196,14 +185,4 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         visibleEntities = entities.prefix(visibleEntityCountLimit)
     }
 #endif
-}
-
-private func filter(pins: [LoggerMessageEntity], mode: ConsoleMode) -> [LoggerMessageEntity] {
-    pins.filter {
-        switch mode {
-        case .all: return true
-        case .logs: return $0.task == nil
-        case .network: return $0.task != nil
-        }
-    }
 }
