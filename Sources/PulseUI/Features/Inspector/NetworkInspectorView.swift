@@ -14,6 +14,7 @@ struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
 
     @State private var shareItems: ShareItems?
+    @State private var sharedTask: NetworkTaskEntity?
     @ObservedObject private var settings: UserSettings = .shared
     @EnvironmentObject private var environment: ConsoleEnvironment
     @Environment(\.store) private var store
@@ -25,19 +26,19 @@ struct NetworkInspectorView: View {
         .animation(.default, value: task.state)
 #if os(iOS) || os(visionOS)
         .listStyle(.insetGrouped)
-        .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                trailingNavigationBarItems
-            }
-        }
         .safeAreaInset(edge: .bottom) {
             OpenOnMacOverlay(entity: task)
         }
         .inlineNavigationTitle(environment.delegate.getShortTitle(for: task))
+        .sheet(item: $shareItems, content: ShareView.init)
 #else
         .listStyle(.sidebar)
 #endif
-        .sheet(item: $shareItems, content: ShareView.init)
+        .toolbar {
+            ToolbarItemGroup(placement: .automatic) {
+                trailingNavigationBarItems
+            }
+        }
     }
 
     @ViewBuilder
@@ -75,6 +76,7 @@ struct NetworkInspectorView: View {
                 .padding(.top, -10)
         }
     }
+
 #if os(iOS) || os(visionOS)
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
@@ -96,6 +98,15 @@ struct NetworkInspectorView: View {
         }, label: {
             Image(systemName: "ellipsis.circle")
         })
+    }
+#else
+    @ViewBuilder
+    private var trailingNavigationBarItems: some View {
+        PinButton(viewModel: PinButtonViewModel(task), isTextNeeded: false)
+        Button(action: { sharedTask = task }) {
+            Label("Share", systemImage: "square.and.arrow.up")
+        }
+        .popover(item: $sharedTask, attachmentAnchor: .point(.center), arrowEdge: .top) { ShareNetworkTaskView(task: $0) }
     }
 #endif
 }
