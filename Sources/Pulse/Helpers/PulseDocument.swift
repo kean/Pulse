@@ -20,28 +20,6 @@ final class PulseDocument {
         try container.loadStore()
     }
 
-    /// Opens existing store and returns store info.
-    func open() throws -> LoggerStore.Info {
-        guard let info = getBlob(forKey: "info") else {
-            throw LoggerStore.Error.storeInvalid
-        }
-        return try JSONDecoder().decode(LoggerStore.Info.self, from: info)
-    }
-
-    // Opens an existing database.
-    func database() throws -> Data {
-        guard let database = getBlob(forKey: "database") else {
-            throw LoggerStore.Error.storeInvalid
-        }
-        return database
-    }
-
-    func getBlob(forKey key: String) -> Data? {
-        try? context.first(PulseBlobEntity.self) {
-            $0.predicate = NSPredicate(format: "key == %@", key)
-        }?.data
-    }
-
     func close() throws {
         let coordinator = container.persistentStoreCoordinator
         for store in coordinator.persistentStores {
