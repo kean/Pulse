@@ -102,15 +102,11 @@ final class StoreDetailsViewModel: ObservableObject {
     @Published private(set) var errorMessage: String?
 
     func load(from source: StoreDetailsView.Source) {
-        do {
-            switch source {
-            case .store(let store):
-                loadInfo(for: store)
-            case .info(let value):
-                display(value)
-            }
-        } catch {
-            errorMessage = error.localizedDescription
+        switch source {
+        case .store(let store):
+            loadInfo(for: store)
+        case .info(let value):
+            display(value)
         }
     }
 
