@@ -20,7 +20,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     public let options: Options
 
     /// The configuration with which the store was initialized with.
-    let configuration: Configuration
+    public let configuration: Configuration
 
     /// Current session or the latest session in case of an archive.
     private(set) public var session: Session = .current
