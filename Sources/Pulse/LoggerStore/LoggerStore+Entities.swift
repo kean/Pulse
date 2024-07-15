@@ -281,7 +281,7 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// A decompressed blob size.
     @NSManaged public var decompressedSize: Int32
 
-    @NSManaged public var isUncompressed: Bool
+    @NSManaged var isUncompressed: Bool
 
     @NSManaged var rawContentType: String?
 

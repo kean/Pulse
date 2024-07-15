@@ -16,12 +16,12 @@ extension RemoteLogger {
     }
 
     /// - warning: This method is not designed to be used outside of the package.
-    public static func _saveSession(_ session: LoggerStore.Session, info: LoggerStore.Info.AppInfo, store: LoggerStore) {
+    static func _saveSession(_ session: LoggerStore.Session, info: LoggerStore.Info.AppInfo, store: LoggerStore) {
         store.startSession(session, info: info)
     }
 
     /// - warning: This method is not designed to be used outside of the package.
-    public static func _process(_ event: LoggerStore.Event, store: LoggerStore) {
+    static func _process(_ event: LoggerStore.Event, store: LoggerStore) {
         store.handleExternalEvent(event)
     }
 }

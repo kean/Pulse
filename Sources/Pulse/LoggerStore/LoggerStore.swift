@@ -16,14 +16,11 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     /// The URL the store was initialized with.
     public let storeURL: URL
 
-    @available(*, deprecated, message: "Always returns `false`")
-    public let isArchive: Bool = false
-
     /// The options with which the store was opened with.
     public let options: Options
 
     /// The configuration with which the store was initialized with.
-    public let configuration: Configuration
+    let configuration: Configuration
 
     /// Current session or the latest session in case of an archive.
     private(set) public var session: Session = .current
@@ -51,7 +48,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     private var sessionIndex: Int64 = 0
 
     /// The folder where Pulse stores its documents.
-    public static var logsURL: URL { URL.logs }
+    static var logsURL: URL { URL.logs }
 
     private let blobsURL: URL
     private let manifestURL: URL
@@ -1249,7 +1246,6 @@ extension LoggerStore {
         case fileDoesntExist
         case storeInvalid
         case unsupportedVersion(version: String, minimumSupportedVersion: String)
-        case documentIsReadonly
         case fileAlreadyExists
         case unknownError
 
@@ -1257,7 +1253,6 @@ extension LoggerStore {
             switch self {
             case .fileDoesntExist: return "File doesn't exist"
             case .storeInvalid: return "Store format is invalid"
-            case .documentIsReadonly: return "Document is readonly"
             case let .unsupportedVersion(version, minimumSupportedVersion): return "The store was created by with Pulse vesrion \(version). Minimum supported version is \(minimumSupportedVersion)."
             case .fileAlreadyExists: return "The file at the given location already exists"
             case .unknownError: return "Unexpected error"
