@@ -697,7 +697,7 @@ extension LoggerStore {
 
     // MARK: - Performing Changes
 
-    private func perform(_ changes: @escaping (NSManagedObjectContext) -> Void) {
+    func perform(_ changes: @escaping (NSManagedObjectContext) -> Void) {
         if options.contains(.synchronous) {
             backgroundContext.performAndWait {
                 changes(backgroundContext)
@@ -1166,54 +1166,6 @@ extension LoggerStore {
             appInfo: .make(),
             deviceInfo: .make()
         )
-    }
-}
-
-// MARK: - LoggerStore (Pins)
-
-extension LoggerStore {
-    public var pins: Pins { Pins(store: self) }
-
-    public final class Pins {
-        static let pinServiceKey = "com.github.kean.pulse.pin-service"
-
-        weak var store: LoggerStore?
-
-        public init(store: LoggerStore) {
-            self.store = store
-        }
-
-        public func togglePin(for message: LoggerMessageEntity) {
-            guard let store = store else { return }
-            store.perform {
-                guard let message = $0.object(with: message.objectID) as? LoggerMessageEntity else { return }
-                self._togglePin(for: message)
-            }
-        }
-
-        public func togglePin(for task: NetworkTaskEntity) {
-            guard let store = store else { return }
-            store.perform {
-                guard let task = $0.object(with: task.objectID) as? NetworkTaskEntity else { return }
-                task.message.map(self._togglePin)
-            }
-        }
-
-        public func removeAllPins() {
-            guard let store = store else { return }
-            store.perform {
-                let messages = try? $0.fetch(LoggerMessageEntity.self) {
-                    $0.predicate = NSPredicate(format: "isPinned == YES")
-                }
-                for message in messages ?? [] {
-                    self._togglePin(for: message)
-                }
-            }
-        }
-
-        private func _togglePin(for message: LoggerMessageEntity) {
-            message.isPinned.toggle()
-        }
     }
 }
 
