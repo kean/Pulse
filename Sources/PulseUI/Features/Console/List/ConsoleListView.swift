@@ -50,10 +50,10 @@ private struct _InternalConsoleListView: View {
 
     @ViewBuilder private var contents: some View {
         _ConsoleListView()
-            .environment(\.defaultMinListRowHeight, 8)
 #if os(macOS)
             .searchable(text: $searchBarViewModel.text, placement: .sidebar)
 #else
+            .environment(\.defaultMinListRowHeight, 8)
             .searchable(text: $searchBarViewModel.text)
             .textInputAutocapitalization(.never)
 #endif
@@ -133,10 +133,8 @@ private struct _ConsoleListView: View {
                     ConsoleListContentView()
                 }
             }
+            .listRowSeparator(.hidden)
             .scrollContentBackground(.hidden)
-            .environment(\.defaultMinListRowHeight, 1)
-
-            Divider()
 
             if isSearching {
                 ConsoleSearchToolbar()

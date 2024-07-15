@@ -37,43 +37,21 @@ struct NetworkInspectorView: View {
             }
         }
     }
-
-    #else
+#else
     var body: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 0) {
-                List {
-                    contents
-                        .listRowSeparator(.hidden)
-                }
-                .animation(.default, value: task.state)
-                .frame(minWidth: 320, maxWidth: 420)
-                
-                Divider()
-                
-                if task.hasMetrics {
-                    metrics
-                        .frame(minWidth: 360, idealWidth: 360, maxWidth: 420)
-                }
-            }
+        List {
+            contents
+                .listRowSeparator(.hidden)
         }
+        .scrollContentBackground(.hidden)
+        .animation(.default, value: task.state)
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
                 trailingNavigationBarItems
             }
         }
     }
-
-    @ViewBuilder
-    private var metrics: some View {
-        List {
-            ForEach(task.orderedTransactions, id: \.index) {
-                NetworkInspectorTransactionView(viewModel:  .init(transaction: $0, task: task))
-            }
-        }
-        .listStyle(.inset(alternatesRowBackgrounds: false))
-    }
-    #endif
+#endif
 
     @ViewBuilder
     private var contents: some View {
@@ -106,8 +84,10 @@ struct NetworkInspectorView: View {
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .fixedSize()
+#if os(iOS) || os(visionOS)
                 .padding(.bottom, 4)
                 .padding(.top, -10)
+#endif
         }
     }
 

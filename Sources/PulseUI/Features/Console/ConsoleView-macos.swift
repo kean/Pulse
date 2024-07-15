@@ -18,18 +18,39 @@ public struct ConsoleView: View {
 
     public var body: some View {
         if #available(macOS 13, *) {
-            NavigationSplitView(sidebar: {
-                ConsoleMainView(environment: environment)
-            }, detail: {
-                NavigationStack {
-                    Text("No Selection")
-                }
-            })
-            .injecting(environment)
-            .navigationTitle("")
+            _ConsoleView(environment: environment)
         } else {
             PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires macOS 13 or later").padding()
         }
+    }
+}
+
+@available(macOS 13, *)
+private struct _ConsoleView: View {
+    @StateObject private var environment: ConsoleEnvironment
+    @State private var columnVisibility = NavigationSplitViewVisibility.all
+
+    init(environment: ConsoleEnvironment) {
+        _environment = StateObject(wrappedValue: environment)
+    }
+
+    public var body: some View {
+        NavigationSplitView(
+            columnVisibility: $columnVisibility,
+            sidebar: {
+                ConsoleMainView(environment: environment)
+                    .navigationSplitViewColumnWidth(min: 320, ideal: 420, max: 640)
+            },
+            content: {
+                EmptyView()
+                    .navigationSplitViewColumnWidth(320)
+            },
+            detail: {
+                EmptyView()
+            }
+        )
+        .injecting(environment)
+        .navigationTitle("")
     }
 }
 
@@ -46,7 +67,7 @@ private struct ConsoleMainView: View {
 
     var body: some View {
         ConsoleListView()
-            .frame(minWidth: 400, idealWidth: 500, minHeight: 120, idealHeight: 480)
+            .frame(minWidth: 300, idealWidth: 500, minHeight: 120, idealHeight: 480)
             .toolbar {
                 ToolbarItemGroup(placement: .automatic) {
                     Button(action: { isSharingStore = true }) {

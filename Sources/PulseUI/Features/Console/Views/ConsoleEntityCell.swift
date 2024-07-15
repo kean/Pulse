@@ -15,14 +15,8 @@ struct ConsoleEntityCell: View {
         switch LoggerEntity(entity) {
         case .message(let message):
             _ConsoleMessageCell(message: message)
-#if os(macOS)
-                .listRowSeparator(.visible)
-#endif
         case .task(let task):
             _ConsoleTaskCell(task: task)
-#if os(macOS)
-                .listRowSeparator(.visible)
-#endif
         }
     }
 }
