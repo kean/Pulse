@@ -13,8 +13,6 @@ struct StoreDetailsView: View {
     enum Source {
         /// Loads the info when the view appears on screen.
         case store(LoggerStore)
-        /// Opens the info for the given archive.
-        case archive(url: URL)
         /// Displays prefetched info.
         case info(LoggerStore.Info)
     }
@@ -108,8 +106,6 @@ final class StoreDetailsViewModel: ObservableObject {
             switch source {
             case .store(let store):
                 loadInfo(for: store)
-            case .archive(let storeURL):
-                display(try LoggerStore.Info.make(storeURL: storeURL))
             case .info(let value):
                 display(value)
             }
