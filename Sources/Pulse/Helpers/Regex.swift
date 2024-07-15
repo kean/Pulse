@@ -28,28 +28,4 @@ final class Regex {
         let range = NSRange(s.startIndex..<s.endIndex, in: s)
         return regex.firstMatch(in: s, options: [], range: range) != nil
     }
-
-    func matches(in s: String) -> [Match] {
-        let range = NSRange(s.startIndex..<s.endIndex, in: s)
-        return matches(in: s, range: range)
-    }
-
-    func matches(in s: String, range: NSRange) -> [Match] {
-        let matches = regex.matches(in: s, options: [], range: range)
-        return matches.map { match in
-            let ranges = (0..<match.numberOfRanges)
-                .map { match.range(at: $0) }
-                .filter { $0.location != NSNotFound }
-            return Match(fullMatch: s[Range(match.range, in: s)!],
-                         groups: ranges.dropFirst().map { s[Range($0, in: s)!] }
-            )
-        }
-    }
-}
-
-extension Regex {
-    struct Match {
-        let fullMatch: Substring
-        let groups: [Substring]
-    }
 }
