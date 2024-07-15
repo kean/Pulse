@@ -247,7 +247,6 @@
 		0CF5E9CD2A0138BD00E68548 /* URLSessionMockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E9CC2A0138BD00E68548 /* URLSessionMockManager.swift */; };
 		0CFA8CD72C4401FB001A1DCC /* SectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFA8CD62C4401FB001A1DCC /* SectionHeaderView.swift */; };
 		0CFB0CA42A3F662300221FEA /* SettingsView-tvos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFB0CA32A3F662300221FEA /* SettingsView-tvos.swift */; };
-		0CFD1CDB29E2E8FD003872EF /* LoggerStore+Remote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */; };
 		0CFF79DD29EB7A8E00BE767B /* SessionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */; };
 		0CFF79DF29EB7B4300BE767B /* SessionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */; };
 		0CFF79E229EC1FA200BE767B /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79E029EC1F7800BE767B /* ImageProcessor.swift */; };
@@ -678,7 +677,6 @@
 		0CF5E9CC2A0138BD00E68548 /* URLSessionMockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionMockManager.swift; sourceTree = "<group>"; };
 		0CFA8CD62C4401FB001A1DCC /* SectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeaderView.swift; sourceTree = "<group>"; };
 		0CFB0CA32A3F662300221FEA /* SettingsView-tvos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView-tvos.swift"; sourceTree = "<group>"; };
-		0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerStore+Remote.swift"; sourceTree = "<group>"; };
 		0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
 		0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionPickerView.swift; sourceTree = "<group>"; };
 		0CFF79E029EC1F7800BE767B /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
@@ -870,7 +868,6 @@
 				0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */,
 				0CF0D542296F14EA00EED9D4 /* Pulse.framework */,
 				0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */,
-
 				0CF0D6BC296F18ED00EED9D4 /* PulseUITests.xctest */,
 				0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */,
 				0C30B2F32A3F375400D65F8F /* Pulse Demo.app */,
@@ -1086,7 +1083,6 @@
 				0CF0D4A0296F14CF00EED9D4 /* LoggerStore+Event.swift */,
 				0CF0D49C296F14CF00EED9D4 /* LoggerStore+Entities.swift */,
 				0CF0D4A2296F14CF00EED9D4 /* LoggerStore+Model.swift */,
-				0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */,
 				0CF0D49F296F14CF00EED9D4 /* LoggerStore+Extensions.swift */,
 			);
 			path = LoggerStore;
@@ -1646,9 +1642,6 @@
 					0CF0D56B296F17CB00EED9D4 = {
 						CreatedOnToolsVersion = 14.2;
 					};
-					0CF0D68E296F18BE00EED9D4 = {
-						CreatedOnToolsVersion = 14.2;
-					};
 					0CF0D6BB296F18ED00EED9D4 = {
 						CreatedOnToolsVersion = 14.2;
 					};
@@ -1861,7 +1854,6 @@
 				0CF0D562296F15FD00EED9D4 /* Version.swift in Sources */,
 				0CF0D552296F15F200EED9D4 /* URLSessionProxyDelegate.swift in Sources */,
 				0CF0D578296F185000EED9D4 /* Pulse.docc in Sources */,
-				0CFD1CDB29E2E8FD003872EF /* LoggerStore+Remote.swift in Sources */,
 				0CF0D554296F15F600EED9D4 /* RemoteLogger.swift in Sources */,
 				0CF0D54F296F15F200EED9D4 /* NetworkLogger+Redacting.swift in Sources */,
 				0CF0D55C296F15FA00EED9D4 /* LoggerStore+Info.swift in Sources */,
