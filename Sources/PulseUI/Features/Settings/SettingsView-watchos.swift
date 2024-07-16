@@ -10,7 +10,6 @@ import Pulse
 public struct SettingsView: View {
     private let store: LoggerStore
 
-    @StateObject private var syncService: WatchConnectivityService = .shared
     @State private var isShowingShareView = false
 
     public init(store: LoggerStore = .shared) {
@@ -33,14 +32,6 @@ public struct SettingsView: View {
                 }
             }
             Section {
-                Button(action: { syncService.share(store: store) }) {
-                    Text(syncService.state.title)
-                }
-                .disabled(syncService.isButtonDisabled)
-                .alert(item: $syncService.error) { error in
-                    Alert(title: Text("Transfer Failed"), message: Text(error.error.localizedDescription), dismissButton: .cancel(Text("Ok")))
-                }
-
                 if #available(watchOS 9, *) {
                     Button("Share Store") { isShowingShareView = true }
                 }

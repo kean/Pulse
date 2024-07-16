@@ -46,10 +46,6 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         didSet { try? save(manifest) }
     }
     private var sessionIndex: Int64 = 0
-
-    /// The folder where Pulse stores its documents.
-    public static var logsURL: URL { URL.logs }
-
     private let blobsURL: URL
     private let manifestURL: URL
     private let databaseURL: URL // Points to a temporary location if archive
