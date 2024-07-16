@@ -38,7 +38,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     public let events = PassthroughSubject<Event, Never>()
 
     /// The store version.
-    public var version: String { manifest.version.description }
+    public var version: Version { manifest.version }
 
     private var isSaveScheduled = false
     private let queue = DispatchQueue(label: "com.github.kean.pulse.logger-store")

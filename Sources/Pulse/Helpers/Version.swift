@@ -2,12 +2,12 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-struct Version: Comparable, LosslessStringConvertible, Codable, Sendable {
-    let major: Int
-    let minor: Int
-    let patch: Int
+public struct Version: Comparable, LosslessStringConvertible, Codable, Sendable {
+    public let major: Int
+    public let minor: Int
+    public let patch: Int
 
-    init(_ major: Int, _ minor: Int, _ patch: Int) {
+    public init(_ major: Int, _ minor: Int, _ patch: Int) {
         precondition(major >= 0 && minor >= 0 && patch >= 0, "Negative versioning is invalid.")
         self.major = major
         self.minor = minor
@@ -16,15 +16,15 @@ struct Version: Comparable, LosslessStringConvertible, Codable, Sendable {
 
     // MARK: Comparable
 
-    static func == (lhs: Version, rhs: Version) -> Bool {
+    public static func == (lhs: Version, rhs: Version) -> Bool {
         !(lhs < rhs) && !(lhs > rhs)
     }
 
-    static func < (lhs: Version, rhs: Version) -> Bool {
+    public static func < (lhs: Version, rhs: Version) -> Bool {
         (lhs.major, lhs.minor, lhs.patch) < (rhs.major, rhs.minor, rhs.patch)
     }
 
-    init(string: String) throws {
+    public init(string: String) throws {
         guard let version = Version(string) else {
             throw LoggerStore.Error.unknownError // Should never happen
         }
@@ -33,7 +33,7 @@ struct Version: Comparable, LosslessStringConvertible, Codable, Sendable {
 
     // MARK: LosslessStringConvertible
 
-    init?(_ string: String) {
+    public init?(_ string: String) {
         guard string.allSatisfy(\.isASCII) else { return nil }
         let components = string.split(separator: ".", omittingEmptySubsequences: false)
         guard components.count == 3,
@@ -47,13 +47,13 @@ struct Version: Comparable, LosslessStringConvertible, Codable, Sendable {
         self.patch = patch
     }
 
-    var description: String {
+    public var description: String {
         "\(major).\(minor).\(patch)"
     }
 
     // MARK: Codable
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         guard let version = Version(try container.decode(String.self)) else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid version number format")
@@ -61,7 +61,7 @@ struct Version: Comparable, LosslessStringConvertible, Codable, Sendable {
         self = version
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(self.description)
     }
