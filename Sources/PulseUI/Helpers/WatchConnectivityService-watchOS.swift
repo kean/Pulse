@@ -78,7 +78,7 @@ struct FileTransferError: Identifiable {
 }
 
 private func makeExportedStoreURL() -> URL {
-    LoggerStore.logsURL.appendingPathComponent("exported.pulse")
+    fatalError("not implemented")
 }
 
 private extension LoggerStore {
