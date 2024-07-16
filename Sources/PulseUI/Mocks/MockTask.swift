@@ -5,7 +5,7 @@
 import Foundation
 import Pulse
 
-#if DEBUG || PULSE_MOCK_INCLUDED
+#if DEBUG
 
 struct MockTask {
     var kind: Kind = .data

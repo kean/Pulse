@@ -6,7 +6,7 @@ import Foundation
 import Pulse
 import CoreData
 
-#if DEBUG || PULSE_MOCK_INCLUDED
+#if DEBUG
 
 extension LoggerStore {
     static let mock: LoggerStore = {
