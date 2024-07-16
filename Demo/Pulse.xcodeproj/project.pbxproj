@@ -13,13 +13,6 @@
 		0C0B31F426D179A20045C9E1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F226D179A20045C9E1 /* Main.storyboard */; };
 		0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F526D179A70045C9E1 /* Assets.xcassets */; };
 		0C0B31F926D179A70045C9E1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F726D179A70045C9E1 /* LaunchScreen.storyboard */; };
-		0C30B2F62A3F375400D65F8F /* Pulse_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30B2F52A3F375400D65F8F /* Pulse_DemoApp.swift */; };
-		0C30B2FA2A3F375500D65F8F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C30B2F92A3F375500D65F8F /* Assets.xcassets */; };
-		0C30B3032A3F375500D65F8F /* Pulse Demo Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0C30B3022A3F375500D65F8F /* Pulse Demo Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		0C30B3082A3F375500D65F8F /* Pulse_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30B3072A3F375500D65F8F /* Pulse_DemoApp.swift */; };
-		0C30B30C2A3F375500D65F8F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C30B30B2A3F375500D65F8F /* Assets.xcassets */; };
-		0C30B3202A3F383900D65F8F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
-		0C30B3212A3F383A00D65F8F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 		0C57511A2B01BA40001074E5 /* DebugAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5751182B01BA2B001074E5 /* DebugAnalyticsView.swift */; };
 		0C6460DC25F579B8002C55B1 /* Pulse_tvOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6460D625F579B8002C55B1 /* Pulse_tvOSApp.swift */; };
 		0C6460DD25F579B8002C55B1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C6460D725F579B8002C55B1 /* Assets.xcassets */; };
@@ -30,10 +23,6 @@
 		0C70EA812A3F6190000B1071 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 		0C8FCB502C45F05400C4FD84 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB4F2C45F05400C4FD84 /* Pulse */; };
 		0C8FCB522C45F05400C4FD84 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB512C45F05400C4FD84 /* PulseUI */; };
-		0C8FCB542C45F05800C4FD84 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB532C45F05800C4FD84 /* Pulse */; };
-		0C8FCB562C45F05800C4FD84 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB552C45F05800C4FD84 /* PulseUI */; };
-		0C8FCB582C45F05C00C4FD84 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB572C45F05C00C4FD84 /* Pulse */; };
-		0C8FCB5A2C45F05C00C4FD84 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB592C45F05C00C4FD84 /* PulseUI */; };
 		0C8FCB5C2C45F06000C4FD84 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB5B2C45F06000C4FD84 /* Pulse */; };
 		0C8FCB5E2C45F06000C4FD84 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB5D2C45F06000C4FD84 /* PulseUI */; };
 		0C8FCB602C45F06300C4FD84 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB5F2C45F06300C4FD84 /* Pulse */; };
@@ -41,14 +30,10 @@
 		0C8FCB642C45F06900C4FD84 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB632C45F06900C4FD84 /* Pulse */; };
 		0C8FCB662C45F06900C4FD84 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB652C45F06900C4FD84 /* PulseUI */; };
 		0C8FCB6A2C45F12900C4FD84 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB682C45F12900C4FD84 /* MockStore.swift */; };
-		0C8FCB6B2C45F12900C4FD84 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB682C45F12900C4FD84 /* MockStore.swift */; };
-		0C8FCB6C2C45F12900C4FD84 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB682C45F12900C4FD84 /* MockStore.swift */; };
 		0C8FCB6D2C45F12900C4FD84 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB682C45F12900C4FD84 /* MockStore.swift */; };
 		0C8FCB6E2C45F12900C4FD84 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB682C45F12900C4FD84 /* MockStore.swift */; };
 		0C8FCB6F2C45F12900C4FD84 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB682C45F12900C4FD84 /* MockStore.swift */; };
 		0C8FCB702C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
-		0C8FCB712C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
-		0C8FCB722C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
 		0C8FCB732C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
 		0C8FCB742C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
 		0C8FCB752C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
@@ -59,48 +44,7 @@
 		0CDACDE629EC6607007C15CD /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		0C30B3042A3F375500D65F8F /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 0C30B3012A3F375500D65F8F;
-			remoteInfo = "Pulse Demo Watch App";
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXCopyFilesBuildPhase section */
-		0C30B3132A3F375500D65F8F /* Embed Watch Content */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
-			dstSubfolderSpec = 16;
-			files = (
-				0C30B3032A3F375500D65F8F /* Pulse Demo Watch App.app in Embed Watch Content */,
-			);
-			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0C30B31F2A3F37F800D65F8F /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0C30B32E2A3F3A5600D65F8F /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		0C70EA8C2A3F61F9000B1071 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -154,12 +98,8 @@
 		0C0B31FA26D179A70045C9E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionAutomatedIntegration.swift; sourceTree = "<group>"; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
-		0C30B2F32A3F375400D65F8F /* Pulse Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C30B2F52A3F375400D65F8F /* Pulse_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_DemoApp.swift; sourceTree = "<group>"; };
 		0C30B2F92A3F375500D65F8F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		0C30B3022A3F375500D65F8F /* Pulse Demo Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		0C30B3072A3F375500D65F8F /* Pulse_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_DemoApp.swift; sourceTree = "<group>"; };
-		0C30B30B2A3F375500D65F8F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C5751182B01BA2B001074E5 /* DebugAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugAnalyticsView.swift; sourceTree = "<group>"; };
 		0C6460C425F5797B002C55B1 /* Pulse Demo tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C6460D625F579B8002C55B1 /* Pulse_tvOSApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pulse_tvOSApp.swift; sourceTree = "<group>"; };
@@ -196,24 +136,6 @@
 			files = (
 				0C8FCB662C45F06900C4FD84 /* PulseUI in Frameworks */,
 				0C8FCB642C45F06900C4FD84 /* Pulse in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0C30B2F02A3F375400D65F8F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0C8FCB562C45F05800C4FD84 /* PulseUI in Frameworks */,
-				0C8FCB542C45F05800C4FD84 /* Pulse in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0C30B2FF2A3F375500D65F8F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0C8FCB5A2C45F05C00C4FD84 /* PulseUI in Frameworks */,
-				0C8FCB582C45F05C00C4FD84 /* Pulse in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,15 +205,6 @@
 			path = "iOS-paired";
 			sourceTree = "<group>";
 		};
-		0C30B3062A3F375500D65F8F /* watchOS-paired */ = {
-			isa = PBXGroup;
-			children = (
-				0C30B3072A3F375500D65F8F /* Pulse_DemoApp.swift */,
-				0C30B30B2A3F375500D65F8F /* Assets.xcassets */,
-			);
-			path = "watchOS-paired";
-			sourceTree = "<group>";
-		};
 		0C516FBB26015DD2004813B4 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
@@ -300,7 +213,6 @@
 				0CDACDE029EC65F4007C15CD /* Resources */,
 				0C70EA742A3F611B000B1071 /* iOS */,
 				0C30B2F42A3F375400D65F8F /* iOS-paired */,
-				0C30B3062A3F375500D65F8F /* watchOS-paired */,
 				0C9F04F72884F34A0035239F /* macOS */,
 				0C6460D525F579B8002C55B1 /* tvOS */,
 				0C0B31EB26D179A20045C9E1 /* Integrations */,
@@ -329,8 +241,6 @@
 				0C6460C425F5797B002C55B1 /* Pulse Demo tvOS.app */,
 				0C0B31EA26D179A20045C9E1 /* Pulse Integration Examples iOS.app */,
 				0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */,
-				0C30B2F32A3F375400D65F8F /* Pulse Demo.app */,
-				0C30B3022A3F375500D65F8F /* Pulse Demo Watch App.app */,
 				0C70EA732A3F611B000B1071 /* Pulse Demo iOS.app */,
 			);
 			name = Products;
@@ -433,52 +343,6 @@
 			productReference = 0C0B31EA26D179A20045C9E1 /* Pulse Integration Examples iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
-		0C30B2F22A3F375400D65F8F /* Pulse Demo Paired iOS App */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 0C30B3142A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo Paired iOS App" */;
-			buildPhases = (
-				0C30B2EF2A3F375400D65F8F /* Sources */,
-				0C30B2F02A3F375400D65F8F /* Frameworks */,
-				0C30B2F12A3F375400D65F8F /* Resources */,
-				0C30B3132A3F375500D65F8F /* Embed Watch Content */,
-				0C30B31F2A3F37F800D65F8F /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				0C30B3052A3F375500D65F8F /* PBXTargetDependency */,
-			);
-			name = "Pulse Demo Paired iOS App";
-			packageProductDependencies = (
-				0C8FCB532C45F05800C4FD84 /* Pulse */,
-				0C8FCB552C45F05800C4FD84 /* PulseUI */,
-			);
-			productName = "Pulse Demo";
-			productReference = 0C30B2F32A3F375400D65F8F /* Pulse Demo.app */;
-			productType = "com.apple.product-type.application";
-		};
-		0C30B3012A3F375500D65F8F /* Pulse Demo Paired watchOS App */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 0C30B3102A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo Paired watchOS App" */;
-			buildPhases = (
-				0C30B2FE2A3F375500D65F8F /* Sources */,
-				0C30B2FF2A3F375500D65F8F /* Frameworks */,
-				0C30B3002A3F375500D65F8F /* Resources */,
-				0C30B32E2A3F3A5600D65F8F /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "Pulse Demo Paired watchOS App";
-			packageProductDependencies = (
-				0C8FCB572C45F05C00C4FD84 /* Pulse */,
-				0C8FCB592C45F05C00C4FD84 /* PulseUI */,
-			);
-			productName = "Pulse Demo Watch App";
-			productReference = 0C30B3022A3F375500D65F8F /* Pulse Demo Watch App.app */;
-			productType = "com.apple.product-type.application";
-		};
 		0C6460C325F5797B002C55B1 /* Pulse Demo tvOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C6460D225F5797C002C55B1 /* Build configuration list for PBXNativeTarget "Pulse Demo tvOS" */;
@@ -552,18 +416,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastSwiftUpdateCheck = 1430;
+				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = kean;
 				TargetAttributes = {
 					0C0B31E926D179A20045C9E1 = {
 						CreatedOnToolsVersion = 12.4;
-					};
-					0C30B2F22A3F375400D65F8F = {
-						CreatedOnToolsVersion = 14.3;
-					};
-					0C30B3012A3F375500D65F8F = {
-						CreatedOnToolsVersion = 14.3;
 					};
 					0C6460C325F5797B002C55B1 = {
 						CreatedOnToolsVersion = 12.4;
@@ -592,8 +450,6 @@
 			projectRoot = "";
 			targets = (
 				0C70EA722A3F611B000B1071 /* Pulse Demo iOS */,
-				0C30B2F22A3F375400D65F8F /* Pulse Demo Paired iOS App */,
-				0C30B3012A3F375500D65F8F /* Pulse Demo Paired watchOS App */,
 				0C9F04F52884F34A0035239F /* Pulse Demo macOS */,
 				0C6460C325F5797B002C55B1 /* Pulse Demo tvOS */,
 				0C0B31E926D179A20045C9E1 /* Pulse Integration Examples iOS */,
@@ -609,24 +465,6 @@
 				0C0B31F926D179A70045C9E1 /* LaunchScreen.storyboard in Resources */,
 				0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */,
 				0C0B31F426D179A20045C9E1 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0C30B2F12A3F375400D65F8F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0C30B2FA2A3F375500D65F8F /* Assets.xcassets in Resources */,
-				0C30B3202A3F383900D65F8F /* repos.json in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0C30B3002A3F375500D65F8F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0C30B30C2A3F375500D65F8F /* Assets.xcassets in Resources */,
-				0C30B3212A3F383A00D65F8F /* repos.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -675,26 +513,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		0C30B2EF2A3F375400D65F8F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0C30B2F62A3F375400D65F8F /* Pulse_DemoApp.swift in Sources */,
-				0C8FCB712C45F12900C4FD84 /* MockTask.swift in Sources */,
-				0C8FCB6B2C45F12900C4FD84 /* MockStore.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0C30B2FE2A3F375500D65F8F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0C30B3082A3F375500D65F8F /* Pulse_DemoApp.swift in Sources */,
-				0C8FCB722C45F12900C4FD84 /* MockTask.swift in Sources */,
-				0C8FCB6C2C45F12900C4FD84 /* MockStore.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		0C6460C025F5797B002C55B1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -727,14 +545,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		0C30B3052A3F375500D65F8F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 0C30B3012A3F375500D65F8F /* Pulse Demo Paired watchOS App */;
-			targetProxy = 0C30B3042A3F375500D65F8F /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		0C0B31F226D179A20045C9E1 /* Main.storyboard */ = {
@@ -801,178 +611,6 @@
 			};
 			name = Release;
 		};
-		0C30B3112A3F375500D65F8F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = NR8DLKJ7E6;
-				ENABLE_PREVIEWS = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Pulse Demo";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.github.kean.pulse-demo.companion";
-				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.companion.watchkitapp";
-				PRODUCT_NAME = "Pulse Demo Watch App";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 8.0;
-			};
-			name = Debug;
-		};
-		0C30B3122A3F375500D65F8F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = NR8DLKJ7E6;
-				ENABLE_PREVIEWS = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Pulse Demo";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.github.kean.pulse-demo.companion";
-				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.companion.watchkitapp";
-				PRODUCT_NAME = "Pulse Demo Watch App";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 8.0;
-			};
-			name = Release;
-		};
-		0C30B3152A3F375500D65F8F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = NR8DLKJ7E6;
-				ENABLE_PREVIEWS = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Pulse Demo";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.companion";
-				PRODUCT_NAME = "Pulse Demo";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		0C30B3162A3F375500D65F8F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = NR8DLKJ7E6;
-				ENABLE_PREVIEWS = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Pulse Demo";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.companion";
-				PRODUCT_NAME = "Pulse Demo";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 		0C57AD5F245F0EFD005B3400 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1020,7 +658,7 @@
 				MARKETING_VERSION = 4.2.7;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos macosx iphonesimulator iphoneos appletvsimulator appletvos";
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1070,7 +708,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 4.2.7;
 				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "watchsimulator watchos macosx iphonesimulator iphoneos appletvsimulator appletvos";
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -1326,24 +964,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0C30B3102A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo Paired watchOS App" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				0C30B3112A3F375500D65F8F /* Debug */,
-				0C30B3122A3F375500D65F8F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		0C30B3142A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo Paired iOS App" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				0C30B3152A3F375500D65F8F /* Debug */,
-				0C30B3162A3F375500D65F8F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		0C57AD48245F0EFB005B3400 /* Build configuration list for PBXProject "Pulse" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1388,22 +1008,6 @@
 			productName = Pulse;
 		};
 		0C8FCB512C45F05400C4FD84 /* PulseUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PulseUI;
-		};
-		0C8FCB532C45F05800C4FD84 /* Pulse */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Pulse;
-		};
-		0C8FCB552C45F05800C4FD84 /* PulseUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PulseUI;
-		};
-		0C8FCB572C45F05C00C4FD84 /* Pulse */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Pulse;
-		};
-		0C8FCB592C45F05C00C4FD84 /* PulseUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PulseUI;
 		};
