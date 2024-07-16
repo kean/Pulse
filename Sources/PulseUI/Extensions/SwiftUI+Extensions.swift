@@ -107,10 +107,6 @@ extension View {
             .navigationBarTitleDisplayMode(.inline)
 #endif
     }
-
-    func apply<T>(_ closure: (Self) -> T) -> T {
-        closure(self)
-    }
 }
 
 /// Allows you to use `@StateObject` only for memory management (without observing).
