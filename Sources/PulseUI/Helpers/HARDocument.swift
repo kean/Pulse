@@ -1,10 +1,6 @@
+// The MIT License (MIT)
 //
-//  HARDocument.swift
-//  PulseUI
-//
-//  Created by Jota Uribe on 6/02/24.
-//  Copyright © 2024 kean. All rights reserved.
-//
+// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Pulse
