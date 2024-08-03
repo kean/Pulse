@@ -13,22 +13,28 @@ import Combine
     // Sharing options
     @Published var sessions: Set<UUID> = []
     @Published var logLevels = Set(LoggerStore.Level.allCases)
-    @Published var shareStoreOutputs: [ShareStoreOutput] = ShareStoreOutput.allCases
+    let shareStoreOutputs: [ShareStoreOutput]
     @Published var output: ShareStoreOutput
 
     @Published private(set) var isPreparingForSharing = false
     @Published private(set) var errorMessage: String?
     @Published var shareItems: ShareItems?
 
+    @ObservedObject private var settings: UserSettings = .shared
+
     var store: LoggerStore?
-    var environment: ConsoleEnvironment? {
-        didSet {
-            updateForCurrentEnvironment()
-        }
-    }
 
     init() {
-        output = UserSettings.shared.sharingOutput
+        var outputs = UserSettings.shared.allowedShareStoreOutputs
+        if outputs.isEmpty {
+            outputs = ShareStoreOutput.allCases
+        }
+        if outputs.contains(UserSettings.shared.sharingOutput) {
+            output = UserSettings.shared.sharingOutput
+        } else {
+            output = outputs[0]
+        }
+        shareStoreOutputs = outputs
     }
 
     func buttonSharedTapped() {
@@ -36,16 +42,6 @@ import Combine
         isPreparingForSharing = true
         saveSharingOptions()
         prepareForSharing()
-    }
-
-    private func updateForCurrentEnvironment() {
-        guard let environment else { return }
-        shareStoreOutputs = environment.configuration.shareStoreOutputs
-
-        if !shareStoreOutputs.contains(output), let shareStoreOutput = shareStoreOutputs.first {
-            /// Update the selected output to one of the available options.
-            output = shareStoreOutput
-        }
     }
 
     private func saveSharingOptions() {

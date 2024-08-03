@@ -31,7 +31,6 @@ struct ShareStoreView: View {
                     viewModel.sessions = [store.session.id]
                 }
                 viewModel.store = store
-                viewModel.environment = environment
             }
     }
 

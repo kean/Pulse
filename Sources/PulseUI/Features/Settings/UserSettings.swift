@@ -15,15 +15,15 @@ public final class UserSettings: ObservableObject {
     public var mode: ConsoleMode = .network
 
     /// The line limit for messages in the console. By default, `3`.
-    @AppStorage("com.github.kean.pulse.console.cell.line.limit")
+    @AppStorage("com.github.kean.pulse.consoleCellLineLimit")
     public var lineLimit: Int = 3
 
     /// Enables link detection in the response viewier. By default, `false`.
-    @AppStorage("com.github.kean.pulse.link.detection")
+    @AppStorage("com.github.kean.pulse.linkDetection")
     public var isLinkDetectionEnabled = false
 
     /// The default sharing output type. By default, ``ShareStoreOutput/store``.
-    @AppStorage("com.github.kean.pulse.sharing.output")
+    @AppStorage("com.github.kean.pulse.sharingOutput")
     public var sharingOutput: ShareStoreOutput = .store
 
     /// HTTP headers to display in a Console. By default, empty.
@@ -43,6 +43,21 @@ public final class UserSettings: ObservableObject {
 
     /// If `true`, the network inspector will show the current request by default.
     /// If `false`, show the original request.
-    @AppStorage("com.github.kean.pulse.show-current-request")
+    @AppStorage("com.github.kean.pulse.showCurrentRequest")
     public var isShowingCurrentRequest = true
+
+    /// The allowed sharing options.
+    public var allowedShareStoreOutputs: [ShareStoreOutput] {
+        get {
+            let data = rawAllowedShareStoreOutputs.data(using: .utf8) ?? Data()
+            return (try? JSONDecoder().decode([ShareStoreOutput].self, from: data)) ?? []
+        }
+        set { 
+            guard let data = try? JSONEncoder().encode(newValue) else { return }
+            rawAllowedShareStoreOutputs = String(data: data, encoding: .utf8) ?? "[]"
+        }
+    }
+
+    @AppStorage("com.github.kean.pulse.allowedShareStoreOutputs")
+    var rawAllowedShareStoreOutputs: String = "[]"
 }
