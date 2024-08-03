@@ -18,17 +18,14 @@ final class URLSessionMockManager: @unchecked Sendable {
     func getMock(for request: URLRequest) -> URLSessionMock? {
         lock.lock()
         defer { lock.unlock() }
-
-        return mocks.lazy.map(\.value).first {
-            $0.isMatch(request)
-        }
+        return _getMock(for: request)
     }
 
     func shouldMock(_ request: URLRequest) -> Bool {
         lock.lock()
         defer { lock.unlock() }
 
-        guard let mock = getMock(for: request) else {
+        guard let mock = _getMock(for: request) else {
             return false
         }
         defer { numberOfHandledRequests[mock.mockID, default: 0] += 1 }
@@ -40,6 +37,12 @@ final class URLSessionMockManager: @unchecked Sendable {
             return false // Mock for N number of times
         }
         return RemoteLogger.shared.connectionState == .connected
+    }
+
+    private func _getMock(for request: URLRequest) -> URLSessionMock? {
+        mocks.lazy.map(\.value).first {
+            $0.isMatch(request)
+        }
     }
 
     func update(_ mocks: [URLSessionMock]) {

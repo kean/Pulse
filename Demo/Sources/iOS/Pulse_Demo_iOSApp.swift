@@ -22,9 +22,9 @@ struct PulseDemo_iOS: App {
 
 private final class AppViewModel: ObservableObject {
     let log = OSLog(subsystem: "app", category: "AppViewModel")
-    
+
     init() {
-//        URLSessionProxyDelegate.enableAutomaticRegistration()
+//         URLSessionProxyDelegate.enableAutomaticRegistration(logger: NetworkLogger(store: .demo))
 //        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
 //            sendRequest()
 //        }
