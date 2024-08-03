@@ -19,7 +19,8 @@ public struct SettingsView: View {
     public var body: some View {
         Form {
             Section {
-                if store === RemoteLogger.shared.store {
+                if !UserSettings.shared.isRemoteLoggingHidden,
+                   store === RemoteLogger.shared.store {
 #if targetEnvironment(simulator)
                     RemoteLoggerSettingsView(viewModel: .shared)
 #else

@@ -60,4 +60,8 @@ public final class UserSettings: ObservableObject {
 
     @AppStorage("com.github.kean.pulse.allowedShareStoreOutputs")
     var rawAllowedShareStoreOutputs: String = "[]"
+
+    /// If enabled, the console stops showing the remote logging option.
+    @AppStorage("com.github.kean.pulse.isRemoteLoggingAllowed")
+    public var isRemoteLoggingHidden = false
 }

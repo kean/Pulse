@@ -16,7 +16,8 @@ public struct SettingsView: View {
 
     public var body: some View {
         Form {
-            if store === RemoteLogger.shared.store {
+            if !UserSettings.shared.isRemoteLoggingHidden,
+                store === RemoteLogger.shared.store {
                 RemoteLoggerSettingsView(viewModel: .shared)
             }
             Section {

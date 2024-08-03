@@ -130,7 +130,7 @@ extension ConsoleRouterView {
 
     private var destinationSettings: some View {
         SettingsView()
-            .frame(width: 320, height: environment.configuration.allowRemoteLogging ? 420 : 175)
+            .frame(width: 320, height: UserSettings.shared.isRemoteLoggingHidden ? 175 : 420)
             .navigationTitle("Settings")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

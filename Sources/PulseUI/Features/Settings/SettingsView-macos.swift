@@ -17,7 +17,7 @@ struct SettingsView: View {
 
     var body: some View {
         List {
-            if environment.configuration.allowRemoteLogging {
+            if !UserSettings.shared.isRemoteLoggingHidden {
                 if store === RemoteLogger.shared.store {
                     RemoteLoggerSettingsView(viewModel: .shared)
                 } else {
