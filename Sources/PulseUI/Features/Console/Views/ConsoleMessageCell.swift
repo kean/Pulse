@@ -45,9 +45,7 @@ struct ConsoleMessageCell: View {
 #endif
                 .foregroundColor(titleColor)
             Spacer()
-#if PULSE_STANDALONE_APP
-            PinView(message: message)
-#endif
+            Components.makePinView(for: message)
             HStack(spacing: 3) {
                 Text(ConsoleMessageCell.timeFormatter.string(from: message.createdAt))
                     .lineLimit(1)

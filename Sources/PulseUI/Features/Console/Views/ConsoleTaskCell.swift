@@ -32,9 +32,7 @@ struct ConsoleTaskCell: View {
             requestHeaders
 #endif
         }
-#if !PULSE_STANDALONE_APP
-            .animation(.default, value: task.state)
-#endif
+        .animation(.default, value: task.state)
 #if os(macOS)
         contents.padding(.vertical, 5)
 #else
@@ -61,9 +59,7 @@ struct ConsoleTaskCell: View {
             details
 #endif
             Spacer()
-#if PULSE_STANDALONE_APP
-            PinView(task: task)
-#endif
+            Components.makePinView(for: task)
 #if !os(watchOS)
             HStack(spacing: 3) {
                 time

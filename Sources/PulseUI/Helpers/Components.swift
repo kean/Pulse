@@ -4,8 +4,6 @@
 
 import SwiftUI
 
-#if !PULSE_STANDALONE_APP
-
 struct Components {
     @available(iOS 15, macOS 13, visionOS 1.0, *)
     static func makeSessionPicker(selection: Binding<Set<UUID>>) -> some View {
@@ -19,6 +17,12 @@ struct Components {
     static func makeConsoleEntityCell(entity: NSManagedObject) -> some View {
         ConsoleEntityCell(entity: entity)
     }
-}
 
-#endif
+    static func makePinView(for task: NetworkTaskEntity) -> some View {
+        EmptyView()
+    }
+
+    static func makePinView(for message: LoggerMessageEntity) -> some View {
+        EmptyView()
+    }
+}

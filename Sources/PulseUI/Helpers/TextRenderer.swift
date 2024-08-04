@@ -414,8 +414,6 @@ extension NSAttributedString.Key {
 
 // MARK: - Previews
 
-#if !PULSE_STANDALONE_APP
-
 #if DEBUG
 struct ConsoleTextRenderer_Previews: PreviewProvider {
     static var previews: some View {
@@ -463,8 +461,6 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
         }
     }
 }
-
-#endif
 
 private let task = LoggerStore.preview.entity(for: .login)
 #endif
