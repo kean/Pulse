@@ -4,8 +4,13 @@
 
 import SwiftUI
 
+#if !PULSE_STANDALONE_APP
+
 struct Components {
-    static var makeSessionPicker: ((_ selection: Binding<Set<UUID>>) -> AnyView) = {
-        AnyView(SessionPickerView(selection: $0))
+    @available(iOS 15, macOS 13, visionOS 1.0, *)
+    static func makeSessionPicker(selection: Binding<Set<UUID>>) -> some View {
+        SessionPickerView(selection: selection)
     }
 }
+
+#endif

@@ -20,7 +20,7 @@ struct ConsoleSessionsPickerView: View {
 
     var body: some View {
 #if os(iOS) || os(visionOS)
-        NavigationLink(destination: Components.makeSessionPickerView($selection)) {
+        NavigationLink(destination: Components.makeSessionPicker(selection: $selection)) {
             InfoRow(title: "Sessions", details: selectedSessionTitle)
         }
 #elseif os(macOS)
@@ -32,7 +32,7 @@ struct ConsoleSessionsPickerView: View {
             Button("Select...") { isShowingPicker = true }
         }
         .popover(isPresented: $isShowingPicker, arrowEdge: .trailing) {
-            SessionPickerView(selection: $selection)
+            Components.makeSessionPicker(selection: $selection)
                 .frame(width: 260, height: 370)
 
         }
