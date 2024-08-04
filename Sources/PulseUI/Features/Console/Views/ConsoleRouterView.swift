@@ -8,12 +8,22 @@ import Pulse
 import Combine
 
 final class ConsoleRouter: ObservableObject {
+#if os(macOS)
+    @Published var selection: ConsoleSelectedItem?
+#endif
     @Published var shareItems: ShareItems?
     @Published var isShowingFilters = false
     @Published var isShowingSettings = false
     @Published var isShowingSessions = false
     @Published var isShowingShareStore = false
 }
+
+#if os(macOS)
+enum ConsoleSelectedItem: Hashable {
+    case entity(NSManagedObjectID)
+    case occurrence(NSManagedObjectID, ConsoleSearchOccurrence)
+}
+#endif
 
 struct ConsoleRouterView: View {
     @EnvironmentObject var environment: ConsoleEnvironment

@@ -13,21 +13,13 @@ import PDFKit
 
 final class FileViewerViewModel: ObservableObject {
     let title: String
-    private let context: Context
+    private let context: FileViewerViewModelContext
     var contentType: NetworkLogger.ContentType? { context.contentType }
     private let getData: () -> Data
 
     private(set) lazy var contents: Contents = render(data: getData())
 
-    struct Context {
-        var contentType: NetworkLogger.ContentType?
-        var originalSize: Int64
-        var metadata: [String: String]?
-        var isResponse = true
-        var error: NetworkLogger.DecodingError?
-    }
-
-    init(title: String, context: Context, data: @escaping () -> Data) {
+    init(title: String, context: FileViewerViewModelContext, data: @escaping () -> Data) {
         self.title = title
         self.context = context
         self.getData = data
@@ -59,37 +51,5 @@ final class FileViewerViewModel: ObservableObject {
         }
 #endif
         return nil
-    }
-}
-
-extension NetworkTaskEntity {
-    var requestFileViewerContext: FileViewerViewModel.Context {
-        FileViewerViewModel.Context(
-            contentType: originalRequest?.contentType,
-            originalSize: requestBodySize,
-            metadata: metadata,
-            isResponse: false,
-            error: nil
-        )
-    }
-
-    var responseFileViewerContext: FileViewerViewModel.Context {
-        FileViewerViewModel.Context(
-            contentType: response?.contentType,
-            originalSize: responseBodySize,
-            metadata: metadata,
-            isResponse: true,
-            error: decodingError
-        )
-    }
-
-    /// - returns `nil` if the task is an unknown state. It may happen if the
-    /// task is pending, but it's from the previous app run.
-    func state(in store: LoggerStore) -> NetworkTaskEntity.State? {
-        let state = self.state
-        if state == .pending && self.session != store.session.id {
-            return nil
-        }
-        return state
     }
 }

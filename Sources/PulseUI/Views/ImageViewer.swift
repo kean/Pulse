@@ -30,7 +30,7 @@ struct ImagePreviewViewModel {
     let image: UXImage
     let info: NSAttributedString
 
-    init(image: UXImage, data: Data, context: FileViewerViewModel.Context) {
+    init(image: UXImage, data: Data, context: FileViewerViewModelContext) {
         func intValue(for key: String) -> Int? {
             context.metadata?[key].flatMap { Int($0) }
         }
