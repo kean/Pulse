@@ -10,7 +10,7 @@ struct ConsoleMessageMetadataView: View {
     let message: LoggerMessageEntity
 
     var body: some View {
-        RichTextView(viewModel: .init(string: string))
+        Components.makeRichTextView(string: string)
 #if !os(macOS)
             .navigationTitle("Message Details")
 #endif

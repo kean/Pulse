@@ -11,6 +11,10 @@ struct Components {
     static func makeSessionPicker(selection: Binding<Set<UUID>>) -> some View {
         SessionPickerView(selection: selection)
     }
+
+    static func makeRichTextView(string: NSAttributedString) -> some View {
+        RichTextView(viewModel: .init(string: string))
+    }
 }
 
 #endif
