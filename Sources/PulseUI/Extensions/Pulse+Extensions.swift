@@ -33,38 +33,6 @@ enum LoggerEntity {
     }
 }
 
-extension NetworkTaskEntity {
-    var requestFileViewerContext: FileViewerViewModel.Context {
-        FileViewerViewModel.Context(
-            contentType: originalRequest?.contentType,
-            originalSize: requestBodySize,
-            metadata: metadata,
-            isResponse: false,
-            error: nil
-        )
-    }
-
-    var responseFileViewerContext: FileViewerViewModel.Context {
-        FileViewerViewModel.Context(
-            contentType: response?.contentType,
-            originalSize: responseBodySize,
-            metadata: metadata,
-            isResponse: true,
-            error: decodingError
-        )
-    }
-
-    /// - returns `nil` if the task is an unknown state. It may happen if the
-    /// task is pending, but it's from the previous app run.
-    func state(in store: LoggerStore) -> NetworkTaskEntity.State? {
-        let state = self.state
-        if state == .pending && self.session != store.session.id {
-            return nil
-        }
-        return state
-    }
-}
-
 extension LoggerMessageEntity {
     var logLevel: LoggerStore.Level {
         LoggerStore.Level(rawValue: level) ?? .debug
