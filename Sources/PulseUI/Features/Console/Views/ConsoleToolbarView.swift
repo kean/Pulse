@@ -106,7 +106,7 @@ private struct ConsoleToolbarTitle: View {
     }
 }
 
-private struct ConsoleModeButton: View {
+struct ConsoleModeButton: View {
     let title: String
     var details: String?
     let isSelected: Bool

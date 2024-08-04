@@ -135,6 +135,8 @@ final class ConsoleSearchOperation {
                 if let string = task.requestBody.flatMap(service.getBodyString) {
                     occurrences += ConsoleSearchOperation.search(string, term, scope)
                 }
+            case .originalRequestHeaders, .currentRequestHeaders, .responseHeaders:
+                break // Reserved
             case .responseBody:
                 if let string = task.responseBody.flatMap(service.getBodyString) {
                     occurrences += ConsoleSearchOperation.search(string, term, scope)

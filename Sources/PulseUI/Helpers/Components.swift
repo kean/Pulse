@@ -15,6 +15,10 @@ struct Components {
     static func makeRichTextView(string: NSAttributedString) -> some View {
         RichTextView(viewModel: .init(string: string))
     }
+
+    static func makeConsoleEntityCell(entity: NSManagedObject) -> some View {
+        ConsoleEntityCell(entity: entity)
+    }
 }
 
 #endif

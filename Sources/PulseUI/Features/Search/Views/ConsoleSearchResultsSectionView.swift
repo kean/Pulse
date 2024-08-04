@@ -93,6 +93,8 @@ struct ConsoleSearchResultView: View {
     @ViewBuilder
     private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
         switch occurrence.scope {
+        case .originalRequestHeaders, .currentRequestHeaders, .responseHeaders:
+            EmptyView() // Reserved
         case .requestBody:
             NetworkInspectorRequestBodyView(viewModel: .init(task: task))
         case .responseBody:

@@ -62,7 +62,7 @@ struct ConsoleStaticList: View {
 
     var body: some View {
         List {
-            ForEach(entities, id: \.objectID, content: ConsoleEntityCell.init)
+            ForEach(entities, id: \.objectID, content: Components.makeConsoleEntityCell)
         }
         .listStyle(.plain)
 #if os(iOS) || os(visionOS)
