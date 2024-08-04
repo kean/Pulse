@@ -20,7 +20,6 @@ struct ShareStoreView: View {
     @StateObject private var viewModel = ShareStoreViewModel()
 
     @Environment(\.store) private var store: LoggerStore
-    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
         content
@@ -163,10 +162,8 @@ struct ShareStoreView_Previews: PreviewProvider {
         NavigationView {
             ShareStoreView(onDismiss: {})
         }
-        .injecting(.init(store: .mock))
 #else
         ShareStoreView(onDismiss: {})
-            .injecting(.init(store: .mock))
             .frame(width: 240).fixedSize()
 #endif
     }
