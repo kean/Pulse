@@ -16,7 +16,6 @@ struct NetworkInspectorView: View {
     @State private var shareItems: ShareItems?
     @State private var sharedTask: NetworkTaskEntity?
     @ObservedObject private var settings: UserSettings = .shared
-    @EnvironmentObject private var environment: ConsoleEnvironment
     @Environment(\.store) private var store
 
 #if os(iOS) || os(visionOS)
@@ -29,7 +28,7 @@ struct NetworkInspectorView: View {
         .safeAreaInset(edge: .bottom) {
             OpenOnMacOverlay(entity: task)
         }
-        .inlineNavigationTitle(environment.delegate.getShortTitle(for: task))
+        .inlineNavigationTitle(ConsoleViewDelegate.getShortTitle(for: task))
         .sheet(item: $shareItems, content: ShareView.init)
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {

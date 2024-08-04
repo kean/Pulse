@@ -19,9 +19,8 @@ extension ConsoleView {
     ///   of the console view.
     public init(
         store: LoggerStore = .shared,
-        mode: ConsoleMode = .all,
-        delegate: ConsoleViewDelegate? = nil
+        mode: ConsoleMode = .all
     ) {
-        self.init(environment: .init(store: store, mode: mode, delegate: delegate ?? DefaultConsoleViewDelegate()))
+        self.init(environment: .init(store: store, mode: mode))
     }
 }
