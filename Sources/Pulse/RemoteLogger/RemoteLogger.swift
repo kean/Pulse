@@ -729,5 +729,5 @@ extension RemoteLogger.ConnectionState {
 }
 
 extension RemoteLogger {
-    public static var serviceType = "_pulse._tcp"
+    static let serviceType = "_pulse._tcp"
 }
