@@ -75,7 +75,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     private let keychain = Keychain(service: "com.github.kean.pulse")
     private let log: OSLog
 
-    public enum ConnectionState {
+    @frozen public enum ConnectionState {
         case disconnected, connecting, connected
     }
 

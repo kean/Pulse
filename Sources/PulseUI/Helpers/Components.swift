@@ -4,12 +4,15 @@
 
 import SwiftUI
 import Pulse
+import CoreData
 
 struct Components {
+#if os(iOS) || os(macOS) || os(visionOS)
     @available(iOS 15, macOS 13, visionOS 1, *)
     static func makeSessionPicker(selection: Binding<Set<UUID>>) -> some View {
         SessionPickerView(selection: selection)
     }
+#endif
 
     static func makeRichTextView(string: NSAttributedString) -> some View {
         RichTextView(viewModel: .init(string: string))
