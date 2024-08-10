@@ -5,7 +5,7 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 15, macOS 13, visionOS 1, *)
 struct ConsoleMessageMetadataView: View {
     let message: LoggerMessageEntity
 
@@ -50,7 +50,7 @@ private extension String {
 }
 
 #if DEBUG
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 15, macOS 13, visionOS 1, *)
 struct ConsoleMessageMetadataView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
