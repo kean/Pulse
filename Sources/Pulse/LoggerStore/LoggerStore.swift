@@ -7,9 +7,6 @@ import CoreData
 import Combine
 
 /// Persistently stores logs, network requests, and response blobs.
-///
-/// But SwiftLog is not required and ``LoggerStore`` can also just as easily be used
-/// directly. You can either create a custom store or use ``LoggerStore/shared`` one.
 public final class LoggerStore: @unchecked Sendable, Identifiable {
     public var id: ObjectIdentifier { ObjectIdentifier(self) }
 
