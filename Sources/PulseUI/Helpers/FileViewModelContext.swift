@@ -35,9 +35,9 @@ extension NetworkTaskEntity {
 
     /// - returns `nil` if the task is an unknown state. It may happen if the
     /// task is pending, but it's from the previous app run.
-    func state(in store: LoggerStore) -> NetworkTaskEntity.State? {
+    func state(in store: LoggerStore?) -> NetworkTaskEntity.State? {
         let state = self.state
-        if state == .pending && self.session != store.session.id {
+        if state == .pending, let store, self.session != store.session.id {
             return nil
         }
         return state

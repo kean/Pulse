@@ -11,7 +11,7 @@ struct StatusLabelViewModel {
     let tint: Color
     let title: String
 
-    init(task: NetworkTaskEntity, store: LoggerStore) {
+    init(task: NetworkTaskEntity, store: LoggerStore?) {
         guard let state = task.state(in: store) else {
             self.systemImage = "questionmark.diamond.fill"
             self.tint = .secondary

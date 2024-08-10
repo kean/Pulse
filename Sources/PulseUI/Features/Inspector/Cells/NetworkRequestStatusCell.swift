@@ -58,7 +58,7 @@ struct NetworkRequestStatusCellModel {
     let isMock: Bool
     fileprivate let duration: DurationViewModel?
 
-    init(task: NetworkTaskEntity, store: LoggerStore) {
+    init(task: NetworkTaskEntity, store: LoggerStore?) {
         self.status = StatusLabelViewModel(task: task, store: store)
         self.duration = DurationViewModel(task: task)
         self.isMock = task.isMocked
@@ -135,7 +135,7 @@ struct NetworkRequestStatusCell_Previews: PreviewProvider {
         NavigationView {
             List {
                 ForEach(MockTask.allEntities, id: \.objectID) { task in
-                    NetworkRequestStatusCell(viewModel: .init(task: task, store: .mock))
+                    NetworkRequestStatusCell(viewModel: .init(task: task, store: LoggerStore.mock))
                 }
             }
 #if os(macOS)
