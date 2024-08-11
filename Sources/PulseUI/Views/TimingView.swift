@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
+#if !os(watchOS)
+
 import SwiftUI
 
 struct TimingView: View {
@@ -189,4 +191,6 @@ private let mockSections = [
         TimingRowViewModel(title: "Download", value: "30.0ms", color: .systemGreen, start: 0.75, length: 100.0)
     ])
 ]
+#endif
+
 #endif

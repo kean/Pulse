@@ -41,10 +41,6 @@ struct NetworkInspectorView: View {
                     makeTransferInfo(isSentHidden: true)
                     NetworkInspectorView.makeResponseSection(task: task)
                 }
-                Section {
-                    NetworkMetricsCell(task: task)
-                    NetworkCURLCell(task: task)
-                }
             }
         }
     }

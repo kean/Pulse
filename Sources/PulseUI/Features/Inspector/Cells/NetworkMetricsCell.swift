@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
+#if !os(watchOS)
+
 import SwiftUI
 import Pulse
 
@@ -26,3 +28,5 @@ struct NetworkMetricsCell: View {
         }
     }
 }
+
+#endif

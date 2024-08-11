@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
+#if !os(watchOS)
+
 import SwiftUI
 import Pulse
 import CoreData
@@ -110,5 +112,7 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
 }
 
 private let mockTask = LoggerStore.preview.entity(for: .createAPI)
+
+#endif
 
 #endif

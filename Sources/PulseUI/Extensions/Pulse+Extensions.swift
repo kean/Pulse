@@ -99,6 +99,8 @@ private let possibleFormatters: [DateFormatter] = [
     DateFormatter(dateStyle: .short, timeStyle: .none)
 ]
 
+#if !os(watchOS)
+
 extension NetworkTaskEntity {
     func cURLDescription() -> String {
         guard let request = currentRequest ?? originalRequest,
@@ -127,3 +129,5 @@ extension NetworkTaskEntity {
         return components.joined(separator: " \\\n\t")
     }
 }
+
+#endif

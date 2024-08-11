@@ -112,15 +112,6 @@ extension UXColor {
     static let secondaryLabel = UIColor(Color.secondary)
     static let systemOrange = UIColor(Color.orange)
     static let systemRed = UIColor(Color.red)
-    static let systemBlue = UIColor(Color.blue)
-    static let systemYellow = UIColor(Color.yellow)
-    static let systemGreen = UIColor(Color.green)
-    static let systemTeal = UIColor(Color.indigo) // not available
-    static let systemPurple = UIColor(Color.purple)
-    static var systemGray = UIColor(Color.gray)
-    static var systemGray2: UIColor { systemGray.withAlphaComponent(0.9) }
-    static var systemGray3: UIColor { systemGray.withAlphaComponent(0.8) }
-    static var systemGray4: UIColor { systemGray.withAlphaComponent(0.7) }
 }
 #endif
 
