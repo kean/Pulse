@@ -69,7 +69,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         }
     }
 
-    private static let _shared = Atomic(value: LoggerStore.makeDefault())
+    private static let _shared = Mutex(LoggerStore.makeDefault())
 
     private static func register(store: LoggerStore) {
         guard Thread.isMainThread else {

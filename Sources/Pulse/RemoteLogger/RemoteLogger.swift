@@ -102,7 +102,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     }
 
     public static var shared: RemoteLogger { _shared.value }
-    private static let _shared = Atomic(value: RemoteLogger())
+    private static let _shared = Mutex(RemoteLogger())
 
     /// - parameter store: The store to be synced with the server. By default,
     /// ``LoggerStore/shared``. Only one store can be synced at at time.

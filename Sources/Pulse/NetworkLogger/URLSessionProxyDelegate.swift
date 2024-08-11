@@ -116,7 +116,7 @@ private var sharedLogger: NetworkLogger? {
     get { _sharedLogger.value }
     set { _sharedLogger.value = newValue }
 }
-private let _sharedLogger = Atomic<NetworkLogger?>(value: nil)
+private let _sharedLogger = Mutex<NetworkLogger?>(nil)
 
 public extension URLSessionProxyDelegate {
     /// Enables automatic registration of `URLSessionProxyDelegate`. After calling this method, every time

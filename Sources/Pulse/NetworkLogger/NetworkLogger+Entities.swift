@@ -515,7 +515,7 @@ extension NetworkLogger {
         }
 
         public static var any: ContentType { _any.value }
-        static let _any = Atomic(value: ContentType(rawValue: "*/*")!)
+        static let _any = Mutex(ContentType(rawValue: "*/*")!)
 
         public init(stringLiteral value: String) {
             self = ContentType(rawValue: value) ?? .any
