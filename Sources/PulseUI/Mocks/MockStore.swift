@@ -6,7 +6,7 @@ import Foundation
 import Pulse
 import CoreData
 
-#if DEBUG
+#if DEBUG || STANDALONE_PULSE_APP
 
 extension LoggerStore {
     static let mock: LoggerStore = {
