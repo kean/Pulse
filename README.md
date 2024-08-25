@@ -1,4 +1,4 @@
-<img width="2100" alt="promo-main" src="https://github.com/kean/Pulse/assets/1567433/d8d588db-e165-4beb-9aec-c4a93e59ba29">
+<img width="1440" alt="promo-1" src="https://github.com/user-attachments/assets/d36bbbb7-e884-4f96-8883-10789664cc52">
 
 <br/>
 <br/>
