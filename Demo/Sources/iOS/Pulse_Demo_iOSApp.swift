@@ -24,7 +24,7 @@ private final class AppViewModel: ObservableObject {
     let log = OSLog(subsystem: "app", category: "AppViewModel")
 
     init() {
-//         URLSessionProxyDelegate.enableAutomaticRegistration(logger: NetworkLogger(store: .demo))
+//        URLSessionProxyDelegate.enableAutomaticRegistration(logger: NetworkLogger(store: .demo))
 //        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
 //            sendRequest()
 //        }
@@ -38,7 +38,9 @@ private final class AppViewModel: ObservableObject {
 }
 
 private func sendRequest() {
-    let session = URLSession(configuration: .default)
+    let session = URLSession(configuration: .default, delegate: DemoSessionDelegate(), delegateQueue: nil)
     let task = session.dataTask(with: URLRequest(url: URL(string: "https://github.com/kean/Nuke/archive/refs/tags/11.0.0.zip")!))
     task.resume()
 }
+
+private final class DemoSessionDelegate: NSObject, URLSessionDelegate {}
