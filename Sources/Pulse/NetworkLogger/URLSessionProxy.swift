@@ -14,21 +14,22 @@ public final class URLSessionProxy {
         self.logger = logger
     }
 
-    /// Enables automatic `URLSession` logging.
+    /// Enables automatic logging and remote debugging of network requests.
+    ///
+    /// - warning: This method of logging relies heavily on swizzling and might
+    /// stop working in the future versions of the native SDKs. If you are looking
+    /// for a more stable solution, consider using ``URLSessionProxyDelegate`` or
+    /// manually logging the requests using ``NetworkLogger``.
     ///
     /// - parameter logger: The network logger to be used for recording the requests.
     public static func enable(with logger: NetworkLogger = .init()) {
-        guard URLSessionProxy.proxy == nil else {
-            NSLog("Error: Pulse.URLSessionProxy already enabled")
-            return
-        }
-        guard sharedNetworkLogger == nil else {
-            NSLog("Error: Pulse network request logging is already enabled")
-            return
-        }
+        guard !isAutomaticNetworkLoggingEnabled else { return }
+
         let proxy = URLSessionProxy(logger: logger)
         proxy.enable()
         URLSessionProxy.proxy = proxy
+
+        RemoteLoggerURLProtocol.enableAutomaticRegistration()
     }
 
     func enable() {
@@ -117,6 +118,28 @@ public final class URLSessionProxy {
             }
         }
         method_setImplementation(method, imp_implementationWithBlock(closure))
+    }
+}
+
+// MARK: - RemoteLoggerURLProtocol (Automatic Regisration)
+
+extension RemoteLoggerURLProtocol {
+    @MainActor
+    static func enableAutomaticRegistration() {
+        if let lhs = class_getClassMethod(URLSession.self, #selector(URLSession.init(configuration:delegate:delegateQueue:))),
+           let rhs = class_getClassMethod(URLSession.self, #selector(URLSession.pulse_init2(configuration:delegate:delegateQueue:))) {
+            method_exchangeImplementations(lhs, rhs)
+        }
+    }
+}
+
+private extension URLSession {
+    @objc class func pulse_init2(configuration: URLSessionConfiguration, delegate: URLSessionDelegate?, delegateQueue: OperationQueue?) -> URLSession {
+        guard isConfiguringSessionSafe(delegate: delegate) else {
+            return self.pulse_init2(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
+        }
+        configuration.protocolClasses = [RemoteLoggerURLProtocol.self] + (configuration.protocolClasses ?? [])
+        return self.pulse_init2(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
     }
 }
 
