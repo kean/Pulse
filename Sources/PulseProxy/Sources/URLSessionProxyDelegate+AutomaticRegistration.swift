@@ -30,7 +30,7 @@ private extension URLSession {
         guard !String(describing: delegate).contains("GTMSessionFetcher") else {
             return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
         }
-        configuration.protocolClasses = [URLSessionMockingProtocol.self] + (configuration.protocolClasses ?? [])
+        configuration.protocolClasses = [RemoteLoggerURLProtocol.self] + (configuration.protocolClasses ?? [])
         guard let sharedLogger else {
             assertionFailure("Shared logger is missing")
             return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)

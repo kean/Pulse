@@ -435,9 +435,9 @@ extension LoggerStore {
         }
 
         var currentRequest = event.currentRequest
-        if currentRequest?.headers?[URLSessionMockingProtocol.requestMockedHeaderName] != nil {
+        if currentRequest?.headers?[RemoteLoggerURLProtocol.requestMockedHeaderName] != nil {
             entity.isMocked = true
-            currentRequest?.headers?[URLSessionMockingProtocol.requestMockedHeaderName] = nil
+            currentRequest?.headers?[RemoteLoggerURLProtocol.requestMockedHeaderName] = nil
         } else {
             entity.isMocked = false
         }
