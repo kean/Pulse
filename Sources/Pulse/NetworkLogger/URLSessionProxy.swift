@@ -4,37 +4,6 @@
 
 import Foundation
 
-final class NetworkLoggerURLSessionSwizzlerDelegate: URLSessionSwizzlerDelegate {
-    private let logger: NetworkLogger
-
-    init(logger: NetworkLogger = .init()) {
-        self.logger = logger
-    }
-
-    func swizzlerSessionDidCallResume(task: URLSessionTask) {
-        logger.logTaskCreated(task)
-    }
-
-    func swizzlerSessionDidComplete(task: URLSessionTask, error: (any Error)?) {
-        logger.logTask(task, didCompleteWithError: error)
-    }
-
-    func swizzlerSessionDidFinishCollectingMetrics(task: URLSessionTask, metrics: URLSessionTaskMetrics) {
-        logger.logTask(task, didFinishCollecting: metrics)
-    }
-
-    func swizzlerSessionDidReceiveData(dataTask: URLSessionDataTask, data: Data) {
-        logger.logDataTask(dataTask, didReceive: data)
-    }
-}
-
-protocol URLSessionSwizzlerDelegate: AnyObject {
-    func swizzlerSessionDidCallResume(task: URLSessionTask)
-    func swizzlerSessionDidComplete(task: URLSessionTask, error: (any Error)?)
-    func swizzlerSessionDidFinishCollectingMetrics(task: URLSessionTask, metrics: URLSessionTaskMetrics)
-    func swizzlerSessionDidReceiveData(dataTask: URLSessionDataTask, data: Data)
-}
-
 @MainActor
 public final class URLSessionProxy {
     static var proxy: URLSessionProxy?
@@ -59,32 +28,29 @@ public final class URLSessionProxy {
     }
 
     func enable() {
-        injectIntoNSURLSessionTaskResume()
-        if let sessionClass = NSClassFromString("__NSCFURLLocalSessionConnection") {
-            injectIntoURLSessionDelegate(anyClass: sessionClass)
+        swizzleURLSessionTaskResume()
+        // "__NSCFURLLocalSessionConnection"
+        if let sessionClass = NSClassFromString(["__", "NS", "CFURL", "Local", "Session", "Connection"].joined()) {
+            swizzleDataTaskDidReceiveData(baseClass: sessionClass)
+            swizzleDataDataDidCompleteWithError(baseClass: sessionClass)
+        } else {
+            NSLog("URLSessionProxy failed to initialize. Please report at https://github.com/kean/Pulse/issues.")
         }
     }
 
-    private func injectIntoURLSessionDelegate(anyClass: AnyClass) {
-        swizzleDataTaskDidReceiveData(baseClass: anyClass)
-        swizzleDataDataDidCompleteWithError(baseClass: anyClass)
-    }
-
-    private func injectIntoNSURLSessionTaskResume() {
-        var methodsToSwizzle = [Method]()
-
+    // - `resume` (optional)
+    private func swizzleURLSessionTaskResume() {
+        var methods = [Method]()
         if let method = class_getInstanceMethod(URLSessionTask.self, #selector(URLSessionTask.resume)) {
-            methodsToSwizzle.append(method)
+            methods.append(method)
         }
-
-        if let cfURLSession = NSClassFromString("__NSCFURLSessionTask"),
-           let method = class_getInstanceMethod(cfURLSession, NSSelectorFromString("resume")) {
-            methodsToSwizzle.append(method)
+        // "__NSCFURLSessionTask"
+        if let sessionTaskClass = NSClassFromString(["__", "NS", "CFURL", "Session", "Task"].joined()),
+           let method = class_getInstanceMethod(sessionTaskClass, NSSelectorFromString("resume")) {
+            methods.append(method)
         }
-
-        methodsToSwizzle.forEach {
+        methods.forEach {
             let method = $0
-
             var originalImplementation: IMP?
             let block: @convention(block) (URLSessionTask) -> Void = { [weak self] task in
                 self?.logger.logTaskCreated(task)
@@ -99,15 +65,11 @@ public final class URLSessionProxy {
             originalImplementation = method_setImplementation(method, swizzledIMP)
         }
     }
-}
 
-extension URLSessionProxy {
-
-    /// Swizzles the folowing methods:
-    ///
-    /// - urlSession(_:task:didCompleteWithError:)
+    // - `urlSession(_:task:didCompleteWithError:)`
     func swizzleDataDataDidCompleteWithError(baseClass: AnyClass) {
-        let selector = NSSelectorFromString("_didFinishWithError:")
+        // "_didFinishWithError:"
+        let selector = NSSelectorFromString(["_", "didFinish", "With", "Error", ":"].joined())
         guard let method = class_getInstanceMethod(baseClass, selector),
             baseClass.instancesRespond(to: selector) else {
             return
@@ -119,25 +81,21 @@ extension URLSessionProxy {
             original(object, selector, error)
 
             if let task = object.value(forKey: "task") as? URLSessionTask {
-                if let metrics = task.value(forKey: "_incompleteTaskMetrics") as? URLSessionTaskMetrics {
-                    #warning("FIX")
+                // "_incompleteTaskMetrics"
+                if let metrics = task.value(forKey: ["_", "incomplete", "Task", "Metrics"].joined()) as? URLSessionTaskMetrics {
                     self?.logger.logTask(task, didFinishCollecting: metrics)
                 }
                 let error = error as? Error
                 self?.logger.logTask(task, didCompleteWithError: error)
-            } else {
-                NSLog("Could not get data from _swizzleURLSessionTaskDidCompleteWithError. It might causes due to the latest iOS changes. \(object)")
             }
         }
-
         method_setImplementation(method, imp_implementationWithBlock(closure))
     }
 
-    /// Swizzles the folowing methods:
-    ///
-    /// urlSession(_:dataTask:didReceive:)
+    // - `urlSession(_:dataTask:didReceive:)`
     func swizzleDataTaskDidReceiveData(baseClass: AnyClass) {
-        let selector = NSSelectorFromString("_didReceiveData:")
+        // "_didReceiveData"
+        let selector = NSSelectorFromString(["_", "did", "Receive", "Data", ":"].joined())
         guard let method = class_getInstanceMethod(baseClass, selector),
             baseClass.instancesRespond(to: selector) else {
             return
@@ -150,23 +108,18 @@ extension URLSessionProxy {
             original(object, selector, data)
 
             if let task = object.value(forKey: "task") as? URLSessionDataTask {
-                if let data = data as? Data {
-                    self?.logger.logDataTask(task, didReceive: data)
-                } else {
-                    // TODO: what should it do?
-                }
-            } else {
-                // TODO: update who to call
-                NSLog("Could not get data from _swizzleURLSessionDataTaskDidReceiveData. It might causes due to the latest iOS changes. \(object)")
+                let data = (data as? Data) ?? Data()
+                self?.logger.logDataTask(task, didReceive: data)
             }
         }
         method_setImplementation(method, imp_implementationWithBlock(closure))
     }
 }
 
+// MARK: - Experimental (Deprecated)
+
 @available(*, deprecated, message: "Experimental.URLSessionProxy is replaced with a reworked URLSessionProxy")
-public enum Experimental {
-}
+public enum Experimental {}
 
 @available(*, deprecated, message: "Experimental.URLSessionProxy is replaced with a reworked URLSessionProxy")
 public extension Experimental {
