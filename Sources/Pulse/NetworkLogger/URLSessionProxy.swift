@@ -19,7 +19,11 @@ public final class URLSessionProxy {
     /// - parameter logger: The network logger to be used for recording the requests.
     public static func enable(with logger: NetworkLogger = .init()) {
         guard URLSessionProxy.proxy == nil else {
-            NSLog("Pulse.URLSessionProxy already enabled")
+            NSLog("Error: Pulse.URLSessionProxy already enabled")
+            return
+        }
+        guard sharedNetworkLogger == nil else {
+            NSLog("Error: Pulse network request logging is already enabled")
             return
         }
         let proxy = URLSessionProxy(logger: logger)
@@ -34,7 +38,7 @@ public final class URLSessionProxy {
             swizzleDataTaskDidReceiveData(baseClass: sessionClass)
             swizzleDataDataDidCompleteWithError(baseClass: sessionClass)
         } else {
-            NSLog("URLSessionProxy failed to initialize. Please report at https://github.com/kean/Pulse/issues.")
+            NSLog("Pulse.URLSessionProxy failed to initialize. Please report at https://github.com/kean/Pulse/issues.")
         }
     }
 

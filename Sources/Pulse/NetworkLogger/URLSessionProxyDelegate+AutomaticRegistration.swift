@@ -9,8 +9,13 @@ extension URLSessionProxyDelegate {
     /// you initialize a `URLSession` using `init(configuration:delegate:delegateQueue:))` method, the
     /// delegate will automatically get replaced with a `URLSessionProxyDelegate` that logs all the
     /// needed events and forwards the methods to your original delegate.
+    @MainActor
     public static func enableAutomaticRegistration(logger: NetworkLogger = .init()) {
-        sharedLogger = logger
+        guard sharedNetworkLogger == nil else {
+            NSLog("Error: Puls network request logging is already enabled")
+            return
+        }
+        sharedNetworkLogger = logger
         if let lhs = class_getClassMethod(URLSession.self, #selector(URLSession.init(configuration:delegate:delegateQueue:))),
            let rhs = class_getClassMethod(URLSession.self, #selector(URLSession.pulse_init(configuration:delegate:delegateQueue:))) {
             method_exchangeImplementations(lhs, rhs)
@@ -18,7 +23,7 @@ extension URLSessionProxyDelegate {
     }
 }
 
-private var sharedLogger: NetworkLogger? {
+var sharedNetworkLogger: NetworkLogger? {
     get { _sharedLogger.value }
     set { _sharedLogger.value = newValue }
 }
@@ -30,11 +35,11 @@ private extension URLSession {
             return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
         }
         configuration.protocolClasses = [RemoteLoggerURLProtocol.self] + (configuration.protocolClasses ?? [])
-        guard let sharedLogger else {
+        guard let sharedNetworkLogger else {
             assertionFailure("Shared logger is missing")
             return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
         }
-        let delegate = URLSessionProxyDelegate(logger: sharedLogger, delegate: delegate)
+        let delegate = URLSessionProxyDelegate(logger: sharedNetworkLogger, delegate: delegate)
         return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
     }
 }
