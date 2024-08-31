@@ -8,6 +8,7 @@ import Combine
 import Pulse
 import Network
 
+@MainActor
 final class RemoteLoggerSettingsViewModel: ObservableObject {
     @Published var isEnabled = false
     @Published var pendingPasscodeProtectedServer: RemoteLoggerServerViewModel?
@@ -19,10 +20,10 @@ final class RemoteLoggerSettingsViewModel: ObservableObject {
 
     static var shared = RemoteLoggerSettingsViewModel()
 
-    init(logger: RemoteLogger = .shared) {
-        self.logger = logger
+    init(logger: RemoteLogger? = nil) {
+        self.logger = logger ?? .shared
 
-        isEnabled = logger.isEnabled
+        isEnabled = self.logger.isEnabled
 
         $isEnabled.dropFirst().removeDuplicates().receive(on: DispatchQueue.main)
             .throttle(for: .milliseconds(500), scheduler: DispatchQueue.main, latest: true)

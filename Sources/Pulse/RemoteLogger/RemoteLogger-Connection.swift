@@ -212,7 +212,7 @@ extension RemoteLogger {
 // MARK: Helpers
 
 extension RemoteLogger {
-    static func encode(code: UInt8, body: Data) throws -> Data {
+    nonisolated static func encode(code: UInt8, body: Data) throws -> Data {
         guard body.count < UInt32.max else {
             throw PacketParsingError.unsupportedContentSize
         }
@@ -225,7 +225,7 @@ extension RemoteLogger {
         return data
     }
 
-    static func decode(buffer: Data) throws -> (Connection.Packet, Int) {
+    nonisolated static func decode(buffer: Data) throws -> (Connection.Packet, Int) {
         let header = try PacketHeader(data: buffer)
         guard buffer.count >= header.compressedPacketLength else {
             throw PacketParsingError.notEnoughData

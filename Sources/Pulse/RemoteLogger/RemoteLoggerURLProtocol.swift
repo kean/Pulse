@@ -48,7 +48,7 @@ public final class RemoteLoggerURLProtocol: URLProtocol {
     }
 
     public override class func canInit(with request: URLRequest) -> Bool {
-        guard RemoteLogger.shared.connectionState == .connected else {
+        guard RemoteLogger.latestConnectionState.value == .connected else {
             return false
         }
         return RemoteDebugger.shared.shouldMock(request)

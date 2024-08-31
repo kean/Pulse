@@ -291,6 +291,7 @@ struct ButtonOpenOnMac: View {
     }
 }
 
+@MainActor
 private func openOnMac(_ entity: NSManagedObject) {
     switch LoggerEntity(entity) {
     case .message(let message):

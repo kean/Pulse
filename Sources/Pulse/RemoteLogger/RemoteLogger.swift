@@ -10,8 +10,7 @@ import OSLog
 
 /// Connects to the remote server and sends logs remotely. In the current version,
 /// a server is a Pulse Pro app for macOS).
-///
-/// - warning: Has to be used from the main thread.
+@MainActor
 public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegate {
     /// The store that the logger was initialized with.
     public private(set) var store: LoggerStore?
@@ -46,9 +45,13 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     @Published
     public private(set) var connectionState: ConnectionState = .disconnected {
-        didSet { os_log("Set public connection state %{public}@", log: log, "\(oldValue) → \(connectionState)") }
-
+        didSet {
+            os_log("Set public connection state %{public}@", log: log, "\(oldValue) → \(connectionState)")
+            RemoteLogger.latestConnectionState.value = connectionState
+        }
     }
+
+    nonisolated static let latestConnectionState = Mutex<ConnectionState>(.disconnected)
 
     // Browsing
     private var browser: NWBrowser?
@@ -101,8 +104,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         }
     }
 
-    public static var shared: RemoteLogger { _shared.value }
-    private static let _shared = Mutex(RemoteLogger())
+    public static let shared = RemoteLogger()
 
     /// - parameter store: The store to be synced with the server. By default,
     /// ``LoggerStore/shared``. Only one store can be synced at at time.
@@ -128,9 +130,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         // The buffer is used to cover the time between the app launch and the
         // initial (automatic) connection to the server.
-        let box = SendableBox(value: self)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
-            box.value?.clearBuffer()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) { [weak self] in
+            self?.clearBuffer()
         }
     }
 
@@ -201,12 +202,15 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         parameters.includePeerToPeer = true
 
         let browser = NWBrowser(for: .bonjourWithTXTRecord(type: RemoteLogger.serviceType, domain: nil), using: parameters)
-        let box = SendableBox(value: self)
-        browser.stateUpdateHandler = {
-            box.value?.browserDidUpdateState($0)
+        browser.stateUpdateHandler = { [weak self] state in
+            MainActor.assumeIsolated {
+                self?.browserDidUpdateState(state)
+            }
         }
-        browser.browseResultsChangedHandler = { results, _ in
-            box.value?.browserDidUpdateResults(results)
+        browser.browseResultsChangedHandler = { [weak self] results, _ in
+            MainActor.assumeIsolated {
+                self?.browserDidUpdateResults(results)
+            }
         }
         browser.start(queue: .main)
 
@@ -249,9 +253,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         os_log("Did scheduled browser retry", log: log)
 
         // Automatically retry until the user cancels
-        let box = SendableBox(value: self)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) {
-            guard let self = box.value, self.isEnabled else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) { [weak self] in
+            guard let self, self.isEnabled else { return }
             self.stopBrowser()
             self.startBrowser()
         }
@@ -440,9 +443,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         connection?.send(code: .clientHello, entity: body)
 
         // Set timeout and retry in case there was no response from the server
-        let box = SendableBox(value: self)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
-            box.value?.handshakeDidTimeout()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
+            self?.handshakeDidTimeout()
         }
     }
 
@@ -690,10 +692,6 @@ private func getFallbackDeviceId() -> UUID {
     let id = UUID()
     UserDefaults.standard.set(id.uuidString, forKey: key)
     return id
-}
-
-private struct SendableBox<T: AnyObject>: @unchecked Sendable {
-    weak var value: T?
 }
 
 private extension NWBrowser.Result {

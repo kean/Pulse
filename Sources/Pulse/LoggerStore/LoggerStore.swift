@@ -75,6 +75,13 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         guard Thread.isMainThread else {
             return DispatchQueue.main.async { register(store: store) }
         }
+        MainActor.assumeIsolated {
+            _register(store: store)
+        }
+    }
+
+    @MainActor
+    private static func _register(store: LoggerStore) {
         if RemoteLogger.shared.store == nil {
             RemoteLogger.shared.initialize(store: store)
         }
