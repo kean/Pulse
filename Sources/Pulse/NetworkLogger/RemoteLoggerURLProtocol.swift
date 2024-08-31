@@ -48,7 +48,10 @@ public final class RemoteLoggerURLProtocol: URLProtocol {
     }
 
     public override class func canInit(with request: URLRequest) -> Bool {
-        URLSessionMockManager.shared.shouldMock(request)
+        guard RemoteLogger.shared.connectionState == .connected else {
+            return false
+        }
+        return URLSessionMockManager.shared.shouldMock(request)
     }
 
     static let requestMockedHeaderName = "X-PulseRequestMocked"

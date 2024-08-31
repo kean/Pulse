@@ -36,7 +36,7 @@ final class URLSessionMockManager: @unchecked Sendable {
         if let maxCount = mock.count, count - (mock.skip ?? 0) >= maxCount {
             return false // Mock for N number of times
         }
-        return RemoteLogger.shared.connectionState == .connected
+        return true
     }
 
     private func _getMock(for request: URLRequest) -> URLSessionMock? {
