@@ -14,7 +14,7 @@ struct PulseDemo_iOS: App {
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                ConsoleView(store: .demo)
+                ConsoleView(store: .shared)
             }
         }
     }
@@ -24,10 +24,11 @@ private final class AppViewModel: ObservableObject {
     let log = OSLog(subsystem: "app", category: "AppViewModel")
 
     init() {
-//        URLSessionProxyDelegate.enableAutomaticRegistration(logger: NetworkLogger(store: .demo))
-//        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
-//            sendRequest()
-//        }
+//        URLSessionProxyDelegate.enableAutomaticRegistration()
+        URLSessionProxy.enable()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+            sendRequest()
+        }
 //        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(6)) {
 //            sendRequest()
 //        }
