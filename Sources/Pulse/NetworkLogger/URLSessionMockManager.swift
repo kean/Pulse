@@ -56,8 +56,8 @@ final class URLSessionMockManager: @unchecked Sendable {
     }
 }
 
-final class URLSessionMockingProtocol: URLProtocol {
-    override func startLoading() {
+public final class URLSessionMockingProtocol: URLProtocol {
+    public override func startLoading() {
         guard let mock = URLSessionMockManager.shared.getMock(for: request) else {
             client?.urlProtocol(self, didFailWithError: URLError(.unknown)) // Should never happen
             return
@@ -89,15 +89,15 @@ final class URLSessionMockingProtocol: URLProtocol {
         }
     }
 
-    override func stopLoading() {}
+    public override func stopLoading() {}
 
-    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+    public override class func canonicalRequest(for request: URLRequest) -> URLRequest {
         var request = request
         request.addValue("true", forHTTPHeaderField: URLSessionMockingProtocol.requestMockedHeaderName)
         return request
     }
 
-    override class func canInit(with request: URLRequest) -> Bool {
+    public override class func canInit(with request: URLRequest) -> Bool {
         URLSessionMockManager.shared.shouldMock(request)
     }
 

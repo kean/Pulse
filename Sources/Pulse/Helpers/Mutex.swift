@@ -4,11 +4,11 @@
 
 import Foundation
 
-final class Mutex<T>: @unchecked Sendable {
+package class Mutex<T>: @unchecked Sendable {
     private var _value: T
     private let lock: os_unfair_lock_t
 
-    init(_ value: T) {
+    package init(_ value: T) {
         self._value = value
         self.lock = .allocate(capacity: 1)
         self.lock.initialize(to: os_unfair_lock())
@@ -19,7 +19,7 @@ final class Mutex<T>: @unchecked Sendable {
         lock.deallocate()
     }
 
-    var value: T {
+    package var value: T {
         get {
             os_unfair_lock_lock(lock)
             defer { os_unfair_lock_unlock(lock) }
@@ -32,7 +32,7 @@ final class Mutex<T>: @unchecked Sendable {
         }
     }
 
-    func withLock<U>(_ closure: (inout T) -> U) -> U {
+    package func withLock<U>(_ closure: (inout T) -> U) -> U {
         os_unfair_lock_lock(lock)
         defer { os_unfair_lock_unlock(lock) }
         return closure(&_value)
