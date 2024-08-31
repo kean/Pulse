@@ -10,7 +10,7 @@ public extension URLSessionProxyDelegate {
     /// you initialize a `URLSession` using `init(configuration:delegate:delegateQueue:))` method, the
     /// delegate will automatically get replaced with a `URLSessionProxyDelegate` that logs all the
     /// needed events and forwards the methods to your original delegate.
-    static func enableAutomaticRegistration(logger: NetworkLogger = .init()) {
+    public static func enableAutomaticRegistration(logger: NetworkLogger = .init()) {
         sharedLogger = logger
         if let lhs = class_getClassMethod(URLSession.self, #selector(URLSession.init(configuration:delegate:delegateQueue:))),
            let rhs = class_getClassMethod(URLSession.self, #selector(URLSession.pulse_init(configuration:delegate:delegateQueue:))) {
