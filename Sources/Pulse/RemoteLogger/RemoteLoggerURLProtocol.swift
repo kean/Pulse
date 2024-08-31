@@ -8,7 +8,7 @@ import Foundation
 /// as mocking, request rewriting, breakpoints, and more.
 public final class RemoteLoggerURLProtocol: URLProtocol {
     public override func startLoading() {
-        guard let mock = URLSessionMockManager.shared.getMock(for: request) else {
+        guard let mock = RemoteDebugger.shared.getMock(for: request) else {
             client?.urlProtocol(self, didFailWithError: URLError(.unknown)) // Should never happen
             return
         }
@@ -51,7 +51,7 @@ public final class RemoteLoggerURLProtocol: URLProtocol {
         guard RemoteLogger.shared.connectionState == .connected else {
             return false
         }
-        return URLSessionMockManager.shared.shouldMock(request)
+        return RemoteDebugger.shared.shouldMock(request)
     }
 
     static let requestMockedHeaderName = "X-PulseRequestMocked"

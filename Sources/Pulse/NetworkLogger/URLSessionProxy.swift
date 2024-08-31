@@ -3,7 +3,6 @@
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import Pulse
 
 final class NetworkLoggerURLSessionSwizzlerDelegate: URLSessionSwizzlerDelegate {
     private let logger: NetworkLogger
@@ -181,7 +180,7 @@ public extension Experimental {
         public var isEnabled: Bool = false {
             didSet {
                 if isEnabled {
-                    PulseProxy.URLSessionProxy.enable(with: logger)
+                    Pulse.URLSessionProxy.enable(with: logger)
                 } else {
                     NSLog("Pulse.URLSessionProxy can't be disabled at runtime")
                 }

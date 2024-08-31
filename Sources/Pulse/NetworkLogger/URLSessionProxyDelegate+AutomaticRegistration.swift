@@ -3,9 +3,8 @@
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import Pulse
 
-public extension URLSessionProxyDelegate {
+extension URLSessionProxyDelegate {
     /// Enables automatic registration of `URLSessionProxyDelegate`. After calling this method, every time
     /// you initialize a `URLSession` using `init(configuration:delegate:delegateQueue:))` method, the
     /// delegate will automatically get replaced with a `URLSessionProxyDelegate` that logs all the
