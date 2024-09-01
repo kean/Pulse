@@ -3,6 +3,7 @@
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
+import Pulse
 
 extension NetworkLogger {
     /// Enables automatic logging and remote debugging of network requests.
@@ -37,7 +38,10 @@ extension NetworkLogger {
 
         @MainActor
         static func enable(logger: NetworkLogger?) {
-            guard !isAutomaticNetworkLoggingEnabled else { return }
+            guard NetworkLogger.URLSessionSwizzler.shared == nil else {
+                NSLog("Error: Pulse.URLSessionProxy already enabled")
+                return
+            }
 
             let proxy = URLSessionSwizzler(logger: logger)
             proxy.enable()
@@ -136,6 +140,13 @@ extension NetworkLogger {
     }
 }
 
+func isConfiguringSessionSafe(delegate: URLSessionDelegate?) -> Bool {
+    if String(describing: delegate).contains("GTMSessionFetcher") {
+        return false
+    }
+    return true
+}
+
 // MARK: - RemoteLoggerURLProtocol (Automatic Regisration)
 
 extension RemoteLoggerURLProtocol {
@@ -158,29 +169,3 @@ private extension URLSession {
     }
 }
 
-
-// MARK: - Experimental (Deprecated)
-
-@available(*, deprecated, message: "Experimental.URLSessionSwizzler is replaced with a reworked URLSessionSwizzler")
-public enum Experimental {}
-
-@available(*, deprecated, message: "Experimental.URLSessionSwizzler is replaced with a reworked URLSessionSwizzler")
-public extension Experimental {
-    @MainActor
-    final class URLSessionProxy {
-        public static let shared = URLSessionProxy()
-        public var logger: NetworkLogger = .init()
-        public var configuration: URLSessionConfiguration = .default
-        public var ignoredHosts = Set<String>()
-
-        public var isEnabled: Bool = false {
-            didSet {
-                if isEnabled {
-                    NetworkLogger.enableProxy(logger: logger)
-                } else {
-                    NSLog("Pulse.URLSessionSwizzler can't be disabled at runtime")
-                }
-            }
-        }
-    }
-}

@@ -10,7 +10,7 @@ Learn how to integrate Pulse.
 https://github.com/kean/Pulse
 ```
 
-Add both **Pulse** and **PulseUI** libraries to your app.  
+Add both **Pulse** and **PulseUI** libraries to your app. **PulseProxy** is optional and provides a quick, convenient way to capture network traffic to evaluate the framework.
 
 **Option 2**. Use precompiled binary frameworks from the [latest release](https://github.com/kean/Pulse/releases).
 
@@ -20,7 +20,7 @@ Add both **Pulse** and **PulseUI** libraries to your app.
 
 ### 2.1. Capturing Network Requests
 
-**Option 1 (Quick)**. If you are evaluating the framework, the quickest way to get started is with ``NetworkLogger/enableProxy(logger:)``.
+**Option 1 (Quickest)**. If you are evaluating the framework, the quickest way to get started is with ``NetworkLogger/enableProxy(logger:)``.
 
 ```swift
 #if DEBUG
