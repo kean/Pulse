@@ -7,11 +7,11 @@ Logger and network inspector for Apple platforms.
 ### Essentials
 
 - <doc:GettingStarted>
+- <doc:NetworkLogging-Article>
 - ``LoggerStore``
 
 ### Network Logging
 
-- <doc:NetworkLogging-Article>
 - ``NetworkLogger``
 - ``URLSessionProxyDelegate``
 - ``Experimental``

@@ -18,7 +18,7 @@ Add both **Pulse** and **PulseUI** libraries to your app. **PulseProxy** is opti
 
 **Pulse** framework contains APIs for logging, capturing, and mocking network requests, as well as connecting to the Pulse Pro apps.
 
-### 2.1. Capturing Network Requests
+### 2.1. Capture Network Requests
 
 **Option 1 (Quickest)**. If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
 
@@ -29,6 +29,8 @@ import PulseProxy
 NetworkLogger.enableProxy()
 #endif
 ```
+
+> Note: **PulseProxy** uses method swizzling and private APIs and it is not recommended to include it in the production builds of your app.
 
 **Option 2 (Recommended)**. Use ``NetworkLogger/URLSession``, a thin wrapper on top of `URLSession`. 
 
@@ -43,9 +45,9 @@ session = URLSession(configuration: .default)
 #endif
 ```
 
-> Tip: See <doc:NetworkLogging-Article> for more information about how to configure network logging if your app is not using `URLSession` directly, how to further customize it, how to capture and display decoding errors, and more. Pulse is modular and will accommodate almost any system.
+> Tip: See <doc:NetworkLogging-Article> for more information about how to configure network logging if your app does not use `URLSession` directly, how to further customize it, how to capture and display decoding errors, and more. Pulse is modular and will accommodate almost any system.
 
-### 2.2. Collecting Regular Messages
+### 2.2. Collect Regular Messages
 
 To store regular log messages, use [LoggerStore](https://kean-docs.github.io/pulse/documentation/pulse/loggerstore).
 
