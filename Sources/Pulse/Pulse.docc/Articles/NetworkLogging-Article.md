@@ -1,10 +1,42 @@
 # Capturing Network Requests
 
-Learn how to enable network logging.
+Learn how to enable and configure network logging and debugging.
 
 ## Overview
 
-Pulse works on the `URLSession` level and it needs access to its callbacks to log network requests and capture network metrics. There are multiple ways to do that and they are all covered in this article.
+Pulse works on the `URLSession` level, and it needs access to its callbacks to log network requests and capture network metrics. The framework is modular and provides multiple options that can accommodate almost any system. By the end of this article, you will have a system that:
+
+- Captures network requests and metrics
+- Supports debugging features powered by Pulse Pro, such as mocking 
+
+## Capture Network Requests
+
+### Option 1 (Quickest): PulseProxy.
+
+**Option 1 (Quickest)**. If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
+
+```swift
+import PulseProxy
+
+#if DEBUG
+NetworkLogger.enableProxy()
+#endif
+```
+
+> Note: **PulseProxy** uses method swizzling and private APIs and it is not recommended to include it in the production builds of your app.
+
+**Option 2 (Recommended)**. Use ``NetworkLogger/URLSession``, a thin wrapper on top of `URLSession`. 
+
+```swift
+import Pulse
+
+let session: URLSessionProtocol
+#if DEBUG
+session = NetworkLogger.URLSession(configuration: .default)
+#else
+session = URLSession(configuration: .default)
+#endif
+```
 
 ## Proxy Delegate
 

@@ -13,8 +13,8 @@ Logger and network inspector for Apple platforms.
 ### Network Logging
 
 - ``NetworkLogger``
+- ``URLSessionProtocol``
 - ``URLSessionProxyDelegate``
-- ``Experimental``
 
 ### Remote Logging
 
@@ -30,3 +30,7 @@ Logger and network inspector for Apple platforms.
 - ``NetworkTransactionMetricsEntity``
 - ``NetworkRequestEntity``
 - ``NetworkResponseEntity``
+
+### Deprecated
+
+- ``Experimental``

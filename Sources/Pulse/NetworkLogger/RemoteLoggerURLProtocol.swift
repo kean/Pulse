@@ -58,3 +58,26 @@ public final class RemoteLoggerURLProtocol: URLProtocol {
 
     static let requestMockedHeaderName = "X-PulseRequestMocked"
 }
+
+
+// MARK: - RemoteLoggerURLProtocol (Automatic Regisration)
+
+extension RemoteLoggerURLProtocol {
+    @MainActor
+    static func enableAutomaticRegistration() {
+        if let lhs = class_getClassMethod(URLSession.self, #selector(URLSession.init(configuration:delegate:delegateQueue:))),
+           let rhs = class_getClassMethod(URLSession.self, #selector(URLSession.pulse_init2(configuration:delegate:delegateQueue:))) {
+            method_exchangeImplementations(lhs, rhs)
+        }
+    }
+}
+
+private extension URLSession {
+    @objc class func pulse_init2(configuration: URLSessionConfiguration, delegate: URLSessionDelegate?, delegateQueue: OperationQueue?) -> URLSession {
+        guard isConfiguringSessionSafe(delegate: delegate) else {
+            return self.pulse_init2(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
+        }
+        configuration.protocolClasses = [RemoteLoggerURLProtocol.self] + (configuration.protocolClasses ?? [])
+        return self.pulse_init2(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
+    }
+}
