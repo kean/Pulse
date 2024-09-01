@@ -76,6 +76,8 @@ private extension URLSession {
             assertionFailure("Shared logger is missing")
             return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
         }
+        // TODO: warn if oyu are using this with automatic registration enabled
+        // TODO: deprecate automatic registration
         let delegate = URLSessionProxyDelegate(logger: sharedNetworkLogger, delegate: delegate)
         return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
     }
