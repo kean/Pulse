@@ -171,3 +171,5 @@ public protocol URLSessionProtocol {
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     func upload(for request: URLRequest, from bodyData: Data, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse)
 }
+
+extension URLSession: URLSessionProtocol {}

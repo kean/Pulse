@@ -4,39 +4,47 @@
 
 import Foundation
 
-extension URLSession: URLSessionProtocol {}
-
 extension NetworkLogger {
+    /// A configuration object that defines session behavior.
+    public struct URLSessionOptions: Sendable {
+        /// If enabled, registers ``RemoteLoggerURLProtocol``
+        public var isMockingEnabled = true
+
+        /// A custom logger to be used instead of ``NetworkLogger/shared``.
+        public var logger: NetworkLogger?
+
+        /// Creates default options.
+        public init() {}
+    }
+
     public final class URLSession {
         /// The underlying `URLSession`.
         public let session: Foundation.URLSession
-        var logger: NetworkLogger { _logger ?? .shared}
-        private var _logger: NetworkLogger?
+        var logger: NetworkLogger { options.logger ?? .shared}
+        private let options: URLSessionOptions
 
         public convenience init(
             configuration: URLSessionConfiguration,
-            logger: NetworkLogger? = nil
+            options: URLSessionOptions = .init()
         ) {
-            self.init(configuration: configuration, delegate: nil, delegateQueue: nil, logger: logger)
+            self.init(configuration: configuration, delegate: nil, delegateQueue: nil, options: options)
         }
 
-        public convenience init(
+        public init(
             configuration: URLSessionConfiguration,
             delegate: (any URLSessionDelegate)?,
             delegateQueue: OperationQueue?,
-            logger: NetworkLogger? = nil
+            options: URLSessionOptions = .init()
         ) {
-            let session = Foundation.URLSession(
+            if options.isMockingEnabled {
+                configuration.protocolClasses = [RemoteLoggerURLProtocol.self] + (configuration.protocolClasses ?? [])
+            }
+            self.session = Foundation.URLSession(
                 configuration: configuration,
-                delegate: URLSessionProxyDelegate(logger: logger, delegate: delegate),
+                delegate: URLSessionProxyDelegate(logger: options.logger, delegate: delegate),
                 delegateQueue: delegateQueue
             )
-            self.init(session: session, logger: logger)
-        }
-
-        public init(session: Foundation.URLSession, logger: NetworkLogger? = nil) {
-            self.session = session
-            self._logger = logger
+            self.options = options
         }
     }
 }
