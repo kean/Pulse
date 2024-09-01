@@ -24,8 +24,22 @@ public final class NetworkLogger: @unchecked Sendable {
     private var isFilteringNeeded = false
     private let lock = NSLock()
 
-    // TODO: allow configuring this
-    public static var shared: NetworkLogger { _shared.value }
+    /// A shared network logger.
+    ///
+    /// You can configure a logger by creating a new instance and setting it as
+    /// a shared logger:
+    ///
+    /// ```swift
+    /// NetworkLogger.shared = NetworkLogger {
+    ///     $0.excludedHosts = ["github.com"]
+    /// }
+    /// ```
+    ///
+    /// The best place to do it is at the app launch.
+    public static var shared: NetworkLogger {
+        get { _shared.value }
+        set { _shared.value = newValue }
+    }
     private static let _shared = Mutex(NetworkLogger())
 
     /// The logger configuration.
