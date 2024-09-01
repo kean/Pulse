@@ -16,39 +16,30 @@ Add both **Pulse** and **PulseUI** libraries to your app.
 
 ## 2. Integrate Pulse Framework
 
-**Pulse** framework contains APIs for capturing network requests, logging, and connecting to Pulse apps. 
+**Pulse** framework contains APIs for logging, capturing, and mocking network requests, as well as connecting to the Pulse Pro apps.
 
 ### 2.1. Capturing Network Requests
 
-**Option 1 (Quickest)**. If you are evaluating the framework, the quickest way to get started is ``NetworkLogger/enableProxy``:
+**Option 1 (Quick)**. If you are evaluating the framework, the quickest way to get started is with ``NetworkLogger/enableProxy(logger:)``.
 
 ```swift
+#if DEBUG
 NetworkLogger.enableProxy()
+#endif
 ```
 
-**Option 2 (Recommended)**. Use ``URLSessionProxyDelegate`` with your delegate-based `URLSession` instance: 
+**Option 2 (Recommended)**. Use ``NetworkLogger/URLSession``, a thin wrapper on top of `URLSession`. 
 
 ```swift
-// Enable remote logger features (required for Pulse Pro)
-let configuration = URLSessionConfiguration.default
-configuration.protocolClasses = [RemoteLoggerURLProtocol.self]
-
-// Enable capturing of network traffic using a proxy delegate.
-let session = URLSession(
-    configuration: configuration,
-    delegate: URLSessionProxyDelegate(delegate: <#ActualDelegate#>),
-    delegateQueue: nil
-)
+let session: URLSessionProtocol
+#if DEBUG
+session = NetworkLogger.URLSession(configuration: .default)
+#else
+session = URLSession(configuration: .default)
+#endif
 ```
 
-```swift
-// Alternatively, enable `URLSessionProxyDelegate` for all URLSession instances.
-URLSessionProxyDelegate.enableAutomaticRegistration()
-```
-
-> Important: This option works only with delegate-based sessions, which includes [Alamofire](https://github.com/Alamofire/Alamofire) and [Get](https://github.com/kean/Get). It will **not** work with `URLSession.shared`. For other options, see the dedicated [guide](https://kean-docs.github.io/pulse/documentation/pulse/networklogging-article).
-
-> Tip: To get the most out of the network logger, follow the <doc:NetworkLogging-Article> guide. For example, starting with Pulse 2.0, you can record and view [decoding errors](https://kean.blog/post/pulse-2#decoding-errors) which makes it much easier to see why decoding is failing.
+> Tip: See <doc:NetworkLogging-Article> for more information about how to configure network logging if your app is not using `URLSession` directly, how to further customize it, how to capture and display decoding errors, and more. Pulse is modular and will accommodate almost any system.
 
 ### 2.2. Collecting Regular Messages
 

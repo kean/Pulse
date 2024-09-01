@@ -33,7 +33,7 @@ extension NetworkLogger {
         public init(
             configuration: URLSessionConfiguration,
             delegate: (any URLSessionDelegate)?,
-            delegateQueue: OperationQueue?,
+            delegateQueue: OperationQueue? = nil,
             options: URLSessionOptions = .init()
         ) {
             if options.isMockingEnabled {
@@ -197,6 +197,7 @@ extension NetworkLogger.URLSession: URLSessionProtocol {
         fatalError("Not implemented")
     }
 
+    // TODO: Make it a standalone feature.
     @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func data(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
         // TODO: is this an isssue because with use the same delegate when creating session?
