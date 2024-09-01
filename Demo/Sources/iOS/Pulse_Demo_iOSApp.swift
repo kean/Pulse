@@ -43,9 +43,10 @@ private let demoDelegate = DemoSessionDelegate()
 
 private func sendRequest() {
     Task {
-        let session = URLSession(configuration: .default, delegate: DemoSessionDelegate(), delegateQueue: nil)
+        let original = URLSession(configuration: .default, delegate: DemoSessionDelegate(), delegateQueue: nil)
+        let session = NetworkLogger.URLSessionProxy(session: original)
         if #available(iOS 15.0, *) {
-            let data = try await session.proxy.data(from: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!, delegate: nil)
+            let data = try await session.data(from: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!, delegate: nil)
             print(data.0.count)
         } else {
             // Fallback on earlier versions

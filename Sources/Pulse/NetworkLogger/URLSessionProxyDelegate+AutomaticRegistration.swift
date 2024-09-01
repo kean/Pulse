@@ -42,7 +42,7 @@ extension URLSessionProxyDelegate {
 /// existing mechanisms provided by Pulse.
 @MainActor
 var isAutomaticNetworkLoggingEnabled: Bool {
-    guard NetworkLogger.URLSessionProxy.proxy == nil else {
+    guard NetworkLogger.URLSessionSwizzler.shared == nil else {
         NSLog("Error: Pulse.URLSessionProxy already enabled")
         return true
     }
