@@ -29,7 +29,7 @@ struct NetworkInspectorResponseBodyView: View {
                 return title
             }())
         } else if viewModel.task.responseBodySize > 0 {
-            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", subtitle: "The response body was deleted from the store to reduce its size")
+            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", subtitle: "The response body was deleted from the store to reduce its size. Increase `responseBodySizeLimit` of the store.")
         } else {
             PlaceholderView(imageName: "nosign", title: "Empty Response")
         }

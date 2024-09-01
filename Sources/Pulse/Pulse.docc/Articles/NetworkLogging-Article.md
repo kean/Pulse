@@ -1,4 +1,4 @@
-# Logging Network Requests
+# Capturing Network Requests
 
 Learn how to enable network logging.
 

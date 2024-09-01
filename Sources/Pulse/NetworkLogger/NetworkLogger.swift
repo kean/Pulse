@@ -24,6 +24,10 @@ public final class NetworkLogger: @unchecked Sendable {
     private var isFilteringNeeded = false
     private let lock = NSLock()
 
+    // TODO: allow configuring this
+    public static var shared: NetworkLogger { _shared.value }
+    private static let _shared = Mutex(NetworkLogger())
+
     /// The logger configuration.
     public struct Configuration: Sendable {
         /// A custom label to associated with stored messages.
@@ -104,6 +108,11 @@ public final class NetworkLogger: @unchecked Sendable {
         var configuration = Configuration()
         configure(&configuration)
         self.init(store: store, configuration: configuration)
+    }
+
+    // TODO: finish this
+    public func configure(_ configure: (inout Configuration)) {
+
     }
 
     // MARK: Patterns

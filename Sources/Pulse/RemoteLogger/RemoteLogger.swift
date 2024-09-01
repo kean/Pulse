@@ -114,12 +114,12 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         guard self.store !== store else {
             return
         }
+
         self.store = store
         if isInitialized {
             cancel()
         }
         isInitialized = true
-
         if isEnabled {
             startBrowser()
         }

@@ -39,7 +39,10 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
 
     // MARK: URLSessionTaskDelegate
 
+    var createdTask: URLSessionTask?
+
     public func urlSession(_ session: URLSession, didCreateTask task: URLSessionTask) {
+        createdTask = task
         logger.logTaskCreated(task)
         if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
             taskDelegate?.urlSession?(session, didCreateTask: task)
@@ -94,3 +97,75 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
         interceptedSelectors.contains(selector) ? nil : actualDelegate
     }
 }
+
+extension URLSession {
+    // TODO: allow configuring shared logger
+    public var proxy: NetworkCapturingProxy {
+        NetworkCapturingProxy(session: self, logger: .shared)
+    }
+
+    // TODO: add other methods + completion-based APIs
+    public struct NetworkCapturingProxy {
+        let session: URLSession
+        let logger: NetworkLogger
+
+        @available(iOS 15, tvOS 15, macOS 12, watchOS 8, *)
+        public func data(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
+            let delegate = URLSessionProxyDelegate(logger: logger, delegate: delegate)
+            do {
+                let (data, response) = try await session.data(for: request, delegate: delegate)
+                if let task = delegate.createdTask as? URLSessionDataTask {
+                    logger.logDataTask(task, didReceive: data)
+                    logger.logTask(task, didCompleteWithError: nil)
+                }
+                return (data, response)
+            } catch {
+                if let task = delegate.createdTask {
+                    logger.logTask(task, didCompleteWithError: error)
+                }
+                throw error
+            }
+        }
+
+        @available(iOS 15, tvOS 15, macOS 12, watchOS 8, *)
+        public func data(from url: URL, delegate: (any URLSessionTaskDelegate)? = nil) async throws -> (Data, URLResponse) {
+            try await data(for: URLRequest(url: url), delegate: delegate)
+        }
+    }
+}
+
+public protocol URLSessionProtocol {
+    /// Convenience method to load data using a URLRequest, creates and resumes a URLSessionDataTask internally.
+    ///
+    /// - Parameter request: The URLRequest for which to load data.
+    /// - Parameter delegate: Task-specific delegate.
+    /// - Returns: Data and response.
+    @available(iOS 15, tvOS 15, macOS 12, watchOS 8, *)
+    func data(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse)
+
+    /// Convenience method to load data using a URL, creates and resumes a URLSessionDataTask internally.
+    ///
+    /// - Parameter url: The URL for which to load data.
+    /// - Parameter delegate: Task-specific delegate.
+    /// - Returns: Data and response.
+    @available(iOS 15, tvOS 15, macOS 12, watchOS 8, *)
+    func data(from url: URL, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse)
+}
+
+extension URLSession: URLSessionProtocol {}
+
+//public final class URLSessionProxy {
+//    
+//}
+
+// Enable remote logger features (required for Pulse Pro)
+//let configuration = URLSessionConfiguration.default
+//configuration.protocolClasses = [RemoteLoggerURLProtocol.self]
+//
+//
+//// Enable capturing of network traffic using a proxy delegate.
+//let session = URLSession(
+//    configuration: configuration,
+//    delegate: URLSessionProxyDelegate(delegate: <#ActualDelegate#>),
+//    delegateQueue: nil
+//)

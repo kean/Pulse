@@ -17,8 +17,17 @@ extension URLSessionProxyDelegate {
     /// for automatic logging or manually logging the requests using ``NetworkLogger``.
     ///
     /// - parameter logger: The network logger to be used for recording the requests.
-    @MainActor
     public static func enableAutomaticRegistration(logger: NetworkLogger = .init()) {
+        guard Thread.isMainThread else {
+            return DispatchQueue.main.async { _enableAutomaticRegistration(logger: logger) }
+        }
+        MainActor.assumeIsolated {
+            _enableAutomaticRegistration(logger: logger)
+        }
+    }
+
+    @MainActor
+    static func _enableAutomaticRegistration(logger: NetworkLogger = .init()) {
         guard !isAutomaticNetworkLoggingEnabled else { return }
 
         sharedNetworkLogger = logger
@@ -33,7 +42,7 @@ extension URLSessionProxyDelegate {
 /// existing mechanisms provided by Pulse.
 @MainActor
 var isAutomaticNetworkLoggingEnabled: Bool {
-    guard URLSessionProxy.proxy == nil else {
+    guard NetworkLogger.URLSessionProxy.proxy == nil else {
         NSLog("Error: Pulse.URLSessionProxy already enabled")
         return true
     }

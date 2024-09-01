@@ -2,29 +2,55 @@
 
 Learn how to integrate Pulse.
 
-## Overview
+## 1. Add Frameworks
 
-Pulse is a framework that provides complete access to the underlying data, and there are many ways to use it. This guide describes the basic integration steps.
-
-## 1. Add Pulse and PulseUI Frameworks to Your App
-
-There are two main installation options:
-
-- Add Pulse Swift package to your project using SPM
+**Option 1 (Recommended)**. Add package to your project using SwiftPM.
 
 ```
 https://github.com/kean/Pulse
 ```
 
-- Use precompiled binary frameworks from the [latest release](https://github.com/kean/Pulse/releases)
+Add both **Pulse** and **PulseUI** libraries to your app.  
 
-> info: If you'd like to create binary frameworks using a specific Xcode version, consider using [swift-create-xcframework](https://github.com/marketplace/actions/swift-create-xcframework).
+**Option 2**. Use precompiled binary frameworks from the [latest release](https://github.com/kean/Pulse/releases).
 
 ## 2. Integrate Pulse Framework
 
-To start collecting logs, use [Pulse](https://kean-docs.github.io/pulse/documentation/pulse/) framework.
+**Pulse** framework contains APIs for capturing network requests, logging, and connecting to Pulse apps. 
 
-### 2.1. Collecting Regular Messages
+### 2.1. Capturing Network Requests
+
+**Option 1 (Quickest)**. If you are evaluating the framework, the quickest way to get started is ``NetworkLogger/enableProxy``:
+
+```swift
+NetworkLogger.enableProxy()
+```
+
+**Option 2 (Recommended)**. Use ``URLSessionProxyDelegate`` with your delegate-based `URLSession` instance: 
+
+```swift
+// Enable remote logger features (required for Pulse Pro)
+let configuration = URLSessionConfiguration.default
+configuration.protocolClasses = [RemoteLoggerURLProtocol.self]
+
+// Enable capturing of network traffic using a proxy delegate.
+let session = URLSession(
+    configuration: configuration,
+    delegate: URLSessionProxyDelegate(delegate: <#ActualDelegate#>),
+    delegateQueue: nil
+)
+```
+
+```swift
+// Alternatively, enable `URLSessionProxyDelegate` for all URLSession instances.
+URLSessionProxyDelegate.enableAutomaticRegistration()
+```
+
+> Important: This option works only with delegate-based sessions, which includes [Alamofire](https://github.com/Alamofire/Alamofire) and [Get](https://github.com/kean/Get). It will **not** work with `URLSession.shared`. For other options, see the dedicated [guide](https://kean-docs.github.io/pulse/documentation/pulse/networklogging-article).
+
+> Tip: To get the most out of the network logger, follow the <doc:NetworkLogging-Article> guide. For example, starting with Pulse 2.0, you can record and view [decoding errors](https://kean.blog/post/pulse-2#decoding-errors) which makes it much easier to see why decoding is failing.
+
+### 2.2. Collecting Regular Messages
 
 To store regular log messages, use [LoggerStore](https://kean-docs.github.io/pulse/documentation/pulse/loggerstore).
 
@@ -39,29 +65,7 @@ LoggerStore.shared.storeMessage(
 
 > info: As an alternative to using `LoggerStore` directly, you can use Pulse as a SwiftLog backend using [PersistentLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler/persistentloghandler) struct from [PulseLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler) which is a [Swift package distributed separately](https://github.com/kean/PulseLogHandler).  This way you can have more than one logger at once.
 
-### 2.2. Collecting Network Requests
-
-The recommended option is to use ``URLSessionProxyDelegate`` which sits between [`URLSession`](https://developer.apple.com/documentation/foundation/urlsession) and your actual [`URLSessionDelegate`](https://developer.apple.com/documentation/foundation/urlsessiondelegate).
-
-You can enable ``URLSessionProxyDelegate`` for all `URLSession` instances created by the app by using ``URLSessionProxyDelegate/enableAutomaticRegistration(logger:)``.
-
-```swift
-// Call it anywhere in your code before instantiating a `URLSession`
-URLSessionProxyDelegate.enableAutomaticRegistration()
-
-// Instantiate `URLSession` as usual
-let session = URLSession(
-    configuration: .default,
-    delegate: YourURLSessionDelegate(),
-    delegateQueue: nil
-)
-```
-
-> Important: This option works only with delegate-based sessions, which includes [Alamofire](https://github.com/Alamofire/Alamofire) and [Get](https://github.com/kean/Get). It will **not** work with `URLSession.shared`. For other options, see the dedicated [guide](https://kean-docs.github.io/pulse/documentation/pulse/networklogging-article).
-
 Logs are stored persistently and the store automatically removes old messages and limits the overall size (configurable). It uses a number of space [optimizations techniques](https://kean.blog/post/pulse-2#space-savings), including fast [lzfse](https://developer.apple.com/documentation/compression/algorithm/lzfse) compression.
-
-> Tip: To get the most out of the network logger, follow the <doc:NetworkLogging-Article> guide. For example, starting with Pulse 2.0, you can record and view [decoding errors](https://kean.blog/post/pulse-2#decoding-errors) which makes it much easier to see why decoding is failing.
 
 ## 3. Integrate PulseUI Framework
 
