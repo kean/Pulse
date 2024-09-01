@@ -79,7 +79,7 @@ extension NetworkLogger.URLSession: URLSessionProtocol {
         session.uploadTask(with: request, fromFile: fileURL)
     }
 
-    @available(iOS 17.0, *)
+    @available(iOS 17, tvOS 17, macOS 14, watchOS 9, *)
     public func uploadTask(withResumeData resumeData: Data) -> URLSessionUploadTask {
         session.uploadTask(withResumeData: resumeData)
     }
@@ -177,28 +177,23 @@ extension NetworkLogger.URLSession: URLSessionProtocol {
 
     // MARK: - Swift Concurrency
 
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func data(for request: URLRequest) async throws -> (Data, URLResponse) {
         try await data(for: request, delegate: nil)
     }
 
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func data(from url: URL) async throws -> (Data, URLResponse) {
         fatalError("Not implemented")
     }
 
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func upload(for request: URLRequest, fromFile fileURL: URL) async throws -> (Data, URLResponse) {
         fatalError("Not implemented")
     }
 
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func upload(for request: URLRequest, from bodyData: Data) async throws -> (Data, URLResponse) {
         fatalError("Not implemented")
     }
 
     // TODO: Make it a standalone feature.
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func data(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
         // TODO: is this an isssue because with use the same delegate when creating session?
         // TODO: Make createdTask public here? probably not
@@ -219,17 +214,14 @@ extension NetworkLogger.URLSession: URLSessionProtocol {
         }
     }
 
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func data(from url: URL, delegate: (any URLSessionTaskDelegate)? = nil) async throws -> (Data, URLResponse) {
         try await data(for: URLRequest(url: url), delegate: delegate)
     }
 
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func upload(for request: URLRequest, fromFile fileURL: URL, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
         fatalError("Not implemented")
     }
 
-    @available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
     public func upload(for request: URLRequest, from bodyData: Data, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
         fatalError("Not implemented")
     }
