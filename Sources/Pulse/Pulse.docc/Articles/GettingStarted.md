@@ -4,7 +4,7 @@ Learn how to integrate Pulse.
 
 ## 1. Add Frameworks
 
-**Option 1 (Recommended)**. Add package to your project using SwiftPM.
+- **Option 1 (Recommended)**. Add package to your project using SwiftPM.
 
 ```
 https://github.com/kean/Pulse
@@ -12,7 +12,7 @@ https://github.com/kean/Pulse
 
 Add both **Pulse** and **PulseUI** libraries to your app. **PulseProxy** is optional and provides a quick, convenient way to capture network traffic to evaluate the framework.
 
-**Option 2**. Use precompiled binary frameworks from the [latest release](https://github.com/kean/Pulse/releases).
+- **Option 2**. Use precompiled binary frameworks from the [latest release](https://github.com/kean/Pulse/releases).
 
 ## 2. Integrate Pulse Framework
 
@@ -20,7 +20,7 @@ Add both **Pulse** and **PulseUI** libraries to your app. **PulseProxy** is opti
 
 ### 2.1. Capture Network Requests
 
-**Option 1 (Quickest)**. If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
+- **Option 1 (Quickest)**. If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
 
 ```swift
 import PulseProxy
@@ -30,9 +30,9 @@ NetworkLogger.enableProxy()
 #endif
 ```
 
-> Note: **PulseProxy** uses method swizzling and private APIs and it is not recommended to include it in the production builds of your app.
+> Note: **PulseProxy** uses method swizzling and private APIs and it is not recommended that you include it in the production builds of your app.
 
-**Option 2 (Recommended)**. Use ``NetworkLogger/URLSession``, a thin wrapper on top of `URLSession`. 
+- **Option 2 (Recommended)**. Use ``NetworkLogger/URLSession``, a thin wrapper on top of `URLSession`. 
 
 ```swift
 import Pulse

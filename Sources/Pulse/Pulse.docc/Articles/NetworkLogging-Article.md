@@ -11,9 +11,9 @@ Pulse works on the `URLSession` level, and it needs access to its callbacks to l
 
 ## Capture Network Requests
 
-### Option 1 (Quickest): PulseProxy.
+The first step is to capture network traffic.
 
-**Option 1 (Quickest)**. If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
+- **Option 1 (Quickest)**. If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
 
 ```swift
 import PulseProxy
@@ -23,9 +23,9 @@ NetworkLogger.enableProxy()
 #endif
 ```
 
-> Note: **PulseProxy** uses method swizzling and private APIs and it is not recommended to include it in the production builds of your app.
+> Important: **PulseProxy** uses method swizzling and private APIs, and it is not recommended that you include it in the production builds of your app. It is also not guaranteed to continue working with new versions of the system SDKs.
 
-**Option 2 (Recommended)**. Use ``NetworkLogger/URLSession``, a thin wrapper on top of `URLSession`. 
+- **Option 2 (Recommended)**. Use ``NetworkLogger/URLSession``, a thin wrapper on top of `URLSession`. 
 
 ```swift
 import Pulse
@@ -38,42 +38,28 @@ session = URLSession(configuration: .default)
 #endif
 ```
 
-## Proxy Delegate
+``NetworkLogger/URLSession`` is the best way to integrate Pulse because it supports all `URLSession` APIs, including the new Async/Await methods. It also makes it easy to remove it conditionally.
 
-The recommended option is to use ``URLSessionProxyDelegate`` which sits between [`URLSession`](https://developer.apple.com/documentation/foundation/urlsession) and your actual [`URLSessionDelegate`](https://developer.apple.com/documentation/foundation/urlsessiondelegate).
+- **Option 3.** Use ``URLSessionProxyDelegate``.
 
-You can enable ``URLSessionProxyDelegate`` for all `URLSession` instances created by the app by using ``URLSessionProxyDelegate/enableAutomaticRegistration(logger:)`` (note that it uses Objective-C runtime to achieve that):
-
-```swift
-// Call it anywhere in your code prior to instantiating a `URLSession`
-URLSessionProxyDelegate.enableAutomaticRegistration()
-
-// Instantiate `URLSession` as usual
-let session = URLSession(configuration: .default, delegate: YourURLSessionDelegate(), delegateQueue: nil)
-```
-
-And if you want to enable logging just for specific sessions, use ``URLSessionProxyDelegate`` directly:
+If you use a delegate-based `URLSession` that doesn't rely on any of its convenience APIs, such as [Alamofire](https://github.com/Alamofire/Alamofire), you can record its traffic using a proxy delegate.   
 
 ```swift
-let delegate = URLSessionProxyDelegate(delegate: YourURLSessionDelegate())
+let delegate = URLSessionProxyDelegate(delegate: <#YourSessionDelegate#>)
 let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
 ```
 
-> important: Both these options work only with sessions that use a delegate-based approach and won't work with `URLSession.shared`. In that can you can either log the requests manually, which is covered in the next section or try ``Experimental/URLSessionProxy``.
+- **Option 4 (Manual).** Use ``NetworkLogger`` directly.
 
-## Manual Logging
-
-Another option for capturing network requests is by using ``NetworkLogger`` directly. For example, here can you can use it with Alamofire's `EventMonitor`:
+If none of the convenience APIs described earlier work for you, you can use the underlying ``NetworkLogger`` directly. For example, here is how you can use it with Alamofire's `EventMonitor`:
 
 ```swift
 import Alamofire
 
-// Don't forget to bootstrap the logging system first.
-
-let session = Alamofire.Session(eventMonitors: [NetworkLoggerEventMonitor(logger: logger)])
+let session = Alamofire.Session(eventMonitors: [NetworkLoggerEventMonitor()])
 
 struct NetworkLoggerEventMonitor: EventMonitor {
-    let logger: NetworkLogger
+    var logger: NetworkLogger = .shared
 
     func request(_ request: Request, didCreateTask task: URLSessionTask) {
         logger.logTaskCreated(task)

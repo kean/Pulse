@@ -17,6 +17,8 @@ extension URLSessionProxyDelegate {
     /// for automatic logging or manually logging the requests using ``NetworkLogger``.
     ///
     /// - parameter logger: The network logger to be used for recording the requests. By default, uses shared logger.
+    ///
+    /// - warning: This method is soft-deprecated in Pulse 5.0.
     public static func enableAutomaticRegistration(logger: NetworkLogger? = nil) {
         guard Thread.isMainThread else {
             return DispatchQueue.main.async { _enableAutomaticRegistration(logger: logger) }
