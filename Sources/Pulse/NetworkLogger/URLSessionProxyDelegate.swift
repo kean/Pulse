@@ -15,14 +15,16 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
     private let actualDelegate: URLSessionDelegate?
     private let taskDelegate: URLSessionTaskDelegate?
     private let interceptedSelectors: Set<Selector>
-    private let logger: NetworkLogger
+    private var logger: NetworkLogger { _logger ?? .shared }
+    private let _logger: NetworkLogger?
 
-    /// - parameter logger: By default, creates a logger with `LoggerStore.shared`.
+    /// - parameter logger: By default, uses a shared logger
     /// - parameter delegate: The "actual" session delegate, strongly retained.
-    public init(logger: NetworkLogger = .init(), delegate: URLSessionDelegate? = nil) {
+    public init(logger: NetworkLogger? = nil, delegate: URLSessionDelegate? = nil) {
         self.actualDelegate = delegate
         self.taskDelegate = delegate as? URLSessionTaskDelegate
-        self.logger = logger
+        self._logger = logger
+
         var interceptedSelectors: Set = [
             #selector(URLSessionDataDelegate.urlSession(_:dataTask:didReceive:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didCompleteWithError:)),

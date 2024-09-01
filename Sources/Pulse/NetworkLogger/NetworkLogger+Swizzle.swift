@@ -12,9 +12,8 @@ extension NetworkLogger {
     /// for a more stable solution, consider using ``URLSessionSwizzlerDelegate`` or
     /// manually logging the requests using ``NetworkLogger``.
     ///
-    /// - parameter logger: The network logger to be used for recording the requests.
-    /// By default, uses current shared logger.
-    public static func enableProxy(logger: NetworkLogger = .shared) {
+    /// - parameter logger: The network logger to be used for recording the requests. By default, uses shared logger.
+    public static func enableProxy(logger: NetworkLogger? = nil) {
         guard Thread.isMainThread else {
             return DispatchQueue.main.async { NetworkLogger.URLSessionSwizzler.enable(logger: logger) }
         }
@@ -29,11 +28,11 @@ extension NetworkLogger {
     final class URLSessionSwizzler {
         static var shared: URLSessionSwizzler?
 
-        private var logger: NetworkLogger { customLogger ?? .shared }
-        private let customLogger: NetworkLogger?
+        private var logger: NetworkLogger { _logger ?? .shared }
+        private let _logger: NetworkLogger?
 
         init(logger: NetworkLogger?) {
-            self.customLogger = logger
+            self._logger = logger
         }
 
         @MainActor

@@ -110,11 +110,6 @@ public final class NetworkLogger: @unchecked Sendable {
         self.init(store: store, configuration: configuration)
     }
 
-    // TODO: finish this
-    public func configure(_ configure: (inout Configuration)) {
-
-    }
-
     // MARK: Patterns
 
     private func processPatterns() {

@@ -26,10 +26,9 @@ extension NetworkLogger {
             delegateQueue: OperationQueue?,
             logger: NetworkLogger? = nil
         ) {
-            // TODO: stop using shared logger
             let session = Foundation.URLSession(
                 configuration: configuration,
-                delegate: URLSessionProxyDelegate(logger: logger ?? .shared, delegate: delegate),
+                delegate: URLSessionProxyDelegate(logger: logger, delegate: delegate),
                 delegateQueue: delegateQueue
             )
             self.init(session: session, logger: logger)
