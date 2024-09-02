@@ -20,19 +20,7 @@ Add both **Pulse** and **PulseUI** libraries to your app. **PulseProxy** is opti
 
 ### 2.1. Capture Network Requests
 
-- **Option 1 (Quickest)**. If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
-
-```swift
-import PulseProxy
-
-#if DEBUG
-NetworkLogger.enableProxy()
-#endif
-```
-
-> note: **PulseProxy** uses method swizzling and private APIs and it is not recommended that you include it in the production builds of your app.
-
-- **Option 2 (Recommended)**. Use ``URLSessionProxy``, a thin wrapper on top of `URLSession`. 
+- **Option 1 (Recommended)**. Use ``URLSessionProxy``, a thin wrapper on top of `URLSession`. 
 
 ```swift
 import Pulse
@@ -45,6 +33,18 @@ let session: URLSessionProtocol = URLSession(configuration: .default)
 ```
 
 > tip: See <doc:NetworkLogging-Article> for more information about how to configure network logging if your app does not use `URLSession` directly, how to further customize it, how to capture and display decoding errors, and more. Pulse is modular and will accommodate almost any system.
+
+- **Option 2 (Quickest)**. If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
+
+```swift
+import PulseProxy
+
+#if DEBUG
+NetworkLogger.enableProxy()
+#endif
+```
+
+> note: **PulseProxy** uses method swizzling and private APIs and it is not recommended that you include it in the production builds of your app.
 
 ### 2.2. Collect Regular Messages
 

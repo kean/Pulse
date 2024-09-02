@@ -13,21 +13,7 @@ Pulse works on the `URLSession` level, and it needs access to its callbacks to l
 
 The first step is to capture network traffic.
 
-### Option 1 (Quickest)
-
-If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
-
-```swift
-import PulseProxy
-
-#if DEBUG
-NetworkLogger.enableProxy()
-#endif
-```
-
-> important: **PulseProxy** uses method swizzling and private APIs, and it is not recommended that you include it in the production builds of your app. It is also not guaranteed to continue working with new versions of the system SDKs.
-
-### Option 2 (Recommended)
+### Option 1 (Recommended)
 
 Use ``URLSessionProxy``, a thin wrapper on top of `URLSession`. 
 
@@ -42,6 +28,20 @@ let session: URLSessionProtocol = URLSession(configuration: .default)
 ```
 
 ``URLSessionProxy`` is the best way to integrate Pulse because it supports all `URLSession` APIs, including the new Async/Await methods. It also makes it easy to remove it conditionally.
+
+### Option 2 (Quickest)
+
+If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
+
+```swift
+import PulseProxy
+
+#if DEBUG
+NetworkLogger.enableProxy()
+#endif
+```
+
+> important: **PulseProxy** uses method swizzling and private APIs, and it is not recommended that you include it in the production builds of your app. It is also not guaranteed to continue working with new versions of the system SDKs.
 
 ### Option 3
 
