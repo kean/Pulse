@@ -18,29 +18,20 @@
 
 - ``allMessages()``
 - ``allTasks()``
-- ``getBlobData(forKey:)``
 
-### Export
+### Exporting Logs
 
 - ``export(to:options:)``
 - ``ExportOptions``
 
 ### Managing the Store
 
+- ``info()``
 - ``removeAll()``
 - ``removeSessions(withIDs:)``
 - ``close()``
 - ``destroy()``
-
-### Getting Store Info
-
-- ``info()``
-- ``Info``
-
-### Receiving and Filtering Events
-
-- ``events``
-- ``Event``
+- ``getBlobData(forKey:)``
 
 ### Direct Database Access
 
@@ -48,14 +39,6 @@
 - ``viewContext``
 - ``backgroundContext``
 - ``newBackgroundContext()``
-
-### Nested
-
-- ``Level``
-- ``Metadata``
-- ``MetadataValue``
-- ``Error``
-- ``Session-swift.struct``
 
 ### Core Data Entities
 
@@ -67,3 +50,14 @@
 - ``NetworkTransactionMetricsEntity``
 - ``NetworkRequestEntity``
 - ``NetworkResponseEntity``
+
+### Nested Types
+
+- ``Error``
+- ``Event``
+- ``Info``
+- ``Level``
+- ``MetadataValue``
+- ``Metadata``
+- ``Session-swift.struct``
+- ``Version-swift.struct``

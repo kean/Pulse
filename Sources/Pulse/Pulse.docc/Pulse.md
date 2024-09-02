@@ -10,12 +10,14 @@ Logger and network inspector for Apple platforms.
 - <doc:NextSteps>
 - ``LoggerStore``
 
-### Network Logging
+### Network Logging & Debugging
 
 - <doc:NetworkLogging-Article>
 - ``NetworkLogger``
+- ``URLSessionProxy``
 - ``URLSessionProtocol``
 - ``URLSessionProxyDelegate``
+- ``MockingURLProtocol``
 
 ### Remote Logging
 

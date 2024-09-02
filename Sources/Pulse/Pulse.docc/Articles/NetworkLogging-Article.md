@@ -1,4 +1,4 @@
-# Network Logging and Debugging
+# Network Logging & Debugging
 
 Learn how to enable and configure network logging and debugging.
 

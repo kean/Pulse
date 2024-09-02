@@ -25,7 +25,7 @@ struct SessionsView: View {
     @Environment(\.router) private var router
 
     var body: some View {
-        if store.version < Version(3, 6, 0) {
+        if store.version < LoggerStore.Version(3, 6, 0) {
             PlaceholderView(imageName: "questionmark.app", title: "Unsupported", subtitle: "This feature requires a store created by Pulse version 3.6.0 or higher").padding()
         } else {
             content

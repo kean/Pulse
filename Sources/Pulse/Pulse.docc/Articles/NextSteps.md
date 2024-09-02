@@ -50,6 +50,10 @@ struct AnalyticsLogsView: View {
         }
     }
 }
-``
+```
 
-> important: In the current schema, the alogger creates an associated ``LoggerMessageEntity`` entity for every ``NetworkTaskEntity``, but it will likely change in the future.  
+> important: In the current schema, the alogger creates an associated ``LoggerMessageEntity`` entity for every ``NetworkTaskEntity``, but it will likely change in the future.
+
+## Network Logging & Debugging
+
+See <doc:NetworkLogging-Article> for more information about how to configure network logging if your app does not use `URLSession` directly, how to further customize it, how to capture and display decoding errors, and more.
