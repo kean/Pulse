@@ -28,14 +28,6 @@ struct NetworkInspectorTransferInfoView: View {
 #elseif os(macOS)
     var body: some View {
         HStack {
-            bytesSent
-            Spacer()
-            bytesReceived
-        }
-    }
-#else
-    var body: some View {
-        HStack {
             Spacer()
             bytesSent
             Spacer()
@@ -75,9 +67,14 @@ struct NetworkInspectorTransferInfoView: View {
                 Image(systemName: imageName)
                     .font(.largeTitle)
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(title).font(.headline)
-                    Text(total).font(.headline)
+                    Text(title)
+                    Text(total)
                 }
+#if os(macOS)
+                .font(.title3.weight(.medium))
+#else
+                .font(.headline)
+#endif
             }
             .fixedSize()
             .padding(2)
@@ -103,7 +100,7 @@ struct NetworkInspectorTransferInfoView: View {
 }
 
 #if os(macOS)
-private let valueFont: Font = .subheadline
+private let valueFont: Font = .callout
 #else
 private let valueFont: Font = .footnote
 #endif

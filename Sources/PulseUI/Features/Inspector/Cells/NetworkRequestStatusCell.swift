@@ -36,6 +36,8 @@ struct NetworkRequestStatusCell: View {
         .padding(.bottom, 16)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
+#elseif os(macOS)
+        .font(.title3.weight(.medium))
 #else
         .font(.headline)
 #endif
@@ -48,7 +50,9 @@ struct NetworkRequestStatusCell: View {
         if viewModel.isMock {
             MockBadgeView()
         } else {
+#if !os(macOS)
             viewModel.duration.map(DurationLabel.init)
+#endif
         }
     }
 }
