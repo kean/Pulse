@@ -17,7 +17,10 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     public let options: Options
 
     /// The configuration with which the store was initialized with.
-    public let configuration: Configuration
+    ///
+    /// - warning: This property is not thread-safe. Make sure to change it at
+    /// the app launch before sending any logs.
+    public var configuration: Configuration
 
     /// Current session or the latest session in case of an archive.
     private(set) public var session: Session = .current

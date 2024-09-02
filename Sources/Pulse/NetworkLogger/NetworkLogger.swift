@@ -112,14 +112,14 @@ public final class NetworkLogger: @unchecked Sendable {
     /// - parameters:
     ///   - store: The target store for network requests.
     ///   - configuration: The store configuration.
-    public init(store: LoggerStore = .shared, configuration: Configuration = .init()) {
+    public init(store: LoggerStore? = nil, configuration: Configuration = .init()) {
         self._store = store
         self.configuration = configuration
         self.processPatterns()
     }
 
     /// Initializes and configures the network logger.
-    public convenience init(store: LoggerStore = .shared, _ configure: (inout Configuration) -> Void) {
+    public convenience init(store: LoggerStore? = nil, _ configure: (inout Configuration) -> Void) {
         var configuration = Configuration()
         configure(&configuration)
         self.init(store: store, configuration: configuration)
