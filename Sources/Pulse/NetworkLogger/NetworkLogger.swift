@@ -159,6 +159,9 @@ public final class NetworkLogger: @unchecked Sendable {
     /// Logs the task creation (optional).
     public func logTaskCreated(_ task: URLSessionTask) {
         lock.lock()
+        guard tasks[TaskKey(task: task)] == nil else {
+            return // Already registered
+        }
         let context = context(for: task)
         lock.unlock()
 
