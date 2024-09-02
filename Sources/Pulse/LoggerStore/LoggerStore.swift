@@ -842,26 +842,20 @@ extension LoggerStore {
     ///   - targetURL: The destination directory must already exist. If the
     ///   file at the destination URL already exists, throws an error.
     ///   - options: The other sharing options.
-    ///
-    /// - returns: The information about the created store.
-    @discardableResult
-    public func export(to targetURL: URL, options: ExportOptions = .init()) async throws -> Info {
-        try await Task.detached(priority: .userInitiated) {
-            try self._export(to: targetURL, options: options)
-        }.value
+    public func export(to targetURL: URL, options: ExportOptions = .init()) async throws {
+        try await _export(to: targetURL, options: options)
     }
 
-    @discardableResult
-    private func _export(to targetURL: URL, options: ExportOptions) throws -> Info {
+    private func _export(to targetURL: URL, options: ExportOptions) async throws {
         guard !FileManager.default.fileExists(atPath: targetURL.path) else {
             throw LoggerStore.Error.fileAlreadyExists
         }
-        return try _exportAsArchive(to: targetURL, options: options)
+        try await _exportAsArchive(to: targetURL, options: options)
     }
 
     // MARK: Export as Package
 
-    private func _exportAsPackage(to targetURL: URL, options: ExportOptions) throws -> Info {
+    private func _exportAsPackage(to targetURL: URL, options: ExportOptions) async throws {
         let temporary = TemporaryDirectory()
         defer { temporary.remove() }
 
@@ -887,11 +881,8 @@ extension LoggerStore {
             try? _exportBlobs(to: target)
         }
 
-        let info = try target.info()
         try target.close() // important: has to be called before `move`.
-
         try Files.moveItem(at: temporary.url, to: targetURL)
-        return info
     }
 
     /// Removes any content that doesn't match the given options.
@@ -927,24 +918,24 @@ extension LoggerStore {
 
     // MARK: Export as Archive
 
-    private func _exportAsArchive(to targetURL: URL, options: ExportOptions) throws -> Info {
+    private func _exportAsArchive(to targetURL: URL, options: ExportOptions) async throws {
         if options.predicate != nil || options.sessions != nil {
             let temporary = TemporaryDirectory()
             defer { temporary.remove() }
 
             let tempStoreURL = temporary.url.appending(filename: "temp.pulse")
-            _ = try _exportAsPackage(to: tempStoreURL, options: options)
+            _ = try await _exportAsPackage(to: tempStoreURL, options: options)
 
             let target = try LoggerStore(storeURL: tempStoreURL, options: .readonly)
             defer { try? target.close() }
 
-            return try target._exportPackageAsArchive(to: targetURL)
+            return try await target._exportPackageAsArchive(to: targetURL)
         } else {
-            return try _exportPackageAsArchive(to: targetURL)
+            return try await _exportPackageAsArchive(to: targetURL)
         }
     }
 
-    private func _exportPackageAsArchive(to targetURL: URL) throws -> Info {
+    private func _exportPackageAsArchive(to targetURL: URL) async throws {
         let temporary = TemporaryDirectory()
         defer { temporary.remove() }
 
@@ -952,7 +943,7 @@ extension LoggerStore {
         let databaseURL = temporary.url.appending(filename: databaseFilename)
         try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
 
-        var info = try self.info()
+        var info = try await self.info()
 
         let document = try PulseDocument(documentURL: targetURL)
         var totalSize: Int64 = 0
@@ -1133,16 +1124,19 @@ extension LoggerStore {
     /// Returns the current store's info.
     ///
     /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
-    public func info() throws -> Info {
-        try backgroundContext.performAndReturn { try self._info() }
+    public func info() async throws -> Info {
+        let deviceInfo = await LoggerStore.Info.DeviceInfo.make()
+        return try await container.performBackgroundTask { context in
+            return try self._info(in: context, deviceInfo: deviceInfo)
+        }
     }
 
-    private func _info() throws -> Info {
+    private func _info(in context: NSManagedObjectContext, deviceInfo: LoggerStore.Info.DeviceInfo) throws -> Info {
         let databaseAttributes = try Files.attributesOfItem(atPath: databaseURL.path)
 
-        let messageCount = try backgroundContext.count(for: LoggerMessageEntity.self)
-        let taskCount = try backgroundContext.count(for: NetworkTaskEntity.self)
-        let blobCount = try backgroundContext.count(for: LoggerBlobHandleEntity.self)
+        let messageCount = try context.count(for: LoggerMessageEntity.self)
+        let taskCount = try context.count(for: NetworkTaskEntity.self)
+        let blobCount = try context.count(for: LoggerBlobHandleEntity.self)
 
         return Info(
             storeId: manifest.storeId,
@@ -1156,7 +1150,7 @@ extension LoggerStore {
             blobsSize: try getBlobsSize(),
             blobsDecompressedSize: try getBlobsSize(isDecompressed: true),
             appInfo: .make(),
-            deviceInfo: .make()
+            deviceInfo: deviceInfo
         )
     }
 }

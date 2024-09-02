@@ -110,7 +110,8 @@ func getDeviceId() -> UUID? {
 }
 
 extension LoggerStore.Info.DeviceInfo {
-    static func make() -> LoggerStore.Info.DeviceInfo {
+    @MainActor
+static func make() -> LoggerStore.Info.DeviceInfo {
         let device = UIDevice.current
         return LoggerStore.Info.DeviceInfo(
             name: device.name,
@@ -130,7 +131,8 @@ func getDeviceId() -> UUID? {
 }
 
 extension LoggerStore.Info.DeviceInfo {
-    static func make() -> LoggerStore.Info.DeviceInfo {
+    @MainActor
+static func make() -> LoggerStore.Info.DeviceInfo {
         let device = WKInterfaceDevice.current()
         return LoggerStore.Info.DeviceInfo(
             name: device.name,
@@ -145,7 +147,8 @@ extension LoggerStore.Info.DeviceInfo {
 import AppKit
 
 extension LoggerStore.Info.DeviceInfo {
-    static func make() -> LoggerStore.Info.DeviceInfo {
+    @MainActor
+static func make() -> LoggerStore.Info.DeviceInfo {
         return LoggerStore.Info.DeviceInfo(
             name: Host.current().name ?? "unknown",
             model: "unknown",
