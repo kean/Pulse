@@ -369,7 +369,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         self.connectionState = .connecting
         self.connection = connection
 
-        connection.start(on: DispatchQueue.main)
+        connection.start()
     }
 
     // MARK: RemoteLoggerConnectionDelegate

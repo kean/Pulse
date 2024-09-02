@@ -7,13 +7,14 @@ import Network
 import CryptoKit
 import OSLog
 
+@MainActor
 protocol RemoteLoggerConnectionDelegate: AnyObject {
     func connection(_ connection: RemoteLogger.Connection, didChangeState newState: NWConnection.State)
     func connection(_ connection: RemoteLogger.Connection, didReceiveEvent event: RemoteLogger.Connection.Event)
 }
 
 extension RemoteLogger {
-    final class Connection {
+    final class Connection: @unchecked Sendable  {
         var endpoint: NWEndpoint { connection.endpoint }
         private let connection: NWConnection
         private var buffer = Data()
@@ -22,6 +23,8 @@ extension RemoteLogger {
         private let log: OSLog
 
         weak var delegate: RemoteLoggerConnectionDelegate?
+
+        private let queue = DispatchQueue(label: "com.github.kean.pulse.remote-logger-connection")
 
         convenience init(endpoint: NWEndpoint, using parameters: NWParameters) {
             self.init(NWConnection(to: endpoint, using: parameters))
@@ -35,9 +38,9 @@ extension RemoteLogger {
             self.log = isLogEnabled ? OSLog(subsystem: "com.github.kean.pulse", category: "RemoteLogger") : .disabled
         }
 
-        func start(on queue: DispatchQueue) {
+        func start() {
             connection.stateUpdateHandler = { [weak self] state in
-                guard let self = self else { return }
+                guard let self else { return }
                 DispatchQueue.main.async {
                     self.delegate?.connection(self, didChangeState: state)
                 }
@@ -73,7 +76,7 @@ extension RemoteLogger {
             }
         }
 
-        private func process(data freshData: Data) {
+        private nonisolated func process(data freshData: Data) {
             guard !freshData.isEmpty else { return }
 
             var freshData = freshData
