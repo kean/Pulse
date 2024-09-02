@@ -198,7 +198,7 @@ extension NetworkLogger.URLSession: URLSessionProtocol {
 
     // TODO: Make it a standalone feature.
     public func data(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
-        // TODO: is this an isssue because with use the same delegate when creating session?
+        // TODO: is this an issue because with use the same delegate when creating session?
         // TODO: Make createdTask public here? probably not
         let delegate = URLSessionProxyDelegate(logger: logger, delegate: delegate)
         do {

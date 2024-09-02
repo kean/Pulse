@@ -87,7 +87,7 @@ struct NetworkLoggerEventMonitor: EventMonitor {
 
 ## Configure Logging
 
-### Recod Decoding Errors
+### Record Decoding Errors
 
 The network requests can only be considered successful when the app decodes the response data. With Pulse, you can do just that, and when you open the response body, it'll even highlight the part of the response causing the decoding error.
 

@@ -4,7 +4,7 @@
 
 import Foundation
 
-// TODO: find a better way
+// TODO: rename to `NetworkLogger.MockingURLProtocol`
 
 /// A custom `URLProtocol` that enables Pulse network debugger features such
 /// as mocking, request rewriting, breakpoints, and more.
@@ -60,7 +60,7 @@ public final class RemoteLoggerURLProtocol: URLProtocol {
 }
 
 
-// MARK: - RemoteLoggerURLProtocol (Automatic Regisration)
+// MARK: - RemoteLoggerURLProtocol (Automatic Registration)
 
 extension RemoteLoggerURLProtocol {
     @MainActor
