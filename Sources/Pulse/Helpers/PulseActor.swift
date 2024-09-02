@@ -4,7 +4,7 @@
 
 import Foundation
 
-/// A global actor on which Pulse subsystems are syncrhonized.
+/// A global actor on which Pulse subsystems are synchronized.
 @globalActor
 struct PulseActor {
     actor PulseActor { }
