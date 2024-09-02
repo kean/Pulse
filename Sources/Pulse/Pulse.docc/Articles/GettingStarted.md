@@ -75,26 +75,28 @@ NavigationLink(destination: ConsoleView()) {
 
 > tip: For more information, see the PulseUI [documentation](https://kean-docs.github.io/pulseui/documentation/pulseui/).
 
-## 4. Get Pulse Pro
+![Pulse Console](pulse-console.png)
 
-In addition to the frameworks and the on-device view, Pulse also provides a separate professional macOS app called [Pulse Pro](https://kean.blog/pulse/pro) that you can use for viewing the previously shared logs or even viewing the logs from the device remotely in real-time.
+## 4. Get Pulse Apps
 
-To start using remote logging, there are a couple of extra setup steps:
+Pulse also provides separate indispensable [macOS and iOS apps](https://pulselogger.com) that you can use to view logs collected by the Pulse SDK and even debug your apps in real-time with features like response mocking. The app are [available on the App Store](https://apps.apple.com/us/app/pulse-network-logger/id6661031747).
 
-### 4.1. Configure the App
+The apps require two more simple configuration steps.
 
-Add the following to the app's plist file to allow it to use local networking:
+### 4.1. Update Info.plist
+
+Add the following to your app's plist file:
 
 ```swift
 <key>NSLocalNetworkUsageDescription</key>
-<string>Network usage required for debugging purposes </string>
+<string>Network usage required only for development purposes</string>
 <key>NSBonjourServices</key>
 <array>
   <string>_pulse._tcp</string>
 </array>
 ```
 
-> Note: There will be no user prompts unless you enable remote logging from settings.
+> important: Pulse will **not show** any prompts unless you enable remote logging from the Pulse settings screen.
 
 ### 4.2. Enable Remote Logging
 
@@ -102,7 +104,9 @@ Open the Pulse console from the app, go to Settings, enable "Remote Logging", an
 
 ![Enabling remote logging](remote-logging.png)
 
-Once the connection is established, open Pulse Pro and select the device in the sidebar. The next time you launch the app, the connection will happen automatically.
+Once the connection is established, open the Pulse app on your Mac and select the device in the sidebar. The next time you launch the app, the connection will happen automatically.
+
+![Pulse Pro](pulse-pro.png)
 
 ## Next Steps
 
