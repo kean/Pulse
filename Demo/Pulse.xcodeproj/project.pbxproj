@@ -40,6 +40,7 @@
 		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
+		0CA245732C85E87A00B432DA /* PulseProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 0CA245722C85E87A00B432DA /* PulseProxy */; };
 		0CDACDE529EC6607007C15CD /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 		0CDACDE629EC6607007C15CD /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 /* End PBXBuildFile section */
@@ -152,6 +153,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CA245732C85E87A00B432DA /* PulseProxy in Frameworks */,
 				0C8FCB522C45F05400C4FD84 /* PulseUI in Frameworks */,
 				0C8FCB502C45F05400C4FD84 /* Pulse in Frameworks */,
 			);
@@ -382,6 +384,7 @@
 			packageProductDependencies = (
 				0C8FCB4F2C45F05400C4FD84 /* Pulse */,
 				0C8FCB512C45F05400C4FD84 /* PulseUI */,
+				0CA245722C85E87A00B432DA /* PulseProxy */,
 			);
 			productName = "Pulse Demo iOS";
 			productReference = 0C70EA732A3F611B000B1071 /* Pulse Demo iOS.app */;
@@ -1032,6 +1035,10 @@
 		0C8FCB652C45F06900C4FD84 /* PulseUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PulseUI;
+		};
+		0CA245722C85E87A00B432DA /* PulseProxy */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseProxy;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

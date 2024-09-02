@@ -5,7 +5,7 @@
 import SwiftUI
 import Pulse
 import PulseUI
-import OSLog
+import PulseProxy
 
 @main
 struct PulseDemo_iOS: App {
@@ -21,11 +21,10 @@ struct PulseDemo_iOS: App {
 }
 
 private final class AppViewModel: ObservableObject {
-    let log = OSLog(subsystem: "app", category: "AppViewModel")
-
     init() {
         // URLSessionProxyDelegate.enableAutomaticRegistration()
-        // URLSessionProxy.enable()
+        NetworkLogger.enableProxy()
+
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
             sendRequest()
         }
@@ -59,8 +58,8 @@ private func testClosures() {
 private func testSwiftConcurrency() {
     Task {
         let demoDelegate = DemoSessionDelegate()
-        let session = NetworkLogger.URLSession(configuration: .default, delegate: demoDelegate, delegateQueue: nil)
-//        let session = NetworkLogger.URLSessionProxy(session: original)
+//        let session = NetworkLogger.URLSession(configuration: .default, delegate: demoDelegate, delegateQueue: nil)
+        let session = URLSession(configuration: .default)
         if #available(iOS 15.0, *) {
             let data = try await session.data(from: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!, delegate: demoDelegate)
             print(data.0.count)
