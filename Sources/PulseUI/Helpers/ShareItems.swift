@@ -28,11 +28,11 @@ public enum ShareStoreOutput: String, RawRepresentable, Codable, CaseIterable {
     }
 }
 
-struct ShareItems: Identifiable {
-    let id = UUID()
-    let items: [Any]
-    let size: Int64?
-    let cleanup: () -> Void
+public struct ShareItems: Identifiable {
+    public let id = UUID()
+    public let items: [Any]
+    public let size: Int64?
+    public let cleanup: () -> Void
 
     init(_ items: [Any], size: Int64? = nil, cleanup: @escaping () -> Void = { }) {
         self.items = items
@@ -121,7 +121,7 @@ enum ShareService {
     }
 }
 
-enum ShareOutput {
+public enum ShareOutput {
     case plainText
     case html
     case pdf
