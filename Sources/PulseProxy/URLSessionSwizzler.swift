@@ -15,126 +15,131 @@ extension NetworkLogger {
     ///
     /// - parameter logger: The network logger to be used for recording the requests. By default, uses shared logger.
     public static func enableProxy(logger: NetworkLogger? = nil) {
-        guard Thread.isMainThread else {
-            return DispatchQueue.main.async { NetworkLogger.URLSessionSwizzler.enable(logger: logger) }
-        }
-        MainActor.assumeIsolated {
-            NetworkLogger.URLSessionSwizzler.enable(logger: logger)
-        }
+        URLSessionSwizzler.enable(logger: logger)
     }
 }
 
-extension NetworkLogger {
-    @MainActor
-    final class URLSessionSwizzler {
-        static var shared: URLSessionSwizzler?
+final class URLSessionSwizzler {
+    static var shared: URLSessionSwizzler?
 
-        private var logger: NetworkLogger { _logger ?? .shared }
-        private let _logger: NetworkLogger?
+    private var logger: NetworkLogger { _logger ?? .shared }
+    private let _logger: NetworkLogger?
 
-        init(logger: NetworkLogger?) {
-            self._logger = logger
+    init(logger: NetworkLogger?) {
+        self._logger = logger
+    }
+
+    static let lock = NSLock()
+    static var isEnabled = false
+
+    static func enable(logger: NetworkLogger?) {
+        lock.lock()
+        if isEnabled {
+            lock.unlock()
+            NSLog("Error: Pulse proxy is already enabled")
+            return
         }
+        isEnabled = true
+        lock.unlock()
 
-        @MainActor
-        static func enable(logger: NetworkLogger?) {
-            guard NetworkLogger.URLSessionSwizzler.shared == nil else {
-                NSLog("Error: Pulse.URLSessionProxy already enabled")
-                return
-            }
+        let proxy = URLSessionSwizzler(logger: logger)
+        proxy.enable()
+        URLSessionSwizzler.shared = proxy
+    }
 
-            let proxy = URLSessionSwizzler(logger: logger)
-            proxy.enable()
-            URLSessionSwizzler.shared = proxy
+    func enable() {
+        swizzleURLSessionTaskResume()
+        // "__NSCFURLLocalSessionConnection"
+        if let sessionClass = NSClassFromString(["__", "NS", "CFURL", "Local", "Session", "Connection"].joined()) {
+            swizzleDataTaskDidReceiveData(baseClass: sessionClass)
+            swizzleDataDataDidCompleteWithError(baseClass: sessionClass)
+        } else {
+            NSLog("Pulse.URLSessionSwizzler failed to initialize. Please report at https://github.com/kean/Pulse/issues.")
         }
+    }
 
-        func enable() {
-            swizzleURLSessionTaskResume()
-            // "__NSCFURLLocalSessionConnection"
-            if let sessionClass = NSClassFromString(["__", "NS", "CFURL", "Local", "Session", "Connection"].joined()) {
-                swizzleDataTaskDidReceiveData(baseClass: sessionClass)
-                swizzleDataDataDidCompleteWithError(baseClass: sessionClass)
-            } else {
-                NSLog("Pulse.URLSessionSwizzler failed to initialize. Please report at https://github.com/kean/Pulse/issues.")
-            }
+    // - `resume` (optional)
+    private func swizzleURLSessionTaskResume() {
+        var methods = [Method]()
+        if let method = class_getInstanceMethod(URLSessionTask.self, #selector(URLSessionTask.resume)) {
+            methods.append(method)
         }
+        // "__NSCFURLSessionTask"
+        if let sessionTaskClass = NSClassFromString(["__", "NS", "CFURL", "Session", "Task"].joined()),
+           let method = class_getInstanceMethod(sessionTaskClass, NSSelectorFromString("resume")) {
+            methods.append(method)
+        }
+        methods.forEach {
+            let method = $0
+            var originalImplementation: IMP?
+            let block: @convention(block) (URLSessionTask) -> Void = { [weak self] task in
+                self?.logger.logTaskCreated(task)
 
-        // - `resume` (optional)
-        private func swizzleURLSessionTaskResume() {
-            var methods = [Method]()
-            if let method = class_getInstanceMethod(URLSessionTask.self, #selector(URLSessionTask.resume)) {
-                methods.append(method)
+                guard task.currentRequest != nil else { return }
+                let key = String(method.hashValue)
+                objc_setAssociatedObject(task, key, true, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+                let castedIMP = unsafeBitCast(originalImplementation, to: (@convention(c) (Any) -> Void).self)
+                castedIMP(task)
+                objc_setAssociatedObject(task, key, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             }
-            // "__NSCFURLSessionTask"
-            if let sessionTaskClass = NSClassFromString(["__", "NS", "CFURL", "Session", "Task"].joined()),
-               let method = class_getInstanceMethod(sessionTaskClass, NSSelectorFromString("resume")) {
-                methods.append(method)
-            }
-            methods.forEach {
-                let method = $0
-                var originalImplementation: IMP?
-                let block: @convention(block) (URLSessionTask) -> Void = { [weak self] task in
-                    self?.logger.logTaskCreated(task)
+            let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
+            originalImplementation = method_setImplementation(method, swizzledIMP)
+        }
+    }
 
-                    guard task.currentRequest != nil else { return }
-                    let key = String(method.hashValue)
-                    objc_setAssociatedObject(task, key, true, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-                    let castedIMP = unsafeBitCast(originalImplementation, to: (@convention(c) (Any) -> Void).self)
-                    castedIMP(task)
-                    objc_setAssociatedObject(task, key, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    // - `urlSession(_:task:didCompleteWithError:)`
+    func swizzleDataDataDidCompleteWithError(baseClass: AnyClass) {
+        // "_didFinishWithError:"
+        let selector = NSSelectorFromString(["_", "didFinish", "With", "Error", ":"].joined())
+        guard let method = class_getInstanceMethod(baseClass, selector),
+              baseClass.instancesRespond(to: selector) else {
+            return
+        }
+        typealias MethodSignature = @convention(c) (AnyObject, Selector, AnyObject?) -> Void
+        let originalImp: IMP = method_getImplementation(method)
+        let closure: @convention(block) (AnyObject, AnyObject?) -> Void = { [weak self] object, error in
+            let original: MethodSignature = unsafeBitCast(originalImp, to: MethodSignature.self)
+            original(object, selector, error)
+
+            if let task = object.value(forKey: "task") as? URLSessionTask {
+                // "_incompleteTaskMetrics"
+                if let metrics = task.value(forKey: ["_", "incomplete", "Task", "Metrics"].joined()) as? URLSessionTaskMetrics {
+                    self?.logger.logTask(task, didFinishCollecting: metrics)
                 }
-                let swizzledIMP = imp_implementationWithBlock(unsafeBitCast(block, to: AnyObject.self))
-                originalImplementation = method_setImplementation(method, swizzledIMP)
-            }
-        }
-
-        // - `urlSession(_:task:didCompleteWithError:)`
-        func swizzleDataDataDidCompleteWithError(baseClass: AnyClass) {
-            // "_didFinishWithError:"
-            let selector = NSSelectorFromString(["_", "didFinish", "With", "Error", ":"].joined())
-            guard let method = class_getInstanceMethod(baseClass, selector),
-                  baseClass.instancesRespond(to: selector) else {
-                return
-            }
-            typealias MethodSignature = @convention(c) (AnyObject, Selector, AnyObject?) -> Void
-            let originalImp: IMP = method_getImplementation(method)
-            let closure: @convention(block) (AnyObject, AnyObject?) -> Void = { [weak self] object, error in
-                let original: MethodSignature = unsafeBitCast(originalImp, to: MethodSignature.self)
-                original(object, selector, error)
-
-                if let task = object.value(forKey: "task") as? URLSessionTask {
-                    // "_incompleteTaskMetrics"
-                    if let metrics = task.value(forKey: ["_", "incomplete", "Task", "Metrics"].joined()) as? URLSessionTaskMetrics {
-                        self?.logger.logTask(task, didFinishCollecting: metrics)
+                if var error = error as? NSError {
+                    if error.domain == "kCFErrorDomainCFNetwork" {
+                        // Satifsy LogggerStore (needs refactoring)
+                        error = NSError(domain: URLError.errorDomain, code: error.code, userInfo: error.userInfo)
                     }
-                    let error = error as? Error
                     self?.logger.logTask(task, didCompleteWithError: error)
+                } else {
+                    self?.logger.logTask(task, didCompleteWithError: error as? Error)
                 }
             }
-            method_setImplementation(method, imp_implementationWithBlock(closure))
+        }
+        method_setImplementation(method, imp_implementationWithBlock(closure))
+    }
+
+    // - `urlSession(_:dataTask:didReceive:)`
+    func swizzleDataTaskDidReceiveData(baseClass: AnyClass) {
+        // "_didReceiveData"
+        let selector = NSSelectorFromString(["_", "did", "Receive", "Data", ":"].joined())
+        guard let method = class_getInstanceMethod(baseClass, selector),
+              baseClass.instancesRespond(to: selector) else {
+            return
         }
 
-        // - `urlSession(_:dataTask:didReceive:)`
-        func swizzleDataTaskDidReceiveData(baseClass: AnyClass) {
-            // "_didReceiveData"
-            let selector = NSSelectorFromString(["_", "did", "Receive", "Data", ":"].joined())
-            guard let method = class_getInstanceMethod(baseClass, selector),
-                  baseClass.instancesRespond(to: selector) else {
-                return
-            }
+        typealias MethodSignature =  @convention(c) (AnyObject, Selector, AnyObject) -> Void
+        let originalImp: IMP = method_getImplementation(method)
+        let closure: @convention(block) (AnyObject, AnyObject) -> Void = { [weak self] (object, data) in
+            let original: MethodSignature = unsafeBitCast(originalImp, to: MethodSignature.self)
+            original(object, selector, data)
 
-            typealias MethodSignature =  @convention(c) (AnyObject, Selector, AnyObject) -> Void
-            let originalImp: IMP = method_getImplementation(method)
-            let closure: @convention(block) (AnyObject, AnyObject) -> Void = { [weak self] (object, data) in
-                let original: MethodSignature = unsafeBitCast(originalImp, to: MethodSignature.self)
-                original(object, selector, data)
-
-                if let task = object.value(forKey: "task") as? URLSessionDataTask {
-                    let data = (data as? Data) ?? Data()
-                    self?.logger.logDataTask(task, didReceive: data)
-                }
+            if let task = object.value(forKey: "task") as? URLSessionDataTask {
+                let data = (data as? Data) ?? Data()
+                self?.logger.logDataTask(task, didReceive: data)
             }
-            method_setImplementation(method, imp_implementationWithBlock(closure))
         }
+        method_setImplementation(method, imp_implementationWithBlock(closure))
     }
 }
