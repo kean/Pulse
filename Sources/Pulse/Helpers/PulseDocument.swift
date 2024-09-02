@@ -27,7 +27,7 @@ final class PulseDocument {
         }
     }
 
-    static let model: NSManagedObjectModel = {
+    static var model: NSManagedObjectModel {
         let model = NSManagedObjectModel()
         let blob = NSEntityDescription(class: PulseBlobEntity.self)
         blob.properties = [
@@ -36,7 +36,7 @@ final class PulseDocument {
         ]
         model.entities = [blob]
         return model
-    }()
+    }
 }
 
 final class PulseBlobEntity: NSManagedObject {
