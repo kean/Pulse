@@ -8,22 +8,7 @@ import Foundation
 ///
 /// - note: ``NetworkLogger`` is used internally by ``URLSessionProxyDelegate`` and
 /// should generally not be used directly.
-public final class NetworkLogger: @unchecked Sendable {
-    private let configuration: Configuration
-    private let store: LoggerStore
-
-    private var includedHosts: [Regex] = []
-    private var includedURLs: [Regex] = []
-    private var excludedHosts: [Regex] = []
-    private var excludedURLs: [Regex] = []
-
-    private var sensitiveHeaders: [Regex] = []
-    private var sensitiveQueryItems: Set<String> = []
-    private var sensitiveDataFields: Set<String> = []
-
-    private var isFilteringNeeded = false
-    private let lock = NSLock()
-
+public final class NetworkLogger: Sendable {
     /// A shared network logger.
     ///
     /// You can configure a logger by creating a new instance and setting it as
@@ -106,15 +91,15 @@ public final class NetworkLogger: @unchecked Sendable {
         public init() {}
     }
 
+    private let imp: _NetworkLogger
+
     /// Initializes the network logger.
     ///
     /// - parameters:
     ///   - store: The target store for network requests.
     ///   - configuration: The store configuration.
     public init(store: LoggerStore = .shared, configuration: Configuration = .init()) {
-        self.store = store
-        self.configuration = configuration
-        self.processPatterns()
+        self.imp = _NetworkLogger(store: store, configuration: configuration)
     }
 
     /// Initializes and configures the network logger.
@@ -124,9 +109,78 @@ public final class NetworkLogger: @unchecked Sendable {
         self.init(store: store, configuration: configuration)
     }
 
-    // MARK: Patterns
+    public func logTaskCreated(_ task: URLSessionTask) {
+        let date = Date()
+        Task { @PulseActor in
+            imp.logTaskCreated(task, createdAt: date)
+        }
+    }
 
-    private func processPatterns() {
+    public func logDataTask(_ dataTask: URLSessionDataTask, didReceive data: Data) {
+        Task { @PulseActor in
+            imp.logDataTask(dataTask, didReceive: data)
+        }
+    }
+
+    public func logTask(_ task: URLSessionTask, didUpdateProgress progress: (completed: Int64, total: Int64)) {
+        Task { @PulseActor in
+            imp.logTask(task, didUpdateProgress: progress)
+        }
+    }
+
+    public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+        Task { @PulseActor in
+            imp.logTask(task, didFinishCollecting: metrics)
+        }
+    }
+
+
+    public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: NetworkLogger.Metrics) {
+        Task { @PulseActor in
+            imp.logTask(task, didFinishCollecting: metrics)
+        }
+    }
+
+    public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?) {
+        let date = Date()
+        Task { @PulseActor in
+            imp.logTask(task, didCompleteWithError: error, createdAt: date)
+        }
+    }
+
+    public func logTask(_ task: URLSessionTask, didFinishDecodingWithError error: Error?) {
+        let date = Date()
+        Task { @PulseActor in
+            imp.logTask(task, didFinishDecodingWithError: error, createdAt: date)
+        }
+    }
+}
+
+@PulseActor
+private class _NetworkLogger: @unchecked Sendable {
+    private let configuration: NetworkLogger.Configuration
+    private let store: LoggerStore
+
+    private let includedHosts: [Regex]
+    private let includedURLs: [Regex]
+    private let excludedHosts: [Regex]
+    private let excludedURLs: [Regex]
+
+    private let sensitiveHeaders: [Regex]
+    private let sensitiveQueryItems: Set<String>
+    private let sensitiveDataFields: Set<String>
+
+    private let isFilteringNeeded: Bool
+
+    /// Initializes the network logger.
+    ///
+    /// - parameters:
+    ///   - store: The target store for network requests.
+    ///   - configuration: The store configuration.
+    nonisolated init(store: LoggerStore = .shared, configuration: NetworkLogger.Configuration = .init()) {
+        self.store = store
+        self.configuration = configuration
+
         func process(_ pattern: String) -> Regex? {
             process(pattern, options: [])
         }
@@ -157,38 +211,32 @@ public final class NetworkLogger: @unchecked Sendable {
     // MARK: Logging
 
     /// Logs the task creation (optional).
-    public func logTaskCreated(_ task: URLSessionTask) {
-        lock.lock()
+    func logTaskCreated(_ task: URLSessionTask, createdAt: Date) {
         guard tasks[TaskKey(task: task)] == nil else {
             return // Already registered
         }
         let context = context(for: task)
-        lock.unlock()
 
         guard let originalRequest = task.originalRequest else { return }
         send(.networkTaskCreated(LoggerStore.Event.NetworkTaskCreated(
             taskId: context.taskId,
             taskType: NetworkLogger.TaskType(task: task),
-            createdAt: Date(),
+            createdAt: createdAt,
             originalRequest: .init(originalRequest),
-            currentRequest: task.currentRequest.map(Request.init),
+            currentRequest: task.currentRequest.map(NetworkLogger.Request.init),
             label: configuration.label,
             taskDescription: task.taskDescription
         )))
     }
 
     /// Logs the task data that gets appended to the previously received chunks (required).
-    public func logDataTask(_ dataTask: URLSessionDataTask, didReceive data: Data) {
-        lock.lock()
+    func logDataTask(_ dataTask: URLSessionDataTask, didReceive data: Data) {
         let context = self.context(for: dataTask)
         context.data.append(data)
-        lock.unlock()
     }
 
-    public func logTask(_ task: URLSessionTask, didUpdateProgress progress: (completed: Int64, total: Int64)) {
-        lock.lock()
+    func logTask(_ task: URLSessionTask, didUpdateProgress progress: (completed: Int64, total: Int64)) {
         let context = self.context(for: task)
-        lock.unlock()
 
         send(.networkTaskProgressUpdated(.init(
             taskId: context.taskId,
@@ -199,51 +247,44 @@ public final class NetworkLogger: @unchecked Sendable {
     }
 
     /// Logs the task completion (required).
-    public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?) {
+    func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?, createdAt: Date) {
         guard error != nil || !configuration.isWaitingForDecoding else { return }
-        _logTask(task, didCompleteWithError: error)
+        _logTask(task, didCompleteWithError: error, createdAt: createdAt)
     }
 
     /// Logs the task metrics (optional).
-    public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
-        lock.lock()
+    func logTask(_ task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
         context(for: task).metrics = NetworkLogger.Metrics(metrics: metrics)
-        lock.unlock()
     }
 
     /// Logs the task metrics (optional).
-    public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: NetworkLogger.Metrics) {
-        lock.lock()
+    func logTask(_ task: URLSessionTask, didFinishCollecting metrics: NetworkLogger.Metrics) {
         context(for: task).metrics = metrics
-        lock.unlock()
     }
 
-    public func logTask(_ task: URLSessionTask, didFinishDecodingWithError error: Error?) {
-        _logTask(task, didCompleteWithError: error)
+    func logTask(_ task: URLSessionTask, didFinishDecodingWithError error: Error?, createdAt: Date) {
+        _logTask(task, didCompleteWithError: error, createdAt: createdAt)
     }
 
-    private func _logTask(_ task: URLSessionTask, didCompleteWithError error: Error?) {
-        lock.lock()
+    private func _logTask(_ task: URLSessionTask, didCompleteWithError error: Error?, createdAt: Date) {
         let context = self.context(for: task)
         tasks[TaskKey(task: task)] = nil
 
         guard let originalRequest = task.originalRequest else {
-            lock.unlock()
             return // This should never happen
         }
 
         let metrics = context.metrics
         let data = context.data
-        lock.unlock()
 
         send(.networkTaskCompleted(.init(
             taskId: context.taskId,
             taskType: NetworkLogger.TaskType(task: task),
-            createdAt: Date(),
-            originalRequest: Request(originalRequest),
-            currentRequest: task.currentRequest.map(Request.init),
-            response: task.response.map(Response.init),
-            error: error.map(ResponseError.init),
+            createdAt: createdAt,
+            originalRequest: NetworkLogger.Request(originalRequest),
+            currentRequest: task.currentRequest.map(NetworkLogger.Request.init),
+            response: task.response.map(NetworkLogger.Response.init),
+            error: error.map(NetworkLogger.ResponseError.init),
             requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
