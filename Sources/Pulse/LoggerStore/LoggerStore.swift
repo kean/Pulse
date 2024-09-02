@@ -997,14 +997,7 @@ extension LoggerStore {
 
             try document.context.save()
             try? document.close()
-
-            return info
         }
-    }
-
-    @available(*, deprecated, message: "Deprecated") // 3.6
-    public func copy(to targetURL: URL, predicate: NSPredicate? = nil) throws -> Info {
-        try _export(to: targetURL, options: .init(predicate: predicate))
     }
 }
 
