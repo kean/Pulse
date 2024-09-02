@@ -10,7 +10,8 @@ import Foundation
 /// should generally not be used directly.
 public final class NetworkLogger: @unchecked Sendable {
     private let configuration: Configuration
-    private let store: LoggerStore
+    private var store: LoggerStore { _store ?? .shared }
+    private let _store: LoggerStore?
 
     private var includedHosts: [Regex] = []
     private var includedURLs: [Regex] = []
@@ -112,7 +113,7 @@ public final class NetworkLogger: @unchecked Sendable {
     ///   - store: The target store for network requests.
     ///   - configuration: The store configuration.
     public init(store: LoggerStore = .shared, configuration: Configuration = .init()) {
-        self.store = store
+        self._store = store
         self.configuration = configuration
         self.processPatterns()
     }
