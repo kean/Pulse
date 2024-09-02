@@ -126,7 +126,7 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
     }
 
     public func dataTask(with url: URL, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionDataTask {
-        fatalError("Not implemented")
+        dataTask(with: URLRequest(url: url), completionHandler: completionHandler)
     }
 
     public func uploadTask(with request: URLRequest, fromFile fileURL: URL, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionUploadTask {
