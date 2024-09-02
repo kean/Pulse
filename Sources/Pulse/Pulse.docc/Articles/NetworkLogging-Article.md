@@ -98,9 +98,11 @@ The network requests can only be considered successful when the app decodes the 
 
 ```swift
 // Initial setup
-let logger = NetworkLogger {
-    $0.isWaitingForDecoding = true
-}
+var configuration = NetworkLogger.Configuration()
+configuration.isWaitingForDecoding = true
+
+let logger = NetworkLogger(configuration: configuration)
+
 let session = NetworkLogger.URLSession(configuration: .default, logger: logger)
 
 // Add this to the code that performs decoding of the responses.
@@ -114,25 +116,27 @@ logger.logTask(task, didFinishDecodingWithError: decodingError)
 ``NetworkLogger/Configuration`` has a set of convenience APIs for managing what information is included or excluded from the logs.
 
 ```swift
-let logger = NetworkLogger {
-    // Includes only requests with the given domain.
-    $0.includedHosts = ["*.example.com"]
+var configuration = NetworkLogger.Configuration()
 
-    // Exclude some subdomains.
-    $0.excludedHosts = ["logging.example.com"]
+// Includes only requests with the given domain.
+configuration.includedHosts = ["*.example.com"]
 
-    // Exclude specific URLs.
-    $0.excludedURLs = ["*/log/event"]
+// Exclude some subdomains.
+configuration.excludedHosts = ["logging.example.com"]
 
-    // Replaces values for the given HTTP headers with "<private>"
-    $0.sensitiveHeaders = ["Authorization", "Access-Token"]
+// Exclude specific URLs.
+configuration.excludedURLs = ["*/log/event"]
 
-    // Redacts sensitive query items.
-    $0.sensitiveQueryItems = ["password"]
+// Replaces values for the given HTTP headers with "<private>"
+configuration.sensitiveHeaders = ["Authorization", "Access-Token"]
 
-    // Replaces values for the given response and request JSON fields with "<private>"
-    $0.sensitiveDataFields = ["password"]
-}
+// Redacts sensitive query items.
+configuration.sensitiveQueryItems = ["password"]
+
+// Replaces values for the given response and request JSON fields with "<private>"
+configuration.sensitiveDataFields = ["password"]
+
+let logger = NetworkLogger(configuration: configuration)
 ```
 
 You can then replace the default decoder with your custom instance:

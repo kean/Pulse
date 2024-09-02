@@ -118,12 +118,12 @@ public final class NetworkLogger: @unchecked Sendable {
         self.processPatterns()
     }
 
-    /// Initializes and configures the network logger.
-    public convenience init(store: LoggerStore? = nil, _ configure: (inout Configuration) -> Void) {
-        var configuration = Configuration()
-        configure(&configuration)
-        self.init(store: store, configuration: configuration)
-    }
+//    /// Initializes and configures the network logger.
+//    public convenience init(store: LoggerStore? = nil, _ configure: (inout Configuration) -> Void) {
+//        var configuration = Configuration()
+//        configure(&configuration)
+//        self.init(store: store, configuration: configuration)
+//    }
 
     // MARK: Patterns
 
