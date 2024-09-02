@@ -104,15 +104,17 @@ final class StoreDetailsViewModel: ObservableObject {
     func load(from source: StoreDetailsView.Source) {
         switch source {
         case .store(let store):
-            loadInfo(for: store)
+            Task {
+                await loadInfo(for: store)
+            }
         case .info(let value):
             display(value)
         }
     }
 
-    private func loadInfo(for store: LoggerStore) {
+    private func loadInfo(for store: LoggerStore) async {
         do {
-            let info = try store.info()
+            let info = try await store.info()
             if store === LoggerStore.shared {
                 self.storeSizeLimit = store.configuration.sizeLimit
             }
