@@ -10,9 +10,6 @@ extension NetworkLogger {
         /// If enabled, registers ``RemoteLoggerURLProtocol``
         public var isMockingEnabled = true
 
-        /// A custom logger to be used instead of ``NetworkLogger/shared``.
-        public var logger: NetworkLogger?
-
         /// Creates default options.
         public init() {}
     }
@@ -20,20 +17,25 @@ extension NetworkLogger {
     public final class URLSession {
         /// The underlying `URLSession`.
         public let session: Foundation.URLSession
-        var logger: NetworkLogger { options.logger ?? .shared}
+        var logger: NetworkLogger { _logger ?? .shared }
+        private let _logger: NetworkLogger?
         private let options: URLSessionOptions
 
+        /// - parameter logger: A custom logger to use instead of ``NetworkLogger/shared``.
         public convenience init(
             configuration: URLSessionConfiguration,
+            logger: NetworkLogger? = nil,
             options: URLSessionOptions = .init()
         ) {
             self.init(configuration: configuration, delegate: nil, delegateQueue: nil, options: options)
         }
 
+        /// - parameter logger: A custom logger to use instead of ``NetworkLogger/shared``.
         public init(
             configuration: URLSessionConfiguration,
             delegate: (any URLSessionDelegate)?,
             delegateQueue: OperationQueue? = nil,
+            logger: NetworkLogger? = nil,
             options: URLSessionOptions = .init()
         ) {
             if options.isMockingEnabled {
@@ -41,10 +43,11 @@ extension NetworkLogger {
             }
             self.session = Foundation.URLSession(
                 configuration: configuration,
-                delegate: URLSessionProxyDelegate(logger: options.logger, delegate: delegate),
+                delegate: URLSessionProxyDelegate(logger: logger, delegate: delegate),
                 delegateQueue: delegateQueue
             )
             self.options = options
+            self._logger = logger
         }
     }
 }

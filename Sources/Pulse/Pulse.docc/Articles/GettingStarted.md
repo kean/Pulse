@@ -30,7 +30,7 @@ NetworkLogger.enableProxy()
 #endif
 ```
 
-> Note: **PulseProxy** uses method swizzling and private APIs and it is not recommended that you include it in the production builds of your app.
+> note: **PulseProxy** uses method swizzling and private APIs and it is not recommended that you include it in the production builds of your app.
 
 - **Option 2 (Recommended)**. Use ``NetworkLogger/URLSession``, a thin wrapper on top of `URLSession`. 
 
@@ -45,7 +45,7 @@ session = URLSession(configuration: .default)
 #endif
 ```
 
-> Tip: See <doc:NetworkLogging-Article> for more information about how to configure network logging if your app does not use `URLSession` directly, how to further customize it, how to capture and display decoding errors, and more. Pulse is modular and will accommodate almost any system.
+> tip: See <doc:NetworkLogging-Article> for more information about how to configure network logging if your app does not use `URLSession` directly, how to further customize it, how to capture and display decoding errors, and more. Pulse is modular and will accommodate almost any system.
 
 ### 2.2. Collect Regular Messages
 
