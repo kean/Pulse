@@ -85,6 +85,12 @@ struct NetworkLoggerEventMonitor: EventMonitor {
 }
 ```
 
+Alternatively, if you don't have access to `URLSessionTask`, you can store the request/response directly in ``LoggerStore``:
+
+```swift
+LoggerStore.shared.storeRequest(urlRequest, response: urlResponse, ...)
+```
+
 ## Configure Logging
 
 ### Record Decoding Errors
