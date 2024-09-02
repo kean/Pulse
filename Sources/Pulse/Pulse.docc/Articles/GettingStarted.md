@@ -32,16 +32,15 @@ NetworkLogger.enableProxy()
 
 > note: **PulseProxy** uses method swizzling and private APIs and it is not recommended that you include it in the production builds of your app.
 
-- **Option 2 (Recommended)**. Use ``NetworkLogger/URLSession``, a thin wrapper on top of `URLSession`. 
+- **Option 2 (Recommended)**. Use ``URLSessionProxy``, a thin wrapper on top of `URLSession`. 
 
 ```swift
 import Pulse
 
-let session: URLSessionProtocol
 #if DEBUG
-session = NetworkLogger.URLSession(configuration: .default)
+let session: URLSessionProtocol = URLSessionProxy(configuration: .default)
 #else
-session = URLSession(configuration: .default)
+let session: URLSessionProtocol = URLSession(configuration: .default)
 #endif
 ```
 

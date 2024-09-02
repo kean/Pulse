@@ -29,27 +29,26 @@ NetworkLogger.enableProxy()
 
 ### Option 2 (Recommended)
 
-Use ``NetworkLogger/URLSession``, a thin wrapper on top of `URLSession`. 
+Use ``URLSessionProxy``, a thin wrapper on top of `URLSession`. 
 
 ```swift
 import Pulse
 
-let session: URLSessionProtocol
 #if DEBUG
-session = NetworkLogger.URLSession(configuration: .default)
+let session: URLSessionProtocol = URLSessionProxy(configuration: .default)
 #else
-session = URLSession(configuration: .default)
+let session: URLSessionProtocol = URLSession(configuration: .default)
 #endif
 ```
 
-``NetworkLogger/URLSession`` is the best way to integrate Pulse because it supports all `URLSession` APIs, including the new Async/Await methods. It also makes it easy to remove it conditionally.
+``URLSessionProxy`` is the best way to integrate Pulse because it supports all `URLSession` APIs, including the new Async/Await methods. It also makes it easy to remove it conditionally.
 
 ### Option 3
 
-If you use a delegate-based `URLSession` that doesn't rely on any of its convenience APIs, such as [Alamofire](https://github.com/Alamofire/Alamofire), you can record its traffic using ``NetworkLogger/URLSessionProxyDelegate``.   
+If you use a delegate-based `URLSession` that doesn't rely on any of its convenience APIs, such as [Alamofire](https://github.com/Alamofire/Alamofire), you can record its traffic using ``URLSessionProxyDelegate``.   
 
 ```swift
-let delegate = NetworkLogger.URLSessionProxyDelegate(delegate: <#YourSessionDelegate#>)
+let delegate = URLSessionProxyDelegate(delegate: <#YourSessionDelegate#>)
 let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
 ```
 
@@ -171,7 +170,7 @@ private func process(event: LoggerStore.Event) {
 
 ## Network Debugging
 
-In addition to logging, Pulse provides network debugging features, such as logging. If you use the recommended ``NetworkLogger/URLSession``, these features are enabled automatically, and you don't need to do anything. In other cases, make sure to inject ``MockingURLProtocol`` in the set of URL protocols used by your `URLSession`:
+In addition to logging, Pulse provides network debugging features, such as logging. If you use the recommended ``URLSessionProxy``, these features are enabled automatically, and you don't need to do anything. In other cases, make sure to inject ``MockingURLProtocol`` in the set of URL protocols used by your `URLSession`:
 
 ```swift
 let configuration = URLSesionConfiguration.default

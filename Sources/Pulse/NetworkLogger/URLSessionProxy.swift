@@ -4,9 +4,11 @@
 
 import Foundation
 
-extension NetworkLogger {
+/// A thin wrapper on top of `URLSession` that simplifies logging of network
+/// requests and enables other Pulse features.
+public final class URLSessionProxy: URLSessionProtocol {
     /// A configuration object that defines session behavior.
-    public struct URLSessionOptions: Sendable {
+    public struct Options: Sendable {
         /// If enabled, registers ``RemoteLoggerURLProtocol``
         public var isMockingEnabled = true
 
@@ -14,45 +16,43 @@ extension NetworkLogger {
         public init() {}
     }
 
-    public final class URLSession {
-        /// The underlying `URLSession`.
-        public let session: Foundation.URLSession
-        var logger: NetworkLogger { _logger ?? .shared }
-        private let _logger: NetworkLogger?
-        private let options: URLSessionOptions
+    /// The underlying `URLSession`.
+    public let session: Foundation.URLSession
+    var logger: NetworkLogger { _logger ?? .shared }
+    private let _logger: NetworkLogger?
+    private let options: Options
 
-        /// - parameter logger: A custom logger to use instead of ``NetworkLogger/shared``.
-        public convenience init(
-            configuration: URLSessionConfiguration,
-            logger: NetworkLogger? = nil,
-            options: URLSessionOptions = .init()
-        ) {
-            self.init(configuration: configuration, delegate: nil, delegateQueue: nil, options: options)
-        }
-
-        /// - parameter logger: A custom logger to use instead of ``NetworkLogger/shared``.
-        public init(
-            configuration: URLSessionConfiguration,
-            delegate: (any URLSessionDelegate)?,
-            delegateQueue: OperationQueue? = nil,
-            logger: NetworkLogger? = nil,
-            options: URLSessionOptions = .init()
-        ) {
-            if options.isMockingEnabled {
-                configuration.protocolClasses = [MockingURLProtocol.self] + (configuration.protocolClasses ?? [])
-            }
-            self.session = Foundation.URLSession(
-                configuration: configuration,
-                delegate: URLSessionProxyDelegate(logger: logger, delegate: delegate),
-                delegateQueue: delegateQueue
-            )
-            self.options = options
-            self._logger = logger
-        }
+    /// - parameter logger: A custom logger to use instead of ``NetworkLogger/shared``.
+    public convenience init(
+        configuration: URLSessionConfiguration,
+        logger: NetworkLogger? = nil,
+        options: Options = .init()
+    ) {
+        self.init(configuration: configuration, delegate: nil, delegateQueue: nil, options: options)
     }
-}
 
-extension NetworkLogger.URLSession: URLSessionProtocol {
+    /// - parameter logger: A custom logger to use instead of ``NetworkLogger/shared``.
+    public init(
+        configuration: URLSessionConfiguration,
+        delegate: (any URLSessionDelegate)?,
+        delegateQueue: OperationQueue? = nil,
+        logger: NetworkLogger? = nil,
+        options: Options = .init()
+    ) {
+        if options.isMockingEnabled {
+            configuration.protocolClasses = [MockingURLProtocol.self] + (configuration.protocolClasses ?? [])
+        }
+        self.session = Foundation.URLSession(
+            configuration: configuration,
+            delegate: URLSessionProxyDelegate(logger: logger, delegate: delegate),
+            delegateQueue: delegateQueue
+        )
+        self.options = options
+        self._logger = logger
+    }
+
+    // MARK: - URLSessionProtocol
+
     public var sessionDescription: String? {
         get { session.sessionDescription }
         set { session.sessionDescription = newValue }
