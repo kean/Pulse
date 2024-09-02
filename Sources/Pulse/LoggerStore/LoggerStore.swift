@@ -54,6 +54,9 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     private var requestsCache: [NetworkLogger.Request: NetworkRequestEntity] = [:]
     private var responsesCache: [NetworkLogger.Response: NetworkResponseEntity] = [:]
 
+    /// For testing purposes.
+    var makeCurrentDate: () -> Date = { Date() }
+
     // MARK: Shared
 
     /// Returns a shared store.
@@ -280,7 +283,7 @@ extension LoggerStore {
         line: UInt = #line
     ) {
         handle(.messageStored(.init(
-            createdAt: createdAt ?? configuration.makeCurrentDate(),
+            createdAt: createdAt ?? makeCurrentDate(),
             label: label,
             level: level,
             message: message,
@@ -307,7 +310,7 @@ extension LoggerStore {
         handle(.networkTaskCompleted(.init(
             taskId: UUID(),
             taskType: .dataTask,
-            createdAt: configuration.makeCurrentDate(),
+            createdAt: makeCurrentDate(),
             originalRequest: NetworkLogger.Request(request),
             currentRequest: NetworkLogger.Request(request),
             response: response.map(NetworkLogger.Response.init),
@@ -980,7 +983,7 @@ extension LoggerStore {
             // The output file is also going to be about 10-20% larger because of
             // the unused pages in the sqlite database.
             info.totalStoreSize = totalSize + 500 // info is roughly 500 bytes
-            info.creationDate = configuration.makeCurrentDate()
+            info.creationDate = makeCurrentDate()
             info.modifiedDate = info.creationDate
 
             let infoBlob = PulseBlobEntity(context: document.context)
@@ -1025,7 +1028,7 @@ extension LoggerStore {
     }
 
     private func removeExpiredMessages() throws {
-        let cutoffDate = configuration.makeCurrentDate().addingTimeInterval(-configuration.maxAge)
+        let cutoffDate = makeCurrentDate().addingTimeInterval(-configuration.maxAge)
         let sessionIDs = try backgroundContext.fetch(LoggerSessionEntity.self) {
             $0.predicate = NSPredicate(format: "createdAt < %@", cutoffDate as NSDate)
         }.map(\.id)

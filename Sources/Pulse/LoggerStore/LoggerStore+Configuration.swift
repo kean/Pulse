@@ -87,9 +87,6 @@ extension LoggerStore {
         /// ``LoggerStore/Options-swift.struct/sweep`` option. The default store supports sweeps.
         public var maxAge: TimeInterval = 14 * 86400
 
-        /// For testing purposes.
-        var makeCurrentDate: () -> Date = { Date() }
-
         /// Gets called when the store receives an event. You can use it to
         /// modify the event before it is stored in order, for example, filter
         /// out some sensitive information. If you return `nil`, the event
