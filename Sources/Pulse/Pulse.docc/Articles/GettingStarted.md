@@ -10,7 +10,7 @@ Learn how to integrate Pulse.
 https://github.com/kean/Pulse
 ```
 
-Add both **Pulse** and **PulseUI** libraries to your app. **PulseProxy** is optional and provides a quick, convenient way to capture network traffic to evaluate the framework.
+Add **Pulse** and **PulseUI** libraries to your app.
 
 - **Option 2**. Use precompiled binary frameworks from the [latest release](https://github.com/kean/Pulse/releases).
 
@@ -44,9 +44,9 @@ NetworkLogger.enableProxy()
 #endif
 ```
 
-> note: **PulseProxy** uses method swizzling and private APIs and it is not recommended that you include it in the production builds of your app.
+> important: **PulseProxy** uses swizzling and private APIs and it is not recommended that you include it in the production builds of your app.
 
-### 2.2. Collect Regular Messages
+### 2.2. Collect Logs
 
 To store regular log messages, use [LoggerStore](https://kean-docs.github.io/pulse/documentation/pulse/loggerstore).
 
@@ -59,23 +59,23 @@ LoggerStore.shared.storeMessage(
 )
 ```
 
-> info: As an alternative to using `LoggerStore` directly, you can use Pulse as a SwiftLog backend using [PersistentLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler/persistentloghandler) struct from [PulseLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler) which is a [Swift package distributed separately](https://github.com/kean/PulseLogHandler).  This way you can have more than one logger at once.
-
-Logs are stored persistently and the store automatically removes old messages and limits the overall size (configurable). It uses a number of space [optimizations techniques](https://kean.blog/post/pulse-2#space-savings), including fast [lzfse](https://developer.apple.com/documentation/compression/algorithm/lzfse) compression.
+> tip: Alternatively, you can use it as a SwiftLog backend using [PersistentLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler/persistentloghandler) from a [PulseLogHandler](https://github.com/kean/PulseLogHandler) package.
 
 ## 3. Integrate PulseUI Framework
 
-To view logs and network requests from your app, use [PulseUI](https://kean-docs.github.io/pulseui/documentation/pulseui/) framework. The framework is centered around a single screen: `ConsoleView`. On iOS, you can push it into the existing navigation stack or present it modally.
+[**PulseUI**](https://kean-docs.github.io/pulseui/documentation/pulseui/) allows you to view logs and network requests directly from your app. The framework is centered around a single screen: `ConsoleView`. On iOS, you can push it into the existing navigation stack or present it modally.
 
 ```swift
+import PulseUI
+
 NavigationLink(destination: ConsoleView()) {
     Text("Console")
 }
 ```
 
-> Note: There are some additional steps required for some platforms. For more information see the PulseUI [documentation](https://kean-docs.github.io/pulseui/documentation/pulseui/).
+> tip: For more information, see the PulseUI [documentation](https://kean-docs.github.io/pulseui/documentation/pulseui/).
 
-## 4. Configure Remote Logging with Pulse Pro
+## 4. Get Pulse Pro
 
 In addition to the frameworks and the on-device view, Pulse also provides a separate professional macOS app called [Pulse Pro](https://kean.blog/pulse/pro) that you can use for viewing the previously shared logs or even viewing the logs from the device remotely in real-time.
 
@@ -103,3 +103,7 @@ Open the Pulse console from the app, go to Settings, enable "Remote Logging", an
 ![Enabling remote logging](remote-logging.png)
 
 Once the connection is established, open Pulse Pro and select the device in the sidebar. The next time you launch the app, the connection will happen automatically.
+
+## Next Steps
+
+Learn how to configure Pulse to best suit your app needs in <doc:NextSteps> and explore additional networking debugging techniques in <doc:NetworkLogging-Article>. 

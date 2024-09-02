@@ -101,15 +101,16 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     /// Initializes the store with the given URL. The store needs to be
     ///
     /// The ``LoggerStore/shared`` store is a package optimized for writing. When
-    /// you are ready to share the store, create a Pulse document using ``copy(to:predicate:)`` 
+    /// you are ready to share the store, create a Pulse document using ``export(to:options:)``
     /// method. The document format is optimized to use the least amount of space possible.
     ///
     /// - parameters:
     ///   - storeURL: The store URL that points to a package (directory)
     ///   with a Pulse database.
-    ///   - options: By default, empty. To create a store, use ``Options-swift.struct/create``.
+    ///   - options: By default, contains ``LoggerStore/Options-swift.struct/create``
+    ///   and ``LoggerStore/Options-swift.struct/sweep`` options.
     ///   - configuration: The store configuration specifying size limit, etc.
-    public init(storeURL: URL, options: Options = [], configuration: Configuration = .init()) throws {
+    public init(storeURL: URL, options: Options = [.create, .sweep], configuration: Configuration = .init()) throws {
         var isDirectory: ObjCBool = ObjCBool(false)
         let fileExists = Files.fileExists(atPath: storeURL.path, isDirectory: &isDirectory)
         guard (fileExists && isDirectory.boolValue) || options.contains(.create) else {
