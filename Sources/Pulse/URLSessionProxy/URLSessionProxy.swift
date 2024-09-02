@@ -6,7 +6,7 @@ import Foundation
 
 /// A thin wrapper on top of `URLSession` that simplifies logging of network
 /// requests and enables other Pulse features.
-public final class URLSessionProxy: URLSessionProtocol {
+public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
     /// A configuration object that defines session behavior.
     public struct Options: Sendable {
         /// If enabled, registers ``RemoteLoggerURLProtocol``
@@ -123,20 +123,21 @@ public final class URLSessionProxy: URLSessionProtocol {
 
     public func dataTask(with request: URLRequest, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionDataTask {
         // TODO: refactor and remove retain cycles
-        var task: URLSessionDataTask?
-        let onReceive: (Data?, URLResponse?, Error?) -> Void = { (data, response, error) in
-            if let task {
+        let box = Mutex<URLSessionDataTask?>(nil)
+        let onReceive: @Sendable (Data?, URLResponse?, Error?) -> Void = { [logger] data, response, error in
+            if let task = box.value {
                 if let data {
-                    self.logger.logDataTask(task, didReceive: data)
+                    logger.logDataTask(task, didReceive: data)
                 }
-                self.logger.logTask(task, didCompleteWithError: error)
+                logger.logTask(task, didCompleteWithError: error)
             }
         }
-        task = session.dataTask(with: request) {data, response, error in
+        let task = session.dataTask(with: request) {data, response, error in
             onReceive(data, response, error)
             completionHandler(data, response, error)
         }
-        return task!
+        box.value = task
+        return task
     }
 
     public func dataTask(with url: URL, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionDataTask {
@@ -204,13 +205,13 @@ public final class URLSessionProxy: URLSessionProtocol {
         do {
             let (data, response) = try await session.data(for: request, delegate: delegate)
             // TODO: use mutex here?
-            if let task = delegate.createdTask as? URLSessionDataTask {
+            if let task = delegate.createdTask.value as? URLSessionDataTask {
                 logger.logDataTask(task, didReceive: data)
                 logger.logTask(task, didCompleteWithError: nil)
             }
             return (data, response)
         } catch {
-            if let task = delegate.createdTask {
+            if let task = delegate.createdTask.value {
                 logger.logTask(task, didCompleteWithError: error)
             }
             throw error

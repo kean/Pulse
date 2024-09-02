@@ -471,7 +471,9 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             isLoggingPaused = true
         case .resume:
             isLoggingPaused = false
-            buffer?.forEach(send)
+            for event in (buffer ?? []) {
+                send(event: event)
+            }
         case .ping:
             scheduleAutomaticDisconnect()
         case .message:

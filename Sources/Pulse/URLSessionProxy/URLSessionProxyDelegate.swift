@@ -41,10 +41,10 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
 
     // MARK: URLSessionTaskDelegate
 
-    var createdTask: URLSessionTask?
+    let createdTask = Mutex<URLSessionTask?>(nil)
 
     public func urlSession(_ session: Foundation.URLSession, didCreateTask task: URLSessionTask) {
-        createdTask = task
+        createdTask.value = task
         logger.logTaskCreated(task)
         if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
             taskDelegate?.urlSession?(session, didCreateTask: task)
