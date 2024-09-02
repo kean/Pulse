@@ -133,15 +133,18 @@ extension RemoteLogger {
         func send(code: UInt8, data: Data) {
             do {
                 let data = try encode(code: code, body: data)
-                let log = self.log
-                connection.send(content: data, completion: .contentProcessed({ error in
+                connection.send(content: data, completion: .contentProcessed({ [weak self] error in
                     if let error {
-                        os_log("Failed to send data: %{public}@", log: log, type: .error, "\(error)")
+                        self?.logSendDataError(error)
                     }
                 }))
             } catch {
                 os_log("Failed to encode a packet: %{public}@", log: log, type: .error, "\(error)")
             }
+        }
+
+        private func logSendDataError(_ error: Error) {
+            os_log("Failed to send data: %{public}@", log: log, type: .error, "\(error)")
         }
 
         func send<T: Encodable>(code: UInt8, entity: T) {
