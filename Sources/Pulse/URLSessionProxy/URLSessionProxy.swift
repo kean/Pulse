@@ -122,18 +122,14 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
     // MARK: - Closures
 
     public func dataTask(with request: URLRequest, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionDataTask {
-        // TODO: refactor and remove retain cycles
         let box = Mutex<URLSessionDataTask?>(nil)
-        let onReceive: @Sendable (Data?, URLResponse?, Error?) -> Void = { [logger] data, response, error in
+        let task = session.dataTask(with: request) { [logger] data, response, error in
             if let task = box.value {
                 if let data {
                     logger.logDataTask(task, didReceive: data)
                 }
                 logger.logTask(task, didCompleteWithError: error)
             }
-        }
-        let task = session.dataTask(with: request) {data, response, error in
-            onReceive(data, response, error)
             completionHandler(data, response, error)
         }
         box.value = task
