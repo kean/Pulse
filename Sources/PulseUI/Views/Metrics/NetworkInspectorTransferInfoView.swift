@@ -85,22 +85,28 @@ struct NetworkInspectorTransferInfoView: View {
                 VStack(alignment: .trailing) {
                     Text("Headers:")
                         .foregroundColor(.secondary)
-                        .font(.footnote)
+                        .font(valueFont)
                     Text("Body:")
                         .foregroundColor(.secondary)
-                        .font(.footnote)
+                        .font(valueFont)
                 }
                 VStack(alignment: .leading) {
                     Text(headers)
-                        .font(.footnote)
+                        .font(valueFont)
                     Text(body)
-                        .font(.footnote)
+                        .font(valueFont)
                 }
             }
             .fixedSize()
         }
     }
 }
+
+#if os(macOS)
+private let valueFont: Font = .subheadline
+#else
+private let valueFont: Font = .footnote
+#endif
 
 #if os(tvOS)
 private let spacing: CGFloat = 20

@@ -130,8 +130,8 @@ struct ConsoleConstants {
     static let fontInfo = Font.system(size: 14)
     static let fontBody = Font.system(size: 15)
 #elseif os(macOS)
-    static let fontTitle = Font.caption
-    static let fontInfo = Font.caption
+    static let fontTitle = Font.subheadline
+    static let fontInfo = Font.subheadline
     static let fontBody = Font.body
 #elseif os(iOS) || os(visionOS)
     static let fontTitle = Font.subheadline.monospacedDigit()

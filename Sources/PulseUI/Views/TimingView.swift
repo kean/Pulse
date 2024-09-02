@@ -36,7 +36,11 @@ private struct TimingSectionView: View {
         VStack(spacing: 6) {
             HStack {
                 Text(viewModel.title)
+#if os(macOS)
+                    .font(.headline)
+#else
                     .font(.subheadline)
+#endif
                     .lineLimit(1)
                     .foregroundColor(viewModel.isHeader ? .secondary : .primary)
                 Spacer()
@@ -100,14 +104,22 @@ private struct TimingRowView: View {
 
     private func makeTitle(_ text: String) -> some View {
         Text(text)
+#if os(macOS)
+            .font(.subheadline)
+#else
             .font(.footnote)
+#endif
             .lineLimit(1)
             .foregroundColor(.secondary)
     }
 
     private func makeValue(_ text: String) -> some View {
         Text(text)
+#if os(macOS)
+            .font(.system(.subheadline, design: .monospaced))
+#else
             .font(.system(.caption, design: .monospaced))
+#endif
             .lineLimit(1)
             .foregroundColor(.secondary)
     }
