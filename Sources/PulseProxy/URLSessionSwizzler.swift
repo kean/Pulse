@@ -108,7 +108,7 @@ final class URLSessionSwizzler {
                 }
                 if var error = error as? NSError {
                     if error.domain == "kCFErrorDomainCFNetwork" {
-                        // Satifsy LogggerStore (needs refactoring)
+                        // Satisfy LogggerStore (needs refactoring)
                         error = NSError(domain: URLError.errorDomain, code: error.code, userInfo: error.userInfo)
                     }
                     self?.logger.logTask(task, didCompleteWithError: error)

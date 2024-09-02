@@ -48,7 +48,7 @@ private func sendRequest() {
 
 
 private func testClosures() {
-    let session = NetworkLogger.URLSession(configuration: .default)
+    let session = URLSessionProxy(configuration: .default)
     let task = session.dataTask(with: URLRequest(url: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!)) { data, _, _ in
         NSLog("didFinish: \(data?.count)")
     }
