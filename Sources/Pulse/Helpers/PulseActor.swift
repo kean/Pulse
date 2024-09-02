@@ -6,7 +6,7 @@ import Foundation
 
 /// A global actor on which Pulse subsystems are syncrhonized.
 @globalActor
-public struct PulseActor {
-    public actor PulseActor { }
-    public static let shared = PulseActor()
+struct PulseActor {
+    actor PulseActor { }
+    static let shared = PulseActor()
 }
