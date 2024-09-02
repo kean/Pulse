@@ -9,7 +9,7 @@ import Foundation
 public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
     /// A configuration object that defines session behavior.
     public struct Options: Sendable {
-        /// If enabled, registers ``RemoteLoggerURLProtocol``
+        /// If enabled, registers ``MockingURLProtocol``.
         public var isMockingEnabled = true
 
         /// Creates default options.
