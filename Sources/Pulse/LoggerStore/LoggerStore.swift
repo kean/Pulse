@@ -442,9 +442,9 @@ extension LoggerStore {
         }
 
         var currentRequest = event.currentRequest
-        if currentRequest?.headers?[RemoteLoggerURLProtocol.requestMockedHeaderName] != nil {
+        if currentRequest?.headers?[MockingURLProtocol.requestMockedHeaderName] != nil {
             entity.isMocked = true
-            currentRequest?.headers?[RemoteLoggerURLProtocol.requestMockedHeaderName] = nil
+            currentRequest?.headers?[MockingURLProtocol.requestMockedHeaderName] = nil
         } else {
             entity.isMocked = false
         }

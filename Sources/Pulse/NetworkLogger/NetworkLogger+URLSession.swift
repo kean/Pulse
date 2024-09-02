@@ -39,7 +39,7 @@ extension NetworkLogger {
             options: URLSessionOptions = .init()
         ) {
             if options.isMockingEnabled {
-                configuration.protocolClasses = [RemoteLoggerURLProtocol.self] + (configuration.protocolClasses ?? [])
+                configuration.protocolClasses = [MockingURLProtocol.self] + (configuration.protocolClasses ?? [])
             }
             self.session = Foundation.URLSession(
                 configuration: configuration,

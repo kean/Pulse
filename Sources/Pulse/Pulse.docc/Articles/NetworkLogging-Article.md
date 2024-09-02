@@ -1,4 +1,4 @@
-# Capturing Network Requests
+# Network Logging and Debugging
 
 Learn how to enable and configure network logging and debugging.
 
@@ -161,4 +161,19 @@ private func process(event: LoggerStore.Event) {
         break
     }
 }
+```
+
+## Network Debugging
+
+In addition to logging, Pulse provides network debugging features, such as logging. If you use the recommended ``NetworkLogger/URLSession``, these features are enabled automatically, and you don't need to do anything. In other cases, make sure to inject ``MockingURLProtocol`` in the set of URL protocols used by your `URLSession`:
+
+```swift
+let configuration = URLSesionConfiguration.default
+configuration.protocolClasses = [MockingURLProtocol.self] + (configuration.protocolClasses ?? [])
+```
+
+Alternatively, you can use automatic registration.
+
+```swift
+MockingURLProtocol.enableAutomaticRegistration()
 ```
