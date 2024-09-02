@@ -4,7 +4,7 @@
 
 import Foundation
 
-extension URLSessionProxyDelegate {
+extension NetworkLogger.URLSessionProxyDelegate {
     /// Enables automatic logging and remote debugging of network requests using
     /// `URLSessionProxyDelegate`.
     ///
@@ -13,8 +13,7 @@ extension URLSessionProxyDelegate {
     /// `RemoteLoggerURLProtocol` to the list of session protocol classes.
     ///
     /// - warning: This logging method works only with delegate-based `URLSession`
-    /// instances. If it doesn't work for you, consider using ``URLSessionProxy``
-    /// for automatic logging or manually logging the requests using ``NetworkLogger``.
+    /// instances.
     ///
     /// - parameter logger: The network logger to be used for recording the requests. By default, uses shared logger.
     ///
@@ -70,7 +69,7 @@ private extension URLSession {
             return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
         }
         configuration.protocolClasses = [RemoteLoggerURLProtocol.self] + (configuration.protocolClasses ?? [])
-        let delegate = URLSessionProxyDelegate(logger: sharedNetworkLogger, delegate: delegate)
+        let delegate = NetworkLogger.URLSessionProxyDelegate(logger: sharedNetworkLogger, delegate: delegate)
         return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
     }
 }
