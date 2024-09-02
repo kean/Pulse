@@ -21,17 +21,6 @@ Logger and network inspector for Apple platforms.
 
 - ``RemoteLogger``
 
-### Core Data Entities
-
-- ``LoggerMessageEntity``
-- ``LoggerBlobHandleEntity``
-- ``LoggerSessionEntity``
-- ``NetworkTaskEntity``
-- ``NetworkTaskProgressEntity``
-- ``NetworkTransactionMetricsEntity``
-- ``NetworkRequestEntity``
-- ``NetworkResponseEntity``
-
 ### Deprecated
 
 - ``Experimental``

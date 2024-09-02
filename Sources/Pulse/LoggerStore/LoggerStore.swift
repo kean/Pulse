@@ -62,7 +62,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
 
     // MARK: Shared
 
-    /// Returns a shared store.
+    /// Returns the shared store.
     ///
     /// You can replace the default store with a custom one. If you replace the
     /// shared store, it automatically gets registered as the default store
@@ -327,7 +327,7 @@ extension LoggerStore {
     }
 
     /// Handles event created by the current store and dispatches it to observers.
-    public func handle(_ event: Event) {
+    func handle(_ event: Event) {
         guard let event = configuration.willHandleEvent(event) else {
             return
         }

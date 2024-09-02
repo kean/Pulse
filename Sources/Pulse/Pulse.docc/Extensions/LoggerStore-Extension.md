@@ -2,29 +2,17 @@
 
 ## Topics
 
-### Getting a Store
-
-- ``shared``
-
 ### Initializers
 
+- ``shared``
 - ``init(storeURL:options:configuration:)``
 - ``Options-swift.struct``
 - ``Configuration-swift.struct``
 
-### Instance Properties
-
-- ``storeURL``
-- ``version``
-- ``options-swift.property``
-- ``session-swift.property``
-- ``isArchive``
-- ``configuration-swift.property``
-
 ### Storing Logs
 
 - ``storeMessage(createdAt:label:level:message:metadata:file:function:line:)``
-- ``storeRequest(_:response:error:data:metrics:label:)``
+- ``storeRequest(_:response:error:data:metrics:label:taskDescription:)``
 
 ### Accessing Logs
 
@@ -34,14 +22,13 @@
 
 ### Export
 
-- ``export(to:as:options:)``
+- ``export(to:options:)``
 - ``ExportOptions``
-- ``DocumentType``
-- ``copy(to:predicate:)``
 
 ### Managing the Store
 
 - ``removeAll()``
+- ``removeSessions(withIDs:)``
 - ``close()``
 - ``destroy()``
 
@@ -49,11 +36,6 @@
 
 - ``info()``
 - ``Info``
-
-### Managing Pins
-
-- ``pins-swift.property``
-- ``Pins-swift.class``
 
 ### Receiving and Filtering Events
 
@@ -65,6 +47,7 @@
 - ``container``
 - ``viewContext``
 - ``backgroundContext``
+- ``newBackgroundContext()``
 
 ### Nested
 
@@ -73,3 +56,14 @@
 - ``MetadataValue``
 - ``Error``
 - ``Session-swift.struct``
+
+### Core Data Entities
+
+- ``LoggerMessageEntity``
+- ``LoggerBlobHandleEntity``
+- ``LoggerSessionEntity``
+- ``NetworkTaskEntity``
+- ``NetworkTaskProgressEntity``
+- ``NetworkTransactionMetricsEntity``
+- ``NetworkRequestEntity``
+- ``NetworkResponseEntity``
