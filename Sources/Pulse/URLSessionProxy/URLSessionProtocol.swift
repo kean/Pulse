@@ -156,6 +156,41 @@ public protocol URLSessionProtocol {
     /// - Parameter delegate: Task-specific delegate.
     /// - Returns: Data and response.
     func upload(for request: URLRequest, from bodyData: Data, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse)
+
+    /// Convenience method to download using a URLRequest, creates and resumes a URLSessionDownloadTask internally.
+    ///
+    /// - Parameter request: The URLRequest for which to download.
+    /// - Parameter delegate: Task-specific delegate.
+    /// - Returns: Downloaded file URL and response. The file will not be removed automatically.
+    func download(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (URL, URLResponse)
+
+    /// Convenience method to download using a URL, creates and resumes a URLSessionDownloadTask internally.
+    ///
+    /// - Parameter url: The URL for which to download.
+    /// - Parameter delegate: Task-specific delegate.
+    /// - Returns: Downloaded file URL and response. The file will not be removed automatically.
+    func download(from url: URL, delegate: (any URLSessionTaskDelegate)?) async throws -> (URL, URLResponse)
+
+    /// Convenience method to resume download, creates and resumes a URLSessionDownloadTask internally.
+    ///
+    /// - Parameter resumeData: Resume data from an incomplete download.
+    /// - Parameter delegate: Task-specific delegate.
+    /// - Returns: Downloaded file URL and response. The file will not be removed automatically.
+    func download(resumeFrom resumeData: Data, delegate: (any URLSessionTaskDelegate)?) async throws -> (URL, URLResponse)
+
+    /// Returns a byte stream that conforms to AsyncSequence protocol.
+    ///
+    /// - Parameter request: The URLRequest for which to load data.
+    /// - Parameter delegate: Task-specific delegate.
+    /// - Returns: Data stream and response.
+    func bytes(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (URLSession.AsyncBytes, URLResponse)
+
+    /// Returns a byte stream that conforms to AsyncSequence protocol.
+    ///
+    /// - Parameter url: The URL for which to load data.
+    /// - Parameter delegate: Task-specific delegate.
+    /// - Returns: Data stream and response.
+    func bytes(from url: URL, delegate: (any URLSessionTaskDelegate)?) async throws -> (URLSession.AsyncBytes, URLResponse)
 }
 
 extension URLSession: URLSessionProtocol {}
