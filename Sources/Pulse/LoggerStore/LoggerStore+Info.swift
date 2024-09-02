@@ -104,6 +104,7 @@ private func getAppIcon() -> Data? {
 #if os(iOS) || os(tvOS) || os(visionOS)
 import UIKit
 
+@MainActor
 func getDeviceId() -> UUID? {
     UIDevice.current.identifierForVendor
 }
@@ -123,6 +124,7 @@ extension LoggerStore.Info.DeviceInfo {
 #elseif os(watchOS)
 import WatchKit
 
+@MainActor
 func getDeviceId() -> UUID? {
     WKInterfaceDevice.current().identifierForVendor
 }
@@ -154,6 +156,7 @@ extension LoggerStore.Info.DeviceInfo {
     }
 }
 
+@MainActor
 func getDeviceId() -> UUID? {
     return nil
 }
