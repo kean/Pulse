@@ -75,6 +75,7 @@ extension NetworkLogger {
                 var originalImplementation: IMP?
                 let block: @convention(block) (URLSessionTask) -> Void = { [weak self] task in
                     self?.logger.logTaskCreated(task)
+
                     guard task.currentRequest != nil else { return }
                     let key = String(method.hashValue)
                     objc_setAssociatedObject(task, key, true, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
