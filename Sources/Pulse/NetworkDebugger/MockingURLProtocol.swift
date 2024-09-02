@@ -8,7 +8,7 @@ import Foundation
 /// as mocking of the network responses.
 public final class MockingURLProtocol: URLProtocol {
     public override func startLoading() {
-        guard let mock = RemoteDebugger.shared.getMock(for: request) else {
+        guard let mock = NetworkDebugger.shared.getMock(for: request) else {
             client?.urlProtocol(self, didFailWithError: URLError(.unknown)) // Should never happen
             return
         }
@@ -51,7 +51,7 @@ public final class MockingURLProtocol: URLProtocol {
         guard RemoteLogger.latestConnectionState.value == .connected else {
             return false
         }
-        return RemoteDebugger.shared.shouldMock(request)
+        return NetworkDebugger.shared.shouldMock(request)
     }
 
     static let requestMockedHeaderName = "X-PulseRequestMocked"

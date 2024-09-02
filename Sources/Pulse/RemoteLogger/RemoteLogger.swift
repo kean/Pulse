@@ -481,7 +481,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             switch message.path {
             case .updateMocks:
                 let mocks = try JSONDecoder().decode([URLSessionMock].self, from: message.data)
-                RemoteDebugger.shared.update(mocks)
+                NetworkDebugger.shared.update(mocks)
             case .getMockedResponse, .openMessageDetails, .openTaskDetails:
                 break // Server specific (should never happen)
             }
