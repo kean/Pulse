@@ -51,20 +51,9 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
         self._logger = logger
     }
 
-    // MARK: - URLSessionProtocol
+    // MARK: - URLSessionProtocol (Core)
 
-    public var sessionDescription: String? {
-        get { session.sessionDescription }
-        set { session.sessionDescription = newValue }
-    }
-
-    public func finishTasksAndInvalidate() {
-        session.finishTasksAndInvalidate()
-    }
-
-    public func invalidateAndCancel() {
-        session.invalidateAndCancel()
-    }
+    // These APIs work out of the box thanks to `URLSessionProxyDelegate`.
 
     public func dataTask(with request: URLRequest) -> URLSessionDataTask {
         session.dataTask(with: request)
@@ -119,7 +108,7 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
         session.webSocketTask(with: request)
     }
 
-    // MARK: - Closures
+    // MARK: - URLSessionProtocol (Closures)
 
     public func dataTask(with request: URLRequest, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionDataTask {
         let box = Mutex<URLSessionDataTask?>(nil)
@@ -164,9 +153,8 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
         fatalError("Not implemented")
     }
 
-    // MARK: - Combine
+    // MARK: - URLSessionProtocol (Combine)
 
-    // TODO: add support for logging requests from Combine
     public func dataTaskPublisher(for url: URL) -> URLSession.DataTaskPublisher {
         session.dataTaskPublisher(for: url)
     }
@@ -175,23 +163,7 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
         session.dataTaskPublisher(for: request)
     }
 
-    // MARK: - Swift Concurrency
-
-    public func data(for request: URLRequest) async throws -> (Data, URLResponse) {
-        try await data(for: request, delegate: nil)
-    }
-
-    public func data(from url: URL) async throws -> (Data, URLResponse) {
-        try await data(from: url, delegate: nil)
-    }
-
-    public func upload(for request: URLRequest, fromFile fileURL: URL) async throws -> (Data, URLResponse) {
-        fatalError("Not implemented")
-    }
-
-    public func upload(for request: URLRequest, from bodyData: Data) async throws -> (Data, URLResponse) {
-        fatalError("Not implemented")
-    }
+    // MARK: - URLSessionProtocol (Swift Concurrency)
 
     public func data(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
         let delegate = URLSessionProxyDelegate(logger: logger, delegate: delegate)
@@ -210,7 +182,7 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
         }
     }
 
-    public func data(from url: URL, delegate: (any URLSessionTaskDelegate)? = nil) async throws -> (Data, URLResponse) {
+    public func data(from url: URL, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
         try await data(for: URLRequest(url: url), delegate: delegate)
     }
 
@@ -234,12 +206,12 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
         fatalError("Not implemented")
     }
 
-    public func bytes(for request: URLRequest, delegate: (any URLSessionTaskDelegate)? = nil) async throws -> (URLSession.AsyncBytes, URLResponse) {
+    public func bytes(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (URLSession.AsyncBytes, URLResponse) {
         fatalError("Not implemented")
     }
 
 
-    public func bytes(from url: URL, delegate: (any URLSessionTaskDelegate)? = nil) async throws -> (URLSession.AsyncBytes, URLResponse) {
+    public func bytes(from url: URL, delegate: (any URLSessionTaskDelegate)?) async throws -> (URLSession.AsyncBytes, URLResponse) {
         fatalError("Not implemented")
     }
 }
