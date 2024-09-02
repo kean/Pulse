@@ -6,7 +6,7 @@ import Foundation
 
 /// A custom `URLProtocol` that enables Pulse network debugging features such
 /// as mocking of the network responses.
-public final class MockingURLProtocol: URLProtocol {
+public final class MockingURLProtocol: URLProtocol, @unchecked Sendable {
     public override func startLoading() {
         guard let mock = NetworkDebugger.shared.getMock(for: request) else {
             client?.urlProtocol(self, didFailWithError: URLError(.unknown)) // Should never happen
