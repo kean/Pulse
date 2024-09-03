@@ -130,27 +130,77 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
     }
 
     public func uploadTask(with request: URLRequest, fromFile fileURL: URL, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionUploadTask {
-        fatalError("Not implemented")
+        let box = Mutex<URLSessionUploadTask?>(nil)
+        let task = session.uploadTask(with: request, fromFile: fileURL) { [logger] data, response, error in
+            if let task = box.value {
+                if let data {
+                    logger.logDataTask(task, didReceive: data)
+                }
+                logger.logTask(task, didCompleteWithError: error)
+            }
+            completionHandler(data, response, error)
+        }
+        box.value = task
+        return task
     }
 
     public func uploadTask(with request: URLRequest, from bodyData: Data?, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionUploadTask {
-        fatalError("Not implemented")
+        let box = Mutex<URLSessionUploadTask?>(nil)
+        let task = session.uploadTask(with: request, from: bodyData) { [logger] data, response, error in
+            if let task = box.value {
+                if let data {
+                    logger.logDataTask(task, didReceive: data)
+                }
+                logger.logTask(task, didCompleteWithError: error)
+            }
+            completionHandler(data, response, error)
+        }
+        box.value = task
+        return task
     }
 
+    @available(iOS 17, tvOS 17, macOS 14, watchOS 9, *)
     public func uploadTask(withResumeData resumeData: Data, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionUploadTask {
-        fatalError("Not implemented")
+        let box = Mutex<URLSessionUploadTask?>(nil)
+        let task = session.uploadTask(withResumeData: resumeData) { [logger] data, response, error in
+            if let task = box.value {
+                if let data {
+                    logger.logDataTask(task, didReceive: data)
+                }
+                logger.logTask(task, didCompleteWithError: error)
+            }
+            completionHandler(data, response, error)
+        }
+        box.value = task
+        return task
     }
 
     public func downloadTask(with request: URLRequest, completionHandler: @escaping @Sendable (URL?, URLResponse?, (any Error)?) -> Void) -> URLSessionDownloadTask {
-        fatalError("Not implemented")
+        let box = Mutex<URLSessionDownloadTask?>(nil)
+        let task = session.downloadTask(with: request) { [logger] url, response, error in
+            if let task = box.value {
+                logger.logTask(task, didCompleteWithError: error)
+            }
+            completionHandler(url, response, error)
+        }
+        box.value = task
+        return task
     }
 
     public func downloadTask(with url: URL, completionHandler: @escaping @Sendable (URL?, URLResponse?, (any Error)?) -> Void) -> URLSessionDownloadTask {
-        fatalError("Not implemented")
+        downloadTask(with: URLRequest(url: url), completionHandler: completionHandler)
     }
 
     public func downloadTask(withResumeData resumeData: Data, completionHandler: @escaping @Sendable (URL?, URLResponse?, (any Error)?) -> Void) -> URLSessionDownloadTask {
-        fatalError("Not implemented")
+        let box = Mutex<URLSessionDownloadTask?>(nil)
+        let task = session.downloadTask(withResumeData: resumeData) { [logger] url, response, error in
+            if let task = box.value {
+                logger.logTask(task, didCompleteWithError: error)
+            }
+            completionHandler(url, response, error)
+        }
+        box.value = task
+        return task
     }
 
     // MARK: - URLSessionProtocol (Combine)
@@ -221,22 +271,46 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
     }
 
     public func download(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (URL, URLResponse) {
-        fatalError("Not implemented")
+        let delegate = URLSessionProxyDelegate(logger: logger, delegate: delegate)
+        do {
+            let (url, response) = try await session.download(for: request, delegate: delegate)
+            if let task = delegate.createdTask.value as? URLSessionDownloadTask {
+                logger.logTask(task, didCompleteWithError: nil)
+            }
+            return (url, response)
+        } catch {
+            if let task = delegate.createdTask.value {
+                logger.logTask(task, didCompleteWithError: error)
+            }
+            throw error
+        }
     }
 
     public func download(from url: URL, delegate: (any URLSessionTaskDelegate)?) async throws -> (URL, URLResponse) {
-        fatalError("Not implemented")
+        try await download(for: URLRequest(url: url), delegate: delegate)
     }
 
     public func download(resumeFrom resumeData: Data, delegate: (any URLSessionTaskDelegate)?) async throws -> (URL, URLResponse) {
-        fatalError("Not implemented")
+        let delegate = URLSessionProxyDelegate(logger: logger, delegate: delegate)
+        do {
+            let (url, response) = try await session.download(resumeFrom: resumeData, delegate: delegate)
+            if let task = delegate.createdTask.value as? URLSessionDownloadTask {
+                logger.logTask(task, didCompleteWithError: nil)
+            }
+            return (url, response)
+        } catch {
+            if let task = delegate.createdTask.value {
+                logger.logTask(task, didCompleteWithError: error)
+            }
+            throw error
+        }
     }
 
     public func bytes(for request: URLRequest, delegate: (any URLSessionTaskDelegate)?) async throws -> (URLSession.AsyncBytes, URLResponse) {
-        fatalError("Not implemented")
+        try await session.bytes(for: request, delegate: delegate)
     }
 
     public func bytes(from url: URL, delegate: (any URLSessionTaskDelegate)?) async throws -> (URLSession.AsyncBytes, URLResponse) {
-        fatalError("Not implemented")
+        try await session.bytes(from: url, delegate: delegate)
     }
 }
