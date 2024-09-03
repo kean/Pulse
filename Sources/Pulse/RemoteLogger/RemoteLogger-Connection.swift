@@ -7,13 +7,14 @@ import Network
 import CryptoKit
 import OSLog
 
+@MainActor
 protocol RemoteLoggerConnectionDelegate: AnyObject {
     func connection(_ connection: RemoteLogger.Connection, didChangeState newState: NWConnection.State)
     func connection(_ connection: RemoteLogger.Connection, didReceiveEvent event: RemoteLogger.Connection.Event)
 }
 
 extension RemoteLogger {
-    final class Connection {
+    final class Connection: @unchecked Sendable  {
         var endpoint: NWEndpoint { connection.endpoint }
         private let connection: NWConnection
         private var buffer = Data()
@@ -22,6 +23,8 @@ extension RemoteLogger {
         private let log: OSLog
 
         weak var delegate: RemoteLoggerConnectionDelegate?
+
+        private let queue = DispatchQueue(label: "com.github.kean.pulse.remote-logger-connection")
 
         convenience init(endpoint: NWEndpoint, using parameters: NWParameters) {
             self.init(NWConnection(to: endpoint, using: parameters))
@@ -35,9 +38,9 @@ extension RemoteLogger {
             self.log = isLogEnabled ? OSLog(subsystem: "com.github.kean.pulse", category: "RemoteLogger") : .disabled
         }
 
-        func start(on queue: DispatchQueue) {
+        func start() {
             connection.stateUpdateHandler = { [weak self] state in
-                guard let self = self else { return }
+                guard let self else { return }
                 DispatchQueue.main.async {
                     self.delegate?.connection(self, didChangeState: state)
                 }
@@ -73,7 +76,7 @@ extension RemoteLogger {
             }
         }
 
-        private func process(data freshData: Data) {
+        private nonisolated func process(data freshData: Data) {
             guard !freshData.isEmpty else { return }
 
             var freshData = freshData
@@ -130,15 +133,18 @@ extension RemoteLogger {
         func send(code: UInt8, data: Data) {
             do {
                 let data = try encode(code: code, body: data)
-                let log = self.log
-                connection.send(content: data, completion: .contentProcessed({ error in
+                connection.send(content: data, completion: .contentProcessed({ [weak self] error in
                     if let error {
-                        os_log("Failed to send data: %{public}@", log: log, type: .error, "\(error)")
+                        self?.logSendDataError(error)
                     }
                 }))
             } catch {
                 os_log("Failed to encode a packet: %{public}@", log: log, type: .error, "\(error)")
             }
+        }
+
+        private func logSendDataError(_ error: Error) {
+            os_log("Failed to send data: %{public}@", log: log, type: .error, "\(error)")
         }
 
         func send<T: Encodable>(code: UInt8, entity: T) {

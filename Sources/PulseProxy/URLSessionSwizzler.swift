@@ -3,17 +3,9 @@
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
+import Pulse
 
-@MainActor
-public final class URLSessionProxy {
-    static var proxy: URLSessionProxy?
-
-    let logger: NetworkLogger
-
-    init(logger: NetworkLogger) {
-        self.logger = logger
-    }
-
+extension NetworkLogger {
     /// Enables automatic logging and remote debugging of network requests.
     ///
     /// - warning: This method of logging relies heavily on swizzling and might
@@ -21,15 +13,38 @@ public final class URLSessionProxy {
     /// for a more stable solution, consider using ``URLSessionProxyDelegate`` or
     /// manually logging the requests using ``NetworkLogger``.
     ///
-    /// - parameter logger: The network logger to be used for recording the requests.
-    public static func enable(with logger: NetworkLogger = .init()) {
-        guard !isAutomaticNetworkLoggingEnabled else { return }
+    /// - parameter logger: The network logger to be used for recording the requests. By default, uses shared logger.
+    public static func enableProxy(logger: NetworkLogger? = nil) {
+        URLSessionSwizzler.enable(logger: logger)
+    }
+}
 
-        let proxy = URLSessionProxy(logger: logger)
+final class URLSessionSwizzler {
+    static var shared: URLSessionSwizzler?
+
+    private var logger: NetworkLogger { _logger ?? .shared }
+    private let _logger: NetworkLogger?
+
+    init(logger: NetworkLogger?) {
+        self._logger = logger
+    }
+
+    static let lock = NSLock()
+    static var isEnabled = false
+
+    static func enable(logger: NetworkLogger?) {
+        lock.lock()
+        if isEnabled {
+            lock.unlock()
+            NSLog("Error: Pulse proxy is already enabled")
+            return
+        }
+        isEnabled = true
+        lock.unlock()
+
+        let proxy = URLSessionSwizzler(logger: logger)
         proxy.enable()
-        URLSessionProxy.proxy = proxy
-
-        RemoteLoggerURLProtocol.enableAutomaticRegistration()
+        URLSessionSwizzler.shared = proxy
     }
 
     func enable() {
@@ -39,7 +54,7 @@ public final class URLSessionProxy {
             swizzleDataTaskDidReceiveData(baseClass: sessionClass)
             swizzleDataDataDidCompleteWithError(baseClass: sessionClass)
         } else {
-            NSLog("Pulse.URLSessionProxy failed to initialize. Please report at https://github.com/kean/Pulse/issues.")
+            NSLog("Pulse.URLSessionSwizzler failed to initialize. Please report at https://github.com/kean/Pulse/issues.")
         }
     }
 
@@ -59,6 +74,7 @@ public final class URLSessionProxy {
             var originalImplementation: IMP?
             let block: @convention(block) (URLSessionTask) -> Void = { [weak self] task in
                 self?.logger.logTaskCreated(task)
+
                 guard task.currentRequest != nil else { return }
                 let key = String(method.hashValue)
                 objc_setAssociatedObject(task, key, true, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
@@ -76,7 +92,7 @@ public final class URLSessionProxy {
         // "_didFinishWithError:"
         let selector = NSSelectorFromString(["_", "didFinish", "With", "Error", ":"].joined())
         guard let method = class_getInstanceMethod(baseClass, selector),
-            baseClass.instancesRespond(to: selector) else {
+              baseClass.instancesRespond(to: selector) else {
             return
         }
         typealias MethodSignature = @convention(c) (AnyObject, Selector, AnyObject?) -> Void
@@ -90,8 +106,15 @@ public final class URLSessionProxy {
                 if let metrics = task.value(forKey: ["_", "incomplete", "Task", "Metrics"].joined()) as? URLSessionTaskMetrics {
                     self?.logger.logTask(task, didFinishCollecting: metrics)
                 }
-                let error = error as? Error
-                self?.logger.logTask(task, didCompleteWithError: error)
+                if var error = error as? NSError {
+                    if error.domain == "kCFErrorDomainCFNetwork" {
+                        // Satisfy LogggerStore (needs refactoring)
+                        error = NSError(domain: URLError.errorDomain, code: error.code, userInfo: error.userInfo)
+                    }
+                    self?.logger.logTask(task, didCompleteWithError: error)
+                } else {
+                    self?.logger.logTask(task, didCompleteWithError: error as? Error)
+                }
             }
         }
         method_setImplementation(method, imp_implementationWithBlock(closure))
@@ -102,7 +125,7 @@ public final class URLSessionProxy {
         // "_didReceiveData"
         let selector = NSSelectorFromString(["_", "did", "Receive", "Data", ":"].joined())
         guard let method = class_getInstanceMethod(baseClass, selector),
-            baseClass.instancesRespond(to: selector) else {
+              baseClass.instancesRespond(to: selector) else {
             return
         }
 
@@ -118,53 +141,5 @@ public final class URLSessionProxy {
             }
         }
         method_setImplementation(method, imp_implementationWithBlock(closure))
-    }
-}
-
-// MARK: - RemoteLoggerURLProtocol (Automatic Regisration)
-
-extension RemoteLoggerURLProtocol {
-    @MainActor
-    static func enableAutomaticRegistration() {
-        if let lhs = class_getClassMethod(URLSession.self, #selector(URLSession.init(configuration:delegate:delegateQueue:))),
-           let rhs = class_getClassMethod(URLSession.self, #selector(URLSession.pulse_init2(configuration:delegate:delegateQueue:))) {
-            method_exchangeImplementations(lhs, rhs)
-        }
-    }
-}
-
-private extension URLSession {
-    @objc class func pulse_init2(configuration: URLSessionConfiguration, delegate: URLSessionDelegate?, delegateQueue: OperationQueue?) -> URLSession {
-        guard isConfiguringSessionSafe(delegate: delegate) else {
-            return self.pulse_init2(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
-        }
-        configuration.protocolClasses = [RemoteLoggerURLProtocol.self] + (configuration.protocolClasses ?? [])
-        return self.pulse_init2(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
-    }
-}
-
-// MARK: - Experimental (Deprecated)
-
-@available(*, deprecated, message: "Experimental.URLSessionProxy is replaced with a reworked URLSessionProxy")
-public enum Experimental {}
-
-@available(*, deprecated, message: "Experimental.URLSessionProxy is replaced with a reworked URLSessionProxy")
-public extension Experimental {
-    @MainActor
-    final class URLSessionProxy {
-        public static let shared = URLSessionProxy()
-        public var logger: NetworkLogger = .init()
-        public var configuration: URLSessionConfiguration = .default
-        public var ignoredHosts = Set<String>()
-
-        public var isEnabled: Bool = false {
-            didSet {
-                if isEnabled {
-                    Pulse.URLSessionProxy.enable(with: logger)
-                } else {
-                    NSLog("Pulse.URLSessionProxy can't be disabled at runtime")
-                }
-            }
-        }
     }
 }

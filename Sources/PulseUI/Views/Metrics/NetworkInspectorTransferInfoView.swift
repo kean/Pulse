@@ -25,14 +25,6 @@ struct NetworkInspectorTransferInfoView: View {
         }
         .frame(maxWidth: .infinity)
     }
-#elseif os(macOS)
-    var body: some View {
-        HStack {
-            bytesSent
-            Spacer()
-            bytesReceived
-        }
-    }
 #else
     var body: some View {
         HStack {
@@ -75,9 +67,14 @@ struct NetworkInspectorTransferInfoView: View {
                 Image(systemName: imageName)
                     .font(.largeTitle)
                 VStack(alignment: .leading, spacing: 0) {
-                    Text(title).font(.headline)
-                    Text(total).font(.headline)
+                    Text(title)
+                    Text(total)
                 }
+#if os(macOS)
+                .font(.title3.weight(.medium))
+#else
+                .font(.headline)
+#endif
             }
             .fixedSize()
             .padding(2)
@@ -85,22 +82,28 @@ struct NetworkInspectorTransferInfoView: View {
                 VStack(alignment: .trailing) {
                     Text("Headers:")
                         .foregroundColor(.secondary)
-                        .font(.footnote)
+                        .font(valueFont)
                     Text("Body:")
                         .foregroundColor(.secondary)
-                        .font(.footnote)
+                        .font(valueFont)
                 }
                 VStack(alignment: .leading) {
                     Text(headers)
-                        .font(.footnote)
+                        .font(valueFont)
                     Text(body)
-                        .font(.footnote)
+                        .font(valueFont)
                 }
             }
             .fixedSize()
         }
     }
 }
+
+#if os(macOS)
+private let valueFont: Font = .callout
+#else
+private let valueFont: Font = .footnote
+#endif
 
 #if os(tvOS)
 private let spacing: CGFloat = 20

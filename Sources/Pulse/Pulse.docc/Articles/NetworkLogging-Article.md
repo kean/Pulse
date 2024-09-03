@@ -1,47 +1,70 @@
-# Logging Network Requests
+# Network Logging & Debugging
 
-Learn how to enable network logging.
+Learn how to enable and configure network logging and debugging.
 
 ## Overview
 
-Pulse works on the `URLSession` level and it needs access to its callbacks to log network requests and capture network metrics. There are multiple ways to do that and they are all covered in this article.
+Pulse works on the `URLSession` level, and it needs access to its callbacks to log network requests and capture network metrics. The framework is modular and provides multiple options that can accommodate almost any system. By the end of this article, you will have a system that:
 
-## Proxy Delegate
+- Captures network requests and metrics
+- Supports debugging features powered by Pulse Pro, such as mocking 
 
-The recommended option is to use ``URLSessionProxyDelegate`` which sits between [`URLSession`](https://developer.apple.com/documentation/foundation/urlsession) and your actual [`URLSessionDelegate`](https://developer.apple.com/documentation/foundation/urlsessiondelegate).
+## Capture Network Requests
 
-You can enable ``URLSessionProxyDelegate`` for all `URLSession` instances created by the app by using ``URLSessionProxyDelegate/enableAutomaticRegistration(logger:)`` (note that it uses Objective-C runtime to achieve that):
+The first step is to capture network traffic.
+
+### Option 1 (Recommended)
+
+Use ``URLSessionProxy``, a thin wrapper on top of `URLSession`. 
 
 ```swift
-// Call it anywhere in your code prior to instantiating a `URLSession`
-URLSessionProxyDelegate.enableAutomaticRegistration()
+import Pulse
 
-// Instantiate `URLSession` as usual
-let session = URLSession(configuration: .default, delegate: YourURLSessionDelegate(), delegateQueue: nil)
+#if DEBUG
+let session: URLSessionProtocol = URLSessionProxy(configuration: .default)
+#else
+let session: URLSessionProtocol = URLSession(configuration: .default)
+#endif
 ```
 
-And if you want to enable logging just for specific sessions, use ``URLSessionProxyDelegate`` directly:
+``URLSessionProxy`` is the best way to integrate Pulse because it supports all `URLSession` APIs, including the new Async/Await methods. It also makes it easy to remove it conditionally.
+
+### Option 2 (Quickest)
+
+If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
 
 ```swift
-let delegate = URLSessionProxyDelegate(delegate: YourURLSessionDelegate())
+import PulseProxy
+
+#if DEBUG
+NetworkLogger.enableProxy()
+#endif
+```
+
+> important: **PulseProxy** uses method swizzling and private APIs, and it is not recommended that you include it in the production builds of your app. It is also not guaranteed to continue working with new versions of the system SDKs.
+
+### Option 3
+
+If you use a delegate-based `URLSession` that doesn't rely on any of its convenience APIs, such as [Alamofire](https://github.com/Alamofire/Alamofire), you can record its traffic using ``URLSessionProxyDelegate``.   
+
+```swift
+let delegate = URLSessionProxyDelegate(delegate: <#YourSessionDelegate#>)
 let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
 ```
 
-> important: Both these options work only with sessions that use a delegate-based approach and won't work with `URLSession.shared`. In that can you can either log the requests manually, which is covered in the next section or try ``Experimental/URLSessionProxy``.
+> important: This method supports a limited subset of scenarios and doesn't work with `URLSession` Async/Await APIs.
 
-## Manual Logging
+### Option 4 (Manual)
 
-Another option for capturing network requests is by using ``NetworkLogger`` directly. For example, here can you can use it with Alamofire's `EventMonitor`:
+If none of the convenience APIs described earlier work for you, you can use the underlying ``NetworkLogger`` directly. For example, here is how you can use it with Alamofire's `EventMonitor`:
 
 ```swift
 import Alamofire
 
-// Don't forget to bootstrap the logging system first.
-
-let session = Alamofire.Session(eventMonitors: [NetworkLoggerEventMonitor(logger: logger)])
+let session = Alamofire.Session(eventMonitors: [NetworkLoggerEventMonitor()])
 
 struct NetworkLoggerEventMonitor: EventMonitor {
-    let logger: NetworkLogger
+    var logger: NetworkLogger = .shared
 
     func request(_ request: Request, didCreateTask task: URLSessionTask) {
         logger.logTaskCreated(task)
@@ -61,75 +84,76 @@ struct NetworkLoggerEventMonitor: EventMonitor {
 }
 ```
 
-> tip: Make sure to capture [`URLSessionTaskMetrics`](https://developer.apple.com/documentation/foundation/urlsessiontaskmetrics) as Pulse makes a great use of them and many of the features won't work without them.
-
-## Session Proxy (Experimental)
-
-To capture _all_ network traffic from _all_ session, including `URLSession.shared`, you can try using ``Experimental/URLSessionProxy``.
+Alternatively, if you don't have access to `URLSessionTask`, you can store the request/response directly in ``LoggerStore``:
 
 ```swift
-Experimental.URLSessionProxy.shared.isEnabled = true
+LoggerStore.shared.storeRequest(urlRequest, response: urlResponse, ...)
 ```
 
-> warning: As clearly communicate by its namespace, it's an experimental feature and it might negatively affect your networking. The way it works is by registering a custom [URLProtocol](https://developer.apple.com/documentation/foundation/urlprotocol) and using a secondary URLSession instance in it, but it can be a useful tool.
+## Configure Logging
 
-> note: Alternatively, you can give the following swizzle-based [approach](https://gist.github.com/kean/3154a5bde8e0c5e9dc3322f21ba86757) a try that is less intrusive but requires more swizzling and can't be shipped with the production code.
+### Record Decoding Errors
 
-## Recoding Decoding Errors
-
-The network requests usually can only be considered successful when the app was able to decode the response data. With Pulse, you can do just that and when you open the response body, it'll even highlight the part of the response that's causing the decoding error.
+The network requests can only be considered successful when the app decodes the response data. With Pulse, you can do just that, and when you open the response body, it'll even highlight the part of the response causing the decoding error.
 
 ```swift
 // Initial setup
-let logger = NetworkLogger(configuration: .init(isWaitingForDecoding: true))
-let delegate = URLSessionProxyDelegate(logger: logger, delegate: YourURLSessionDelegate()))
-// ... create session
+var configuration = NetworkLogger.Configuration()
+configuration.isWaitingForDecoding = true
 
-// Somewhere else in the app where decoding is done.
+let logger = NetworkLogger(configuration: configuration)
+
+let session = NetworkLogger.URLSession(configuration: .default, logger: logger)
+
+// Add this to the code that performs decoding of the responses.
 logger.logTask(task, didFinishDecodingWithError: decodingError)
 ```
 
-## Exclude Information From Logs
+### Exclude Information From Logs
 
-There is usually some sensitive information in network requests, such as passwords, access tokens, and more. It's important to keep it safe.
-
-> tip: It's recommended to use Pulse _only_ in the debug mode.
-
-``NetworkLogger`` captures data safely in a local database and it never leaves your device. Logs are never written to the system's logging system. But of course, logs are meant to be viewed and shared, which is why PulseUI provides sharing options. In case the logs do leave your device, it's best to redact any sensitive information. 
+``NetworkLogger`` captures data safely in a local database, and it never leaves your device. Logs are never written to the system's logging system. But, of course, logs are meant to be viewed and shared, which is why PulseUI provides sharing options. In case the logs do leave your device, it's best to redact any sensitive information. 
 
 ``NetworkLogger/Configuration`` has a set of convenience APIs for managing what information is included or excluded from the logs.
 
 ```swift
-let logger = NetworkLogger {
-    // Includes only requests with the given domain.
-    $0.includedHosts = ["*.example.com"]
+var configuration = NetworkLogger.Configuration()
 
-    // Exclude some subdomains.
-    $0.excludedHosts = ["logging.example.com"]
+// Includes only requests with the given domain.
+configuration.includedHosts = ["*.example.com"]
 
-    // Exclude specific URLs.
-    $0.excludedURLs = ["*/log/event"]
+// Exclude some subdomains.
+configuration.excludedHosts = ["logging.example.com"]
 
-    // Replaces values for the given HTTP headers with "<private>"
-    $0.sensitiveHeaders = ["Authorization", "Access-Token"]
+// Exclude specific URLs.
+configuration.excludedURLs = ["*/log/event"]
 
-    // Redacts sensitive query items.
-    $0.sensitiveQueryItems = ["password"]
+// Replaces values for the given HTTP headers with "<private>"
+configuration.sensitiveHeaders = ["Authorization", "Access-Token"]
 
-    // Replaces values for the given response and request JSON fields with "<private>"
-    $0.sensitiveDataFields = ["password"]
-}
+// Redacts sensitive query items.
+configuration.sensitiveQueryItems = ["password"]
+
+// Replaces values for the given response and request JSON fields with "<private>"
+configuration.sensitiveDataFields = ["password"]
+
+let logger = NetworkLogger(configuration: configuration)
 ```
 
-> tip: "Include" and "exclude" patterns support basic wildcards (`*`), but you can also turns them into full-featured regex patterns using ``NetworkLogger/Configuration/isRegexEnabled``. 
+You can then replace the default decoder with your custom instance:
 
-If the built-in configuration options don't cover all of your use-cases, you can set  ``NetworkLogger/Configuration/willHandleEvent`` closure that provides you complete control for filtering out and updating the events.
+```swift
+NetworkLogger.shared = logger
+```
 
-> important: If you redact information manually from requests or responses, make sure to also update ``NetworkLogger/Metrics`` because individual transactions within metrics contain recorded request and response pairs.
+> Tip: "Include" and "exclude" patterns support basic wildcards (`*`), but you can also turn them into full-featured regex patterns using ``NetworkLogger/Configuration/isRegexEnabled``. 
 
-## Trace in Xcode Console
+If the built-in configuration options don't cover all of your use cases, you can set the ``NetworkLogger/Configuration/willHandleEvent`` closure that provides you complete control for filtering out and updating the events.
 
-While Pulse doesn't print anything in the Xcode Console by default, it's easy to enable such logging for network requests. ``LoggerStore`` re-translates all of the log events that it processes using ``LoggerStore/events`` publisher that you can leverage to log some of the recoded information in the Xcode Console.
+> important: If you redact information manually from requests or responses, also update ``NetworkLogger/Metrics`` because individual transactions within metrics contain recorded request and response pairs.
+
+### Trace in Xcode Console
+
+Pulse doesn't print anything in the Xcode Console by default, but it's easy to enable  logging for network requests. ``LoggerStore`` re-translates all of the log events that it processes using ``LoggerStore/events`` publisher that you can leverage.
 
 ```swift
 func register(store: LoggerStore) {
@@ -146,4 +170,19 @@ private func process(event: LoggerStore.Event) {
         break
     }
 }
+```
+
+## Network Debugging
+
+In addition to logging, Pulse provides network debugging features, such as logging. If you use the recommended ``URLSessionProxy``, these features are enabled automatically, and you don't need to do anything. In other cases, make sure to inject ``MockingURLProtocol`` in the set of URL protocols used by your `URLSession`:
+
+```swift
+let configuration = URLSesionConfiguration.default
+configuration.protocolClasses = [MockingURLProtocol.self] + (configuration.protocolClasses ?? [])
+```
+
+Alternatively, you can use automatic registration.
+
+```swift
+MockingURLProtocol.enableAutomaticRegistration()
 ```

@@ -50,7 +50,7 @@ extension LoggerStore {
 
     /// The store configuration.
     public struct Configuration: @unchecked Sendable {
-        /// Size limit in bytes. `128 MB` by default.
+        /// Size limit in bytes. `256 MB` by default.
         public var sizeLimit: Int64
 
         var blobSizeLimit: Int64 {
@@ -75,8 +75,8 @@ extension LoggerStore {
         public var isStoringOnlyImageThumbnails = true
 
         /// Limit the maximum response size stored by the logger. The default
-        /// value is `5 Mb`. The same limit applies to requests.
-        public var responseBodySizeLimit: Int = 5 * 1048576
+        /// value is `8 MB`. The same limit applies to requests.
+        public var responseBodySizeLimit: Int = 8 * 1048576
 
         var inlineLimit = 16384 // 16 KB
 
@@ -86,9 +86,6 @@ extension LoggerStore {
         /// - note: This option request the store to be instantiated with a
         /// ``LoggerStore/Options-swift.struct/sweep`` option. The default store supports sweeps.
         public var maxAge: TimeInterval = 14 * 86400
-
-        /// For testing purposes.
-        var makeCurrentDate: () -> Date = { Date() }
 
         /// Gets called when the store receives an event. You can use it to
         /// modify the event before it is stored in order, for example, filter
@@ -102,8 +99,8 @@ extension LoggerStore {
         ///
         /// - parameters:
         ///   - sizeLimit: The approximate limit of the logger store, including
-        ///   both the database and the blobs. `128 Mb` by default.
-        public init(sizeLimit: Int64 = 128 * 1_000_000) {
+        ///   both the database and the blobs. `256 Mb` by default.
+        public init(sizeLimit: Int64 = 256 * 1_000_000) {
             self.sizeLimit = sizeLimit
         }
     }

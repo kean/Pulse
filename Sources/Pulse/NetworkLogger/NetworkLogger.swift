@@ -10,7 +10,8 @@ import Foundation
 /// should generally not be used directly.
 public final class NetworkLogger: @unchecked Sendable {
     private let configuration: Configuration
-    private let store: LoggerStore
+    private var store: LoggerStore { _store ?? .shared }
+    private let _store: LoggerStore?
 
     private var includedHosts: [Regex] = []
     private var includedURLs: [Regex] = []
@@ -23,6 +24,24 @@ public final class NetworkLogger: @unchecked Sendable {
 
     private var isFilteringNeeded = false
     private let lock = NSLock()
+
+    /// A shared network logger.
+    ///
+    /// You can configure a logger by creating a new instance and setting it as
+    /// a shared logger:
+    ///
+    /// ```swift
+    /// NetworkLogger.shared = NetworkLogger {
+    ///     $0.excludedHosts = ["github.com"]
+    /// }
+    /// ```
+    ///
+    /// The best place to do it is at the app launch.
+    public static var shared: NetworkLogger {
+        get { _shared.value }
+        set { _shared.value = newValue }
+    }
+    private static let _shared = Mutex(NetworkLogger())
 
     /// The logger configuration.
     public struct Configuration: Sendable {
@@ -93,18 +112,18 @@ public final class NetworkLogger: @unchecked Sendable {
     /// - parameters:
     ///   - store: The target store for network requests.
     ///   - configuration: The store configuration.
-    public init(store: LoggerStore = .shared, configuration: Configuration = .init()) {
-        self.store = store
+    public init(store: LoggerStore? = nil, configuration: Configuration = .init()) {
+        self._store = store
         self.configuration = configuration
         self.processPatterns()
     }
 
-    /// Initializes and configures the network logger.
-    public convenience init(store: LoggerStore = .shared, _ configure: (inout Configuration) -> Void) {
-        var configuration = Configuration()
-        configure(&configuration)
-        self.init(store: store, configuration: configuration)
-    }
+//    /// Initializes and configures the network logger.
+//    public convenience init(store: LoggerStore? = nil, _ configure: (inout Configuration) -> Void) {
+//        var configuration = Configuration()
+//        configure(&configuration)
+//        self.init(store: store, configuration: configuration)
+//    }
 
     // MARK: Patterns
 
@@ -141,6 +160,9 @@ public final class NetworkLogger: @unchecked Sendable {
     /// Logs the task creation (optional).
     public func logTaskCreated(_ task: URLSessionTask) {
         lock.lock()
+        guard tasks[TaskKey(task: task)] == nil else {
+            return // Already registered
+        }
         let context = context(for: task)
         lock.unlock()
 

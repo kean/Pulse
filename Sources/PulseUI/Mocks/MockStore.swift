@@ -80,9 +80,11 @@ private func _asyncPopulateStore(_ store: LoggerStore) async {
         Logger(label: named, store: store)
     }
 
-    let networkLogger = NetworkLogger(store: store) {
-        $0.isWaitingForDecoding = true
-    }
+    let networkLogger = NetworkLogger(store: store, configuration: {
+        var configuration = NetworkLogger.Configuration()
+        configuration.isWaitingForDecoding = true
+        return configuration
+    }())
 
     let urlSession = URLSession(configuration: .default)
 
@@ -149,9 +151,11 @@ private func _syncPopulateStore(_ store: LoggerStore) {
         Logger(label: named, store: store)
     }
 
-    let networkLogger = NetworkLogger(store: store) {
-        $0.isWaitingForDecoding = true
-    }
+    let networkLogger = NetworkLogger(store: store, configuration: {
+        var configuration = NetworkLogger.Configuration()
+        configuration.isWaitingForDecoding = true
+        return configuration
+    }())
 
     let urlSession = URLSession(configuration: .default)
 

@@ -104,12 +104,14 @@ private func getAppIcon() -> Data? {
 #if os(iOS) || os(tvOS) || os(visionOS)
 import UIKit
 
+@MainActor
 func getDeviceId() -> UUID? {
     UIDevice.current.identifierForVendor
 }
 
 extension LoggerStore.Info.DeviceInfo {
-    static func make() -> LoggerStore.Info.DeviceInfo {
+    @MainActor
+static func make() -> LoggerStore.Info.DeviceInfo {
         let device = UIDevice.current
         return LoggerStore.Info.DeviceInfo(
             name: device.name,
@@ -123,12 +125,14 @@ extension LoggerStore.Info.DeviceInfo {
 #elseif os(watchOS)
 import WatchKit
 
+@MainActor
 func getDeviceId() -> UUID? {
     WKInterfaceDevice.current().identifierForVendor
 }
 
 extension LoggerStore.Info.DeviceInfo {
-    static func make() -> LoggerStore.Info.DeviceInfo {
+    @MainActor
+static func make() -> LoggerStore.Info.DeviceInfo {
         let device = WKInterfaceDevice.current()
         return LoggerStore.Info.DeviceInfo(
             name: device.name,
@@ -143,7 +147,8 @@ extension LoggerStore.Info.DeviceInfo {
 import AppKit
 
 extension LoggerStore.Info.DeviceInfo {
-    static func make() -> LoggerStore.Info.DeviceInfo {
+    @MainActor
+static func make() -> LoggerStore.Info.DeviceInfo {
         return LoggerStore.Info.DeviceInfo(
             name: Host.current().name ?? "unknown",
             model: "unknown",
@@ -154,6 +159,7 @@ extension LoggerStore.Info.DeviceInfo {
     }
 }
 
+@MainActor
 func getDeviceId() -> UUID? {
     return nil
 }

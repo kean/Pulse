@@ -17,7 +17,10 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     public let options: Options
 
     /// The configuration with which the store was initialized with.
-    public let configuration: Configuration
+    ///
+    /// - warning: This property is not thread-safe. Make sure to change it at
+    /// the app launch before sending any logs.
+    public var configuration: Configuration
 
     /// Current session or the latest session in case of an archive.
     private(set) public var session: Session = .current
@@ -54,9 +57,12 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     private var requestsCache: [NetworkLogger.Request: NetworkRequestEntity] = [:]
     private var responsesCache: [NetworkLogger.Response: NetworkResponseEntity] = [:]
 
+    /// For testing purposes.
+    var makeCurrentDate: () -> Date = { Date() }
+
     // MARK: Shared
 
-    /// Returns a shared store.
+    /// Returns the shared store.
     ///
     /// You can replace the default store with a custom one. If you replace the
     /// shared store, it automatically gets registered as the default store
@@ -101,15 +107,16 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     /// Initializes the store with the given URL. The store needs to be
     ///
     /// The ``LoggerStore/shared`` store is a package optimized for writing. When
-    /// you are ready to share the store, create a Pulse document using ``copy(to:predicate:)`` 
+    /// you are ready to share the store, create a Pulse document using ``export(to:options:)``
     /// method. The document format is optimized to use the least amount of space possible.
     ///
     /// - parameters:
     ///   - storeURL: The store URL that points to a package (directory)
     ///   with a Pulse database.
-    ///   - options: By default, empty. To create a store, use ``Options-swift.struct/create``.
+    ///   - options: By default, contains ``LoggerStore/Options-swift.struct/create``
+    ///   and ``LoggerStore/Options-swift.struct/sweep`` options.
     ///   - configuration: The store configuration specifying size limit, etc.
-    public init(storeURL: URL, options: Options = [], configuration: Configuration = .init()) throws {
+    public init(storeURL: URL, options: Options = [.create, .sweep], configuration: Configuration = .init()) throws {
         var isDirectory: ObjCBool = ObjCBool(false)
         let fileExists = Files.fileExists(atPath: storeURL.path, isDirectory: &isDirectory)
         guard (fileExists && isDirectory.boolValue) || options.contains(.create) else {
@@ -279,7 +286,7 @@ extension LoggerStore {
         line: UInt = #line
     ) {
         handle(.messageStored(.init(
-            createdAt: createdAt ?? configuration.makeCurrentDate(),
+            createdAt: createdAt ?? makeCurrentDate(),
             label: label,
             level: level,
             message: message,
@@ -306,7 +313,7 @@ extension LoggerStore {
         handle(.networkTaskCompleted(.init(
             taskId: UUID(),
             taskType: .dataTask,
-            createdAt: configuration.makeCurrentDate(),
+            createdAt: makeCurrentDate(),
             originalRequest: NetworkLogger.Request(request),
             currentRequest: NetworkLogger.Request(request),
             response: response.map(NetworkLogger.Response.init),
@@ -320,7 +327,7 @@ extension LoggerStore {
     }
 
     /// Handles event created by the current store and dispatches it to observers.
-    public func handle(_ event: Event) {
+    func handle(_ event: Event) {
         guard let event = configuration.willHandleEvent(event) else {
             return
         }
@@ -442,9 +449,9 @@ extension LoggerStore {
         }
 
         var currentRequest = event.currentRequest
-        if currentRequest?.headers?[RemoteLoggerURLProtocol.requestMockedHeaderName] != nil {
+        if currentRequest?.headers?[MockingURLProtocol.requestMockedHeaderName] != nil {
             entity.isMocked = true
-            currentRequest?.headers?[RemoteLoggerURLProtocol.requestMockedHeaderName] = nil
+            currentRequest?.headers?[MockingURLProtocol.requestMockedHeaderName] = nil
         } else {
             entity.isMocked = false
         }
@@ -842,26 +849,20 @@ extension LoggerStore {
     ///   - targetURL: The destination directory must already exist. If the
     ///   file at the destination URL already exists, throws an error.
     ///   - options: The other sharing options.
-    ///
-    /// - returns: The information about the created store.
-    @discardableResult
-    public func export(to targetURL: URL, options: ExportOptions = .init()) async throws -> Info {
-        try await Task.detached(priority: .userInitiated) {
-            try self._export(to: targetURL, options: options)
-        }.value
+    public func export(to targetURL: URL, options: ExportOptions = .init()) async throws {
+        try await _export(to: targetURL, options: options)
     }
 
-    @discardableResult
-    private func _export(to targetURL: URL, options: ExportOptions) throws -> Info {
+    private func _export(to targetURL: URL, options: ExportOptions) async throws {
         guard !FileManager.default.fileExists(atPath: targetURL.path) else {
             throw LoggerStore.Error.fileAlreadyExists
         }
-        return try _exportAsArchive(to: targetURL, options: options)
+        try await _exportAsArchive(to: targetURL, options: options)
     }
 
     // MARK: Export as Package
 
-    private func _exportAsPackage(to targetURL: URL, options: ExportOptions) throws -> Info {
+    private func _exportAsPackage(to targetURL: URL, options: ExportOptions) async throws {
         let temporary = TemporaryDirectory()
         defer { temporary.remove() }
 
@@ -887,11 +888,8 @@ extension LoggerStore {
             try? _exportBlobs(to: target)
         }
 
-        let info = try target.info()
         try target.close() // important: has to be called before `move`.
-
         try Files.moveItem(at: temporary.url, to: targetURL)
-        return info
     }
 
     /// Removes any content that doesn't match the given options.
@@ -927,24 +925,24 @@ extension LoggerStore {
 
     // MARK: Export as Archive
 
-    private func _exportAsArchive(to targetURL: URL, options: ExportOptions) throws -> Info {
+    private func _exportAsArchive(to targetURL: URL, options: ExportOptions) async throws {
         if options.predicate != nil || options.sessions != nil {
             let temporary = TemporaryDirectory()
             defer { temporary.remove() }
 
             let tempStoreURL = temporary.url.appending(filename: "temp.pulse")
-            _ = try _exportAsPackage(to: tempStoreURL, options: options)
+            _ = try await _exportAsPackage(to: tempStoreURL, options: options)
 
             let target = try LoggerStore(storeURL: tempStoreURL, options: .readonly)
             defer { try? target.close() }
 
-            return try target._exportPackageAsArchive(to: targetURL)
+            return try await target._exportPackageAsArchive(to: targetURL)
         } else {
-            return try _exportPackageAsArchive(to: targetURL)
+            return try await _exportPackageAsArchive(to: targetURL)
         }
     }
 
-    private func _exportPackageAsArchive(to targetURL: URL) throws -> Info {
+    private func _exportPackageAsArchive(to targetURL: URL) async throws {
         let temporary = TemporaryDirectory()
         defer { temporary.remove() }
 
@@ -952,7 +950,7 @@ extension LoggerStore {
         let databaseURL = temporary.url.appending(filename: databaseFilename)
         try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
 
-        var info = try self.info()
+        var info = try await self.info()
 
         let document = try PulseDocument(documentURL: targetURL)
         var totalSize: Int64 = 0
@@ -988,7 +986,7 @@ extension LoggerStore {
             // The output file is also going to be about 10-20% larger because of
             // the unused pages in the sqlite database.
             info.totalStoreSize = totalSize + 500 // info is roughly 500 bytes
-            info.creationDate = configuration.makeCurrentDate()
+            info.creationDate = makeCurrentDate()
             info.modifiedDate = info.creationDate
 
             let infoBlob = PulseBlobEntity(context: document.context)
@@ -997,14 +995,7 @@ extension LoggerStore {
 
             try document.context.save()
             try? document.close()
-
-            return info
         }
-    }
-
-    @available(*, deprecated, message: "Deprecated") // 3.6
-    public func copy(to targetURL: URL, predicate: NSPredicate? = nil) throws -> Info {
-        try _export(to: targetURL, options: .init(predicate: predicate))
     }
 }
 
@@ -1040,7 +1031,7 @@ extension LoggerStore {
     }
 
     private func removeExpiredMessages() throws {
-        let cutoffDate = configuration.makeCurrentDate().addingTimeInterval(-configuration.maxAge)
+        let cutoffDate = makeCurrentDate().addingTimeInterval(-configuration.maxAge)
         let sessionIDs = try backgroundContext.fetch(LoggerSessionEntity.self) {
             $0.predicate = NSPredicate(format: "createdAt < %@", cutoffDate as NSDate)
         }.map(\.id)
@@ -1140,16 +1131,19 @@ extension LoggerStore {
     /// Returns the current store's info.
     ///
     /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
-    public func info() throws -> Info {
-        try backgroundContext.performAndReturn { try self._info() }
+    public func info() async throws -> Info {
+        let deviceInfo = await LoggerStore.Info.DeviceInfo.make()
+        return try await container.performBackgroundTask { context in
+            return try self._info(in: context, deviceInfo: deviceInfo)
+        }
     }
 
-    private func _info() throws -> Info {
+    private func _info(in context: NSManagedObjectContext, deviceInfo: LoggerStore.Info.DeviceInfo) throws -> Info {
         let databaseAttributes = try Files.attributesOfItem(atPath: databaseURL.path)
 
-        let messageCount = try backgroundContext.count(for: LoggerMessageEntity.self)
-        let taskCount = try backgroundContext.count(for: NetworkTaskEntity.self)
-        let blobCount = try backgroundContext.count(for: LoggerBlobHandleEntity.self)
+        let messageCount = try context.count(for: LoggerMessageEntity.self)
+        let taskCount = try context.count(for: NetworkTaskEntity.self)
+        let blobCount = try context.count(for: LoggerBlobHandleEntity.self)
 
         return Info(
             storeId: manifest.storeId,
@@ -1163,7 +1157,7 @@ extension LoggerStore {
             blobsSize: try getBlobsSize(),
             blobsDecompressedSize: try getBlobsSize(isDecompressed: true),
             appInfo: .make(),
-            deviceInfo: .make()
+            deviceInfo: deviceInfo
         )
     }
 }

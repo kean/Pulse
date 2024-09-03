@@ -15,14 +15,16 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
     private let actualDelegate: URLSessionDelegate?
     private let taskDelegate: URLSessionTaskDelegate?
     private let interceptedSelectors: Set<Selector>
-    private let logger: NetworkLogger
+    private var logger: NetworkLogger { _logger ?? .shared }
+    private let _logger: NetworkLogger?
 
-    /// - parameter logger: By default, creates a logger with `LoggerStore.shared`.
+    /// - parameter logger: By default, uses a shared logger
     /// - parameter delegate: The "actual" session delegate, strongly retained.
-    public init(logger: NetworkLogger = .init(), delegate: URLSessionDelegate? = nil) {
+    public init(logger: NetworkLogger? = nil, delegate: URLSessionDelegate? = nil) {
         self.actualDelegate = delegate
         self.taskDelegate = delegate as? URLSessionTaskDelegate
-        self.logger = logger
+        self._logger = logger
+
         var interceptedSelectors: Set = [
             #selector(URLSessionDataDelegate.urlSession(_:dataTask:didReceive:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didCompleteWithError:)),
@@ -39,24 +41,27 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
 
     // MARK: URLSessionTaskDelegate
 
-    public func urlSession(_ session: URLSession, didCreateTask task: URLSessionTask) {
+    let createdTask = Mutex<URLSessionTask?>(nil)
+
+    public func urlSession(_ session: Foundation.URLSession, didCreateTask task: URLSessionTask) {
+        createdTask.value = task
         logger.logTaskCreated(task)
         if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
             taskDelegate?.urlSession?(session, didCreateTask: task)
         }
     }
 
-    public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    public func urlSession(_ session: Foundation.URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         logger.logTask(task, didCompleteWithError: error)
         taskDelegate?.urlSession?(session, task: task, didCompleteWithError: error)
     }
 
-    public func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+    public func urlSession(_ session: Foundation.URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
         logger.logTask(task, didFinishCollecting: metrics)
         taskDelegate?.urlSession?(session, task: task, didFinishCollecting: metrics)
     }
 
-    public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
+    public func urlSession(_ session: Foundation.URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
         if task is URLSessionUploadTask {
             logger.logTask(task, didUpdateProgress: (completed: totalBytesSent, total: totalBytesExpectedToSend))
         }
@@ -65,18 +70,18 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
 
     // MARK: URLSessionDataDelegate
 
-    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+    public func urlSession(_ session: Foundation.URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         logger.logDataTask(dataTask, didReceive: data)
         (actualDelegate as? URLSessionDataDelegate)?.urlSession?(session, dataTask: dataTask, didReceive: data)
     }
 
     // MARK: URLSessionDownloadDelegate
 
-    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+    public func urlSession(_ session: Foundation.URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         (actualDelegate as? URLSessionDownloadDelegate)?.urlSession(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
     }
 
-    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+    public func urlSession(_ session: Foundation.URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         logger.logTask(downloadTask, didUpdateProgress: (completed: totalBytesWritten, total: totalBytesExpectedToWrite))
         (actualDelegate as? URLSessionDownloadDelegate)?.urlSession?(session, downloadTask: downloadTask, didWriteData: bytesWritten, totalBytesWritten: totalBytesWritten, totalBytesExpectedToWrite: totalBytesExpectedToWrite)
     }

@@ -114,12 +114,12 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         guard self.store !== store else {
             return
         }
+
         self.store = store
         if isInitialized {
             cancel()
         }
         isInitialized = true
-
         if isEnabled {
             startBrowser()
         }
@@ -369,7 +369,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         self.connectionState = .connecting
         self.connection = connection
 
-        connection.start(on: DispatchQueue.main)
+        connection.start()
     }
 
     // MARK: RemoteLoggerConnectionDelegate
@@ -471,7 +471,9 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             isLoggingPaused = true
         case .resume:
             isLoggingPaused = false
-            buffer?.forEach(send)
+            for event in (buffer ?? []) {
+                send(event: event)
+            }
         case .ping:
             scheduleAutomaticDisconnect()
         case .message:
@@ -481,7 +483,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             switch message.path {
             case .updateMocks:
                 let mocks = try JSONDecoder().decode([URLSessionMock].self, from: message.data)
-                RemoteDebugger.shared.update(mocks)
+                NetworkDebugger.shared.update(mocks)
             case .getMockedResponse, .openMessageDetails, .openTaskDetails:
                 break // Server specific (should never happen)
             }

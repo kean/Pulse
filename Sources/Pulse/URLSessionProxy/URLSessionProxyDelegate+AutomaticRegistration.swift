@@ -13,12 +13,22 @@ extension URLSessionProxyDelegate {
     /// `RemoteLoggerURLProtocol` to the list of session protocol classes.
     ///
     /// - warning: This logging method works only with delegate-based `URLSession`
-    /// instances. If it doesn't work for you, consider using ``URLSessionProxy``
-    /// for automatic logging or manually logging the requests using ``NetworkLogger``.
+    /// instances.
     ///
-    /// - parameter logger: The network logger to be used for recording the requests.
+    /// - parameter logger: The network logger to be used for recording the requests. By default, uses shared logger.
+    ///
+    /// - warning: This method is soft-deprecated in Pulse 5.0.
+    public static func enableAutomaticRegistration(logger: NetworkLogger? = nil) {
+        guard Thread.isMainThread else {
+            return DispatchQueue.main.async { _enableAutomaticRegistration(logger: logger) }
+        }
+        MainActor.assumeIsolated {
+            _enableAutomaticRegistration(logger: logger)
+        }
+    }
+
     @MainActor
-    public static func enableAutomaticRegistration(logger: NetworkLogger = .init()) {
+    static func _enableAutomaticRegistration(logger: NetworkLogger?) {
         guard !isAutomaticNetworkLoggingEnabled else { return }
 
         sharedNetworkLogger = logger
@@ -33,10 +43,6 @@ extension URLSessionProxyDelegate {
 /// existing mechanisms provided by Pulse.
 @MainActor
 var isAutomaticNetworkLoggingEnabled: Bool {
-    guard URLSessionProxy.proxy == nil else {
-        NSLog("Error: Pulse.URLSessionProxy already enabled")
-        return true
-    }
     guard sharedNetworkLogger == nil else {
         NSLog("Error: Pulse network request logging is already enabled")
         return true
@@ -62,12 +68,30 @@ private extension URLSession {
         guard isConfiguringSessionSafe(delegate: delegate) else {
             return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
         }
-        configuration.protocolClasses = [RemoteLoggerURLProtocol.self] + (configuration.protocolClasses ?? [])
-        guard let sharedNetworkLogger else {
-            assertionFailure("Shared logger is missing")
-            return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
-        }
+        configuration.protocolClasses = [MockingURLProtocol.self] + (configuration.protocolClasses ?? [])
         let delegate = URLSessionProxyDelegate(logger: sharedNetworkLogger, delegate: delegate)
         return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
+    }
+}
+
+// MARK: - Experimental (Deprecated)
+
+@available(*, deprecated, message: "Experimental.URLSessionProxy is replaced with NetworkLogger.enableProxy() from the PulseProxy target")
+public enum Experimental {}
+
+@available(*, deprecated, message: "Experimental.URLSessionProxy is replaced with NetworkLogger.enableProxy() from the PulseProxy target")
+public extension Experimental {
+    @MainActor
+    final class URLSessionProxy {
+        public static let shared = URLSessionProxy()
+        public var logger: NetworkLogger = .init()
+        public var configuration: URLSessionConfiguration = .default
+        public var ignoredHosts = Set<String>()
+
+        public var isEnabled: Bool = false {
+            didSet {
+                NSLog("Pulse.URLSessionProxu can't be disabled at runtime")
+            }
+        }
     }
 }

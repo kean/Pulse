@@ -2,29 +2,51 @@
 
 Learn how to integrate Pulse.
 
-## Overview
+## 1. Add Frameworks
 
-Pulse is a framework that provides complete access to the underlying data, and there are many ways to use it. This guide describes the basic integration steps.
-
-## 1. Add Pulse and PulseUI Frameworks to Your App
-
-There are two main installation options:
-
-- Add Pulse Swift package to your project using SPM
+- **Option 1 (Recommended)**. Add package to your project using SwiftPM.
 
 ```
 https://github.com/kean/Pulse
 ```
 
-- Use precompiled binary frameworks from the [latest release](https://github.com/kean/Pulse/releases)
+Add **Pulse** and **PulseUI** libraries to your app.
 
-> info: If you'd like to create binary frameworks using a specific Xcode version, consider using [swift-create-xcframework](https://github.com/marketplace/actions/swift-create-xcframework).
+- **Option 2**. Use precompiled binary frameworks from the [latest release](https://github.com/kean/Pulse/releases).
 
 ## 2. Integrate Pulse Framework
 
-To start collecting logs, use [Pulse](https://kean-docs.github.io/pulse/documentation/pulse/) framework.
+**Pulse** framework contains APIs for logging, capturing, and mocking network requests, as well as connecting to the Pulse Pro apps.
 
-### 2.1. Collecting Regular Messages
+### 2.1. Capture Network Requests
+
+- **Option 1 (Recommended)**. Use ``URLSessionProxy``, a thin wrapper on top of `URLSession`. 
+
+```swift
+import Pulse
+
+#if DEBUG
+let session: URLSessionProtocol = URLSessionProxy(configuration: .default)
+#else
+let session: URLSessionProtocol = URLSession(configuration: .default)
+#endif
+```
+
+> tip: See <doc:NetworkLogging-Article> for more information about how to configure network logging if your app does not use `URLSession` directly, how to further customize it, how to capture and display decoding errors, and more. Pulse is modular and will accommodate almost any system.
+
+- **Option 2 (Quickest)**. If you are evaluating the framework, the quickest way to get started is with a proxy from the **PulseProxy** module.
+
+```swift
+import PulseProxy
+
+#if DEBUG
+NetworkLogger.enableProxy()
+#endif
+```
+
+> important: **PulseProxy** uses swizzling and private APIs and it is not recommended that you include it in the production builds of your app.
+
+### 2.2. Collect Logs
 
 To store regular log messages, use [LoggerStore](https://kean-docs.github.io/pulse/documentation/pulse/loggerstore).
 
@@ -37,64 +59,44 @@ LoggerStore.shared.storeMessage(
 )
 ```
 
-> info: As an alternative to using `LoggerStore` directly, you can use Pulse as a SwiftLog backend using [PersistentLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler/persistentloghandler) struct from [PulseLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler) which is a [Swift package distributed separately](https://github.com/kean/PulseLogHandler).  This way you can have more than one logger at once.
-
-### 2.2. Collecting Network Requests
-
-The recommended option is to use ``URLSessionProxyDelegate`` which sits between [`URLSession`](https://developer.apple.com/documentation/foundation/urlsession) and your actual [`URLSessionDelegate`](https://developer.apple.com/documentation/foundation/urlsessiondelegate).
-
-You can enable ``URLSessionProxyDelegate`` for all `URLSession` instances created by the app by using ``URLSessionProxyDelegate/enableAutomaticRegistration(logger:)``.
-
-```swift
-// Call it anywhere in your code before instantiating a `URLSession`
-URLSessionProxyDelegate.enableAutomaticRegistration()
-
-// Instantiate `URLSession` as usual
-let session = URLSession(
-    configuration: .default,
-    delegate: YourURLSessionDelegate(),
-    delegateQueue: nil
-)
-```
-
-> Important: This option works only with delegate-based sessions, which includes [Alamofire](https://github.com/Alamofire/Alamofire) and [Get](https://github.com/kean/Get). It will **not** work with `URLSession.shared`. For other options, see the dedicated [guide](https://kean-docs.github.io/pulse/documentation/pulse/networklogging-article).
-
-Logs are stored persistently and the store automatically removes old messages and limits the overall size (configurable). It uses a number of space [optimizations techniques](https://kean.blog/post/pulse-2#space-savings), including fast [lzfse](https://developer.apple.com/documentation/compression/algorithm/lzfse) compression.
-
-> Tip: To get the most out of the network logger, follow the <doc:NetworkLogging-Article> guide. For example, starting with Pulse 2.0, you can record and view [decoding errors](https://kean.blog/post/pulse-2#decoding-errors) which makes it much easier to see why decoding is failing.
+> tip: Alternatively, you can use it as a SwiftLog backend using [PersistentLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler/persistentloghandler) from a [PulseLogHandler](https://github.com/kean/PulseLogHandler) package.
 
 ## 3. Integrate PulseUI Framework
 
-To view logs and network requests from your app, use [PulseUI](https://kean-docs.github.io/pulseui/documentation/pulseui/) framework. The framework is centered around a single screen: `ConsoleView`. On iOS, you can push it into the existing navigation stack or present it modally.
+[**PulseUI**](https://kean-docs.github.io/pulseui/documentation/pulseui/) allows you to view logs and network requests directly from your app. The framework is centered around a single screen: `ConsoleView`. On iOS, you can push it into the existing navigation stack or present it modally.
 
 ```swift
+import PulseUI
+
 NavigationLink(destination: ConsoleView()) {
     Text("Console")
 }
 ```
 
-> Note: There are some additional steps required for some platforms. For more information see the PulseUI [documentation](https://kean-docs.github.io/pulseui/documentation/pulseui/).
+> tip: For more information, see the PulseUI [documentation](https://kean-docs.github.io/pulseui/documentation/pulseui/).
 
-## 4. Configure Remote Logging with Pulse Pro
+![Pulse Console](pulse-console.png)
 
-In addition to the frameworks and the on-device view, Pulse also provides a separate professional macOS app called [Pulse Pro](https://kean.blog/pulse/pro) that you can use for viewing the previously shared logs or even viewing the logs from the device remotely in real-time.
+## 4. Get Pulse Apps
 
-To start using remote logging, there are a couple of extra setup steps:
+Pulse also provides separate indispensable [macOS and iOS apps](https://pulselogger.com) that you can use to view logs collected by the Pulse SDK and even debug your apps in real-time with features like response mocking. The app are [available on the App Store](https://apps.apple.com/us/app/pulse-network-logger/id6661031747).
 
-### 4.1. Configure the App
+The apps require two more simple configuration steps.
 
-Add the following to the app's plist file to allow it to use local networking:
+### 4.1. Update Info.plist
+
+Add the following to your app's plist file:
 
 ```swift
 <key>NSLocalNetworkUsageDescription</key>
-<string>Network usage required for debugging purposes </string>
+<string>Network usage required only for development purposes</string>
 <key>NSBonjourServices</key>
 <array>
   <string>_pulse._tcp</string>
 </array>
 ```
 
-> Note: There will be no user prompts unless you enable remote logging from settings.
+> important: Pulse will **not show** any prompts unless you enable remote logging from the Pulse settings screen.
 
 ### 4.2. Enable Remote Logging
 
@@ -102,4 +104,10 @@ Open the Pulse console from the app, go to Settings, enable "Remote Logging", an
 
 ![Enabling remote logging](remote-logging.png)
 
-Once the connection is established, open Pulse Pro and select the device in the sidebar. The next time you launch the app, the connection will happen automatically.
+Once the connection is established, open the Pulse app on your Mac and select the device in the sidebar. The next time you launch the app, the connection will happen automatically.
+
+![Pulse Pro](pulse-pro.png)
+
+## Next Steps
+
+Learn how to configure Pulse to best suit your app needs in <doc:NextSteps> and explore additional networking debugging techniques in <doc:NetworkLogging-Article>. 

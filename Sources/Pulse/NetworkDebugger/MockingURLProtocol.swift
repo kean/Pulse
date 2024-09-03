@@ -4,11 +4,11 @@
 
 import Foundation
 
-/// A custom `URLProtocol` that enables Pulse network debugger features such
-/// as mocking, request rewriting, breakpoints, and more.
-public final class RemoteLoggerURLProtocol: URLProtocol {
+/// A custom `URLProtocol` that enables Pulse network debugging features such
+/// as mocking of the network responses.
+public final class MockingURLProtocol: URLProtocol, @unchecked Sendable {
     public override func startLoading() {
-        guard let mock = RemoteDebugger.shared.getMock(for: request) else {
+        guard let mock = NetworkDebugger.shared.getMock(for: request) else {
             client?.urlProtocol(self, didFailWithError: URLError(.unknown)) // Should never happen
             return
         }
@@ -43,7 +43,7 @@ public final class RemoteLoggerURLProtocol: URLProtocol {
 
     public override class func canonicalRequest(for request: URLRequest) -> URLRequest {
         var request = request
-        request.addValue("true", forHTTPHeaderField: RemoteLoggerURLProtocol.requestMockedHeaderName)
+        request.addValue("true", forHTTPHeaderField: MockingURLProtocol.requestMockedHeaderName)
         return request
     }
 
@@ -51,8 +51,32 @@ public final class RemoteLoggerURLProtocol: URLProtocol {
         guard RemoteLogger.latestConnectionState.value == .connected else {
             return false
         }
-        return RemoteDebugger.shared.shouldMock(request)
+        return NetworkDebugger.shared.shouldMock(request)
     }
 
     static let requestMockedHeaderName = "X-PulseRequestMocked"
+}
+
+
+// MARK: - MockingURLProtocol (Automatic Registration)
+
+extension MockingURLProtocol {
+    /// Inject the protocol in every `URLSession` instance created by the app.
+    @MainActor
+    public static func enableAutomaticRegistration() {
+        if let lhs = class_getClassMethod(URLSession.self, #selector(URLSession.init(configuration:delegate:delegateQueue:))),
+           let rhs = class_getClassMethod(URLSession.self, #selector(URLSession.pulse_init2(configuration:delegate:delegateQueue:))) {
+            method_exchangeImplementations(lhs, rhs)
+        }
+    }
+}
+
+private extension URLSession {
+    @objc class func pulse_init2(configuration: URLSessionConfiguration, delegate: URLSessionDelegate?, delegateQueue: OperationQueue?) -> URLSession {
+        guard isConfiguringSessionSafe(delegate: delegate) else {
+            return self.pulse_init2(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
+        }
+        configuration.protocolClasses = [MockingURLProtocol.self] + (configuration.protocolClasses ?? [])
+        return self.pulse_init2(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
+    }
 }

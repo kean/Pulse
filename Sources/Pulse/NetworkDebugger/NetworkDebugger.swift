@@ -4,7 +4,7 @@
 
 import Foundation
 
-final class RemoteDebugger: @unchecked Sendable {
+final class NetworkDebugger: @unchecked Sendable {
     private var mocks: [UUID: URLSessionMock] = [:]
 
     // Number of handled requests per mock.
@@ -13,7 +13,7 @@ final class RemoteDebugger: @unchecked Sendable {
 
     private let lock = NSLock()
 
-    static let shared = RemoteDebugger()
+    static let shared = NetworkDebugger()
 
     func getMock(for request: URLRequest) -> URLSessionMock? {
         lock.lock()

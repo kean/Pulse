@@ -17,7 +17,7 @@ struct ImageViewer: View {
                 .border(Color.separator, width: 0.5)
 
             HStack {
-                TextView(string: viewModel.info)
+                TextView(string: TextRenderer().render(viewModel.info))
                 Spacer()
             }
 
@@ -28,7 +28,7 @@ struct ImageViewer: View {
 
 struct ImagePreviewViewModel {
     let image: UXImage
-    let info: NSAttributedString
+    let info: KeyValueSectionViewModel
 
     init(image: UXImage, data: Data, context: FileViewerViewModelContext) {
         func intValue(for key: String) -> Int? {
@@ -66,7 +66,6 @@ struct ImagePreviewViewModel {
         }
 
         self.image = image
-        let section = KeyValueSectionViewModel(title: "Image", color: .pink, items: info)
-        self.info = TextRenderer().render(section)
+        self.info = KeyValueSectionViewModel(title: "Image", color: .pink, items: info)
     }
 }

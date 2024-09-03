@@ -7,26 +7,22 @@ Logger and network inspector for Apple platforms.
 ### Essentials
 
 - <doc:GettingStarted>
+- <doc:NextSteps>
 - ``LoggerStore``
 
-### Network Logging
+### Network Logging & Debugging
 
 - <doc:NetworkLogging-Article>
 - ``NetworkLogger``
+- ``URLSessionProxy``
+- ``URLSessionProtocol``
 - ``URLSessionProxyDelegate``
-- ``Experimental``
+- ``MockingURLProtocol``
 
 ### Remote Logging
 
 - ``RemoteLogger``
 
-### Core Data Entities
+### Deprecated
 
-- ``LoggerMessageEntity``
-- ``LoggerBlobHandleEntity``
-- ``LoggerSessionEntity``
-- ``NetworkTaskEntity``
-- ``NetworkTaskProgressEntity``
-- ``NetworkTransactionMetricsEntity``
-- ``NetworkRequestEntity``
-- ``NetworkResponseEntity``
+- ``Experimental``

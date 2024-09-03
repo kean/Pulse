@@ -4,7 +4,7 @@
 
 import Foundation
 
-final class Regex {
+final class Regex: @unchecked Sendable {
     private let regex: NSRegularExpression
 
     struct Options: OptionSet {
