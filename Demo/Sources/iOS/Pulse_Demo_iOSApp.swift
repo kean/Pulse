@@ -14,7 +14,7 @@ struct PulseDemo_iOS: App {
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                ConsoleView(store: .shared)
+                ConsoleView(store: .demo)
             }
         }
     }
@@ -22,6 +22,9 @@ struct PulseDemo_iOS: App {
 
 private final class AppViewModel: ObservableObject {
     init() {
+        // - warning: If you are testing it, make sure to switch the demo to use
+        // the shared store.
+
         // NetworkLogger.enableProxy()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
@@ -32,7 +35,7 @@ private final class AppViewModel: ObservableObject {
 
 
 private func sendRequest() {
-    testSwiftConcurrency()
+    // testSwiftConcurrency()
 
 //    let task = session.dataTask(with: URLRequest(url: URL(string: "https://github.com/kean/Nuke/archive/refs/tags/11.0.0.zip")!))
 //    task.resume()
