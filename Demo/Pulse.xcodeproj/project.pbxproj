@@ -23,40 +23,22 @@
 		0C70EA812A3F6190000B1071 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 		0C8FCB502C45F05400C4FD84 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB4F2C45F05400C4FD84 /* Pulse */; };
 		0C8FCB522C45F05400C4FD84 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB512C45F05400C4FD84 /* PulseUI */; };
-		0C8FCB5C2C45F06000C4FD84 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB5B2C45F06000C4FD84 /* Pulse */; };
-		0C8FCB5E2C45F06000C4FD84 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB5D2C45F06000C4FD84 /* PulseUI */; };
 		0C8FCB602C45F06300C4FD84 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB5F2C45F06300C4FD84 /* Pulse */; };
 		0C8FCB622C45F06300C4FD84 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB612C45F06300C4FD84 /* PulseUI */; };
 		0C8FCB642C45F06900C4FD84 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB632C45F06900C4FD84 /* Pulse */; };
 		0C8FCB662C45F06900C4FD84 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB652C45F06900C4FD84 /* PulseUI */; };
 		0C8FCB6A2C45F12900C4FD84 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB682C45F12900C4FD84 /* MockStore.swift */; };
-		0C8FCB6D2C45F12900C4FD84 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB682C45F12900C4FD84 /* MockStore.swift */; };
 		0C8FCB6E2C45F12900C4FD84 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB682C45F12900C4FD84 /* MockStore.swift */; };
 		0C8FCB6F2C45F12900C4FD84 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB682C45F12900C4FD84 /* MockStore.swift */; };
 		0C8FCB702C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
-		0C8FCB732C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
 		0C8FCB742C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
 		0C8FCB752C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
-		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
-		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
-		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
 		0CA245732C85E87A00B432DA /* PulseProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 0CA245722C85E87A00B432DA /* PulseProxy */; };
-		0CDACDE529EC6607007C15CD /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 		0CDACDE629EC6607007C15CD /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		0C70EA8C2A3F61F9000B1071 /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0CF0D6E6296F1AE800EED9D4 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
@@ -120,11 +102,6 @@
 		0C8FCB4E2C45F03500C4FD84 /* Pulse */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Pulse; path = ..; sourceTree = "<group>"; };
 		0C8FCB682C45F12900C4FD84 /* MockStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStore.swift; sourceTree = "<group>"; };
 		0C8FCB692C45F12900C4FD84 /* MockTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTask.swift; sourceTree = "<group>"; };
-		0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_Demo_macOSApp.swift; sourceTree = "<group>"; };
-		0C9F04FC2884F34A0035239F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
 		0CDACDE129EC6607007C15CD /* repos.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = repos.json; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
@@ -156,15 +133,6 @@
 				0CA245732C85E87A00B432DA /* PulseProxy in Frameworks */,
 				0C8FCB522C45F05400C4FD84 /* PulseUI in Frameworks */,
 				0C8FCB502C45F05400C4FD84 /* Pulse in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0C9F04F32884F34A0035239F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0C8FCB5E2C45F06000C4FD84 /* PulseUI in Frameworks */,
-				0C8FCB5C2C45F06000C4FD84 /* Pulse in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,7 +183,6 @@
 				0CDACDE029EC65F4007C15CD /* Resources */,
 				0C70EA742A3F611B000B1071 /* iOS */,
 				0C30B2F42A3F375400D65F8F /* iOS-paired */,
-				0C9F04F72884F34A0035239F /* macOS */,
 				0C6460D525F579B8002C55B1 /* tvOS */,
 				0C0B31EB26D179A20045C9E1 /* Integrations */,
 				0C8FCB672C45F0A800C4FD84 /* Shared */,
@@ -242,7 +209,6 @@
 			children = (
 				0C6460C425F5797B002C55B1 /* Pulse Demo tvOS.app */,
 				0C0B31EA26D179A20045C9E1 /* Pulse Integration Examples iOS.app */,
-				0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */,
 				0C70EA732A3F611B000B1071 /* Pulse Demo iOS.app */,
 			);
 			name = Products;
@@ -291,25 +257,6 @@
 				0C8FCB692C45F12900C4FD84 /* MockTask.swift */,
 			);
 			path = Shared;
-			sourceTree = "<group>";
-		};
-		0C9F04F72884F34A0035239F /* macOS */ = {
-			isa = PBXGroup;
-			children = (
-				0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */,
-				0C9F04FC2884F34A0035239F /* Assets.xcassets */,
-				0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */,
-				0C9F04FE2884F34A0035239F /* Preview Content */,
-			);
-			path = macOS;
-			sourceTree = "<group>";
-		};
-		0C9F04FE2884F34A0035239F /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		0CDACDE029EC65F4007C15CD /* Resources */ = {
@@ -390,28 +337,6 @@
 			productReference = 0C70EA732A3F611B000B1071 /* Pulse Demo iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
-		0C9F04F52884F34A0035239F /* Pulse Demo macOS */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 0C9F05042884F34A0035239F /* Build configuration list for PBXNativeTarget "Pulse Demo macOS" */;
-			buildPhases = (
-				0C9F04F22884F34A0035239F /* Sources */,
-				0C9F04F32884F34A0035239F /* Frameworks */,
-				0C9F04F42884F34A0035239F /* Resources */,
-				0CF0D6E6296F1AE800EED9D4 /* Embed Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "Pulse Demo macOS";
-			packageProductDependencies = (
-				0C8FCB5B2C45F06000C4FD84 /* Pulse */,
-				0C8FCB5D2C45F06000C4FD84 /* PulseUI */,
-			);
-			productName = "Pulse Demo macOS";
-			productReference = 0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */;
-			productType = "com.apple.product-type.application";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -432,9 +357,6 @@
 					0C70EA722A3F611B000B1071 = {
 						CreatedOnToolsVersion = 14.3;
 					};
-					0C9F04F52884F34A0035239F = {
-						CreatedOnToolsVersion = 13.4;
-					};
 				};
 			};
 			buildConfigurationList = 0C57AD48245F0EFB005B3400 /* Build configuration list for PBXProject "Pulse" */;
@@ -453,7 +375,6 @@
 			projectRoot = "";
 			targets = (
 				0C70EA722A3F611B000B1071 /* Pulse Demo iOS */,
-				0C9F04F52884F34A0035239F /* Pulse Demo macOS */,
 				0C6460C325F5797B002C55B1 /* Pulse Demo tvOS */,
 				0C0B31E926D179A20045C9E1 /* Pulse Integration Examples iOS */,
 			);
@@ -487,16 +408,6 @@
 			files = (
 				0C70EA7A2A3F611C000B1071 /* Assets.xcassets in Resources */,
 				0C70EA812A3F6190000B1071 /* repos.json in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0C9F04F42884F34A0035239F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */,
-				0CDACDE529EC6607007C15CD /* repos.json in Resources */,
-				0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -534,16 +445,6 @@
 				0C70EA762A3F611B000B1071 /* Pulse_Demo_iOSApp.swift in Sources */,
 				0C8FCB702C45F12900C4FD84 /* MockTask.swift in Sources */,
 				0C8FCB6A2C45F12900C4FD84 /* MockStore.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		0C9F04F22884F34A0035239F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */,
-				0C8FCB732C45F12900C4FD84 /* MockTask.swift in Sources */,
-				0C8FCB6D2C45F12900C4FD84 /* MockStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -858,101 +759,6 @@
 			};
 			name = Release;
 		};
-		0C9F05022884F34A0035239F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = Sources/macOS/Pulse_Demo_macOS.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Sources/macOS/Preview Content\"";
-				ENABLE_PREVIEWS = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Sources/Pulse-Demo-macOS-Info.plist";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Debugging Purposes";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.macos";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Debug;
-		};
-		0C9F05032884F34A0035239F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = Sources/macOS/Pulse_Demo_macOS.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"Sources/macOS/Preview Content\"";
-				ENABLE_PREVIEWS = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Sources/Pulse-Demo-macOS-Info.plist";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Debugging Purposes";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.macos";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -992,15 +798,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0C9F05042884F34A0035239F /* Build configuration list for PBXNativeTarget "Pulse Demo macOS" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				0C9F05022884F34A0035239F /* Debug */,
-				0C9F05032884F34A0035239F /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1009,14 +806,6 @@
 			productName = Pulse;
 		};
 		0C8FCB512C45F05400C4FD84 /* PulseUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PulseUI;
-		};
-		0C8FCB5B2C45F06000C4FD84 /* Pulse */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Pulse;
-		};
-		0C8FCB5D2C45F06000C4FD84 /* PulseUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PulseUI;
 		};
