@@ -2,12 +2,12 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS) || os(visionOS)
-
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
+
+#if os(iOS) || os(visionOS)
 
 @available(iOS 15, visionOS 1.0, macOS 13, *)
 struct ConsoleSearchResultView: View {
@@ -27,13 +27,6 @@ struct ConsoleSearchResultView: View {
         }
         if occurrences.count > limit {
             let total = occurrences.count > ConsoleSearchMatch.limit ? "\(ConsoleSearchMatch.limit)+" : "\(occurrences.count)"
-#if os(macOS)
-            Text("Total Results: \(total)")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .padding(.leading, 16)
-                .padding(.bottom, 8)
-#else
             NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel).injecting(environment)) {
                 Text("Total Results: ")
                     .font(ConsoleConstants.fontBody) +
@@ -41,13 +34,10 @@ struct ConsoleSearchResultView: View {
                     .font(ConsoleConstants.fontBody)
                     .foregroundColor(.secondary)
             }
-#endif
         }
-#if os(iOS) || os(visionOS)
         if isSeparatorNeeded {
             PlainListGroupSeparator()
         }
-#endif
     }
 
     @ViewBuilder
@@ -59,18 +49,10 @@ struct ConsoleSearchResultView: View {
                 .font(ConsoleConstants.fontInfo)
                 .foregroundColor(.secondary)
         }
-#if os(macOS)
-            .listRowSeparator(.visible)
-            .padding(.leading, 16)
-#endif
         if #unavailable(iOS 16) {
             contents.padding(.vertical, 4)
         } else {
-#if os(macOS)
-            contents.padding(.vertical, 4)
-#else
             contents
-#endif
         }
     }
 
@@ -105,7 +87,7 @@ struct ConsoleSearchResultView: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, macOS 13, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchResultDetailsView: View {
     let viewModel: ConsoleSearchResultViewModel
 
@@ -119,7 +101,6 @@ struct ConsoleSearchResultDetailsView: View {
     }
 }
 
-#if os(iOS) || os(visionOS)
 @available(iOS 15, visionOS 1.0, *)
 struct PlainListGroupSeparator: View {
     var body: some View {
@@ -130,7 +111,10 @@ struct PlainListGroupSeparator: View {
             .frame(height: 12)
     }
 }
+
 #endif
+
+#if os(iOS) || os(visionOS) || os(macOS)
 
 @available(iOS 15, visionOS 1.0, *)
 struct PlainListSectionHeader<Content: View>: View {
@@ -141,9 +125,7 @@ struct PlainListSectionHeader<Content: View>: View {
         contents
             .padding(.top, 8)
             .listRowBackground(Color.separator.opacity(0.2))
-#if os(iOS) || os(visionOS)
             .listRowSeparator(.hidden)
-#endif
     }
 
     @ViewBuilder

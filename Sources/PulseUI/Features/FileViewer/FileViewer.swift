@@ -2,22 +2,24 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
+
 import SwiftUI
 import Pulse
 
 struct FileViewer: View {
     @ObservedObject var viewModel: FileViewerViewModel
 
-#if os(iOS) || os(watchOS) || os(macOS) || os(visionOS)
-    var body: some View {
-        contents
-    }
-#elseif os(tvOS)
+#if os(tvOS)
     var body: some View {
         HStack {
             contents
             Spacer()
         }
+    }
+#else
+    var body: some View {
+            contents
     }
 #endif
 
@@ -28,7 +30,7 @@ struct FileViewer: View {
             ScrollView {
                 ImageViewer(viewModel: viewModel)
             }
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
         case .pdf(let document):
             PDFKitRepresentedView(document: document)
                 .edgesIgnoringSafeArea(.all)
@@ -82,6 +84,12 @@ private struct PreviewContainer<Content: View>: View {
     }
 }
 
+#endif
+
+#endif
+
+#if DEBUG
+
 enum MockJSON {
     static let allPossibleValues = """
     {
@@ -122,4 +130,5 @@ enum MockJSON {
     }
     """.data(using: .utf8)!
 }
+
 #endif

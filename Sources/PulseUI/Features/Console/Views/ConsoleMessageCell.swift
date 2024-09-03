@@ -22,15 +22,11 @@ struct ConsoleMessageCell: View {
                 .foregroundColor(.textColor(for: message.logLevel))
                 .lineLimit(settings.lineLimit)
         }
-#if os(macOS)
-        contents.padding(.vertical, 5)
-#else
         if #unavailable(iOS 16) {
             contents.padding(.vertical, 4)
         } else {
             contents
         }
-#endif
     }
 
     @ViewBuilder

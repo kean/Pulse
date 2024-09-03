@@ -414,7 +414,7 @@ extension NSAttributedString.Key {
 
 // MARK: - Previews
 
-#if DEBUG
+#if DEBUG && !os(macOS)
 struct ConsoleTextRenderer_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -447,17 +447,13 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
                 .previewLayout(.fixed(width: 1160, height: 2000)) // Disable interaction to view it
                 .previewDisplayName("HTML (Raw)")
 
-#if os(iOS) || os(macOS) || os(visionOS)
             WebView(data: html, contentType: "application/html")
                 .edgesIgnoringSafeArea([.bottom])
                 .previewDisplayName("HTML")
-#endif
 
-#if os(iOS) || os(visionOS)
             PDFKitRepresentedView(document: PDFDocument(data: try! TextUtilities.pdf(from: string))!)
                 .edgesIgnoringSafeArea([.all])
                 .previewDisplayName("PDF")
-#endif
         }
     }
 }

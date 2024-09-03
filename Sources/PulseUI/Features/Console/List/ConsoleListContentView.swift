@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(tvOS) || os(visionOS) || os(watchOS)
+
 import CoreData
 import Pulse
 import Combine
@@ -70,4 +72,6 @@ struct ConsoleStaticList: View {
 #endif
     }
 }
+#endif
+
 #endif

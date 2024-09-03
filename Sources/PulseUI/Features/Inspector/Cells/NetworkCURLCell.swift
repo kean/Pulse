@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if !os(watchOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
 
 import SwiftUI
 import Pulse

@@ -5,14 +5,14 @@
 import SwiftUI
 import Pulse
 
+#if !os(macOS)
+
 struct NetworkInspectorResponseBodyView: View {
     let viewModel: NetworkInspectorResponseBodyViewModel
 
     var body: some View {
         contents
-#if !os(macOS)
             .inlineNavigationTitle("Response Body")
-#endif
     }
 
     @ViewBuilder
@@ -35,6 +35,8 @@ struct NetworkInspectorResponseBodyView: View {
         }
     }
 }
+
+#endif
 
 final class NetworkInspectorResponseBodyViewModel {
     private(set) lazy var fileViewModel = data.map { data in

@@ -31,7 +31,9 @@ struct NetworkDetailsView: View {
     @ViewBuilder
     private var contents: some View {
         if let viewModel = viewModel?.text, !viewModel.isEmpty {
+#if !os(macOS)
             RichTextView(viewModel: viewModel)
+#endif
         } else {
             PlaceholderView(imageName: "nosign", title: "Empty")
         }

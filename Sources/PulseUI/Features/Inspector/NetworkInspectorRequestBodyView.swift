@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
+#if !os(macOS)
+
 import SwiftUI
 import Pulse
 
@@ -10,9 +12,7 @@ struct NetworkInspectorRequestBodyView: View {
 
     var body: some View {
         contents
-#if !os(macOS)
             .inlineNavigationTitle("Request Body")
-#endif
     }
 
     @ViewBuilder
@@ -60,3 +60,5 @@ final class NetworkInspectorRequestBodyViewModel {
         task.requestBody?.reset()
     }
 }
+
+#endif

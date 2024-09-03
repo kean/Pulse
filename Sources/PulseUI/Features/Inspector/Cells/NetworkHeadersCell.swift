@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
+#if !os(macOS)
+
 import SwiftUI
 import Pulse
 
@@ -60,10 +62,9 @@ struct NetworkHeadersCell_Previews: PreviewProvider {
                     }
                 }
             }
-#if os(macOS)
-            .frame(width: 260)
-#endif
         }
     }
 }
+#endif
+
 #endif

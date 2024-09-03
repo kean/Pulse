@@ -2,12 +2,14 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(tvOS) || os(visionOS) || os(watchOS)
+
 import Foundation
 import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 15, visionOS 1, *)
 struct ConsoleEntityCell: View {
     let entity: NSManagedObject
 
@@ -21,7 +23,7 @@ struct ConsoleEntityCell: View {
     }
 }
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 15, visionOS 1, *)
 private struct _ConsoleMessageCell: View {
     let message: LoggerMessageEntity
 
@@ -37,7 +39,7 @@ private struct _ConsoleMessageCell: View {
         }
 #endif
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
         cell.swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(action: { shareItems = ShareService.share(message, as: .html) }) {
                 Label("Share", systemImage: "square.and.arrow.up.fill")
@@ -57,7 +59,7 @@ private struct _ConsoleMessageCell: View {
     }
 }
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 15, visionOS 1, *)
 private struct _ConsoleTaskCell: View {
     let task: NetworkTaskEntity
     @State private var shareItems: ShareItems?
@@ -75,7 +77,7 @@ private struct _ConsoleTaskCell: View {
         }
 #endif
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
         cell.swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(action: {
 #if os(iOS) || os(visionOS)
@@ -110,3 +112,5 @@ private struct _ConsoleTaskCell: View {
             .injecting(environment)
     }
 }
+
+#endif

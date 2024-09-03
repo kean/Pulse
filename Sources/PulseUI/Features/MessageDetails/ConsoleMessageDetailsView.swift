@@ -5,11 +5,13 @@
 import SwiftUI
 import Pulse
 
+#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
+
 @available(iOS 15, macOS 13, visionOS 1, *)
 struct ConsoleMessageDetailsView: View {
     let message: LoggerMessageEntity
 
-#if os(iOS) || os(visionOS) || os(macOS)
+#if os(iOS) || os(visionOS)
     var body: some View {
         contents
             .inlineNavigationTitle("")
@@ -63,6 +65,11 @@ struct ConsoleMessageDetailsView_Previews: PreviewProvider {
         }
     }
 }
+#endif
+
+#endif
+
+#if DEBUG
 
 func makeMockMessage() -> LoggerMessageEntity {
     let entity = LoggerMessageEntity(context: LoggerStore.mock.viewContext)
@@ -76,4 +83,5 @@ func makeMockMessage() -> LoggerMessageEntity {
     entity.rawMetadata = "customKey: customValue"
     return entity
 }
+
 #endif

@@ -5,6 +5,8 @@
 import SwiftUI
 import Pulse
 
+#if !os(macOS)
+
 @available(iOS 15, visionOS 1.0, *)
 struct NetworkResponseBodyCell: View {
     let viewModel: NetworkResponseBodyCellViewModel
@@ -26,6 +28,8 @@ struct NetworkResponseBodyCell: View {
         NetworkInspectorResponseBodyView(viewModel: viewModel.detailsViewModel)
     }
 }
+
+#endif
 
 struct NetworkResponseBodyCellViewModel {
     let details: String

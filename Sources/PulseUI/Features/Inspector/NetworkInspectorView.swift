@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(visionOS) || os(macOS)
+#if os(iOS) || os(visionOS)
 
 import SwiftUI
 import CoreData
@@ -18,7 +18,6 @@ struct NetworkInspectorView: View {
     @ObservedObject private var settings: UserSettings = .shared
     @Environment(\.store) private var store
 
-#if os(iOS) || os(visionOS)
     var body: some View {
         List {
             contents
@@ -36,21 +35,6 @@ struct NetworkInspectorView: View {
             }
         }
     }
-#else
-    var body: some View {
-        List {
-            contents
-                .listRowSeparator(.hidden)
-        }
-        .scrollContentBackground(.hidden)
-        .animation(.default, value: task.state)
-        .toolbar {
-            ToolbarItemGroup(placement: .automatic) {
-                trailingNavigationBarItems
-            }
-        }
-    }
-#endif
 
     @ViewBuilder
     private var contents: some View {
@@ -83,14 +67,11 @@ struct NetworkInspectorView: View {
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .fixedSize()
-#if os(iOS) || os(visionOS)
                 .padding(.bottom, 4)
                 .padding(.top, -10)
-#endif
         }
     }
 
-#if os(iOS) || os(visionOS)
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
         Menu(content: {
@@ -111,15 +92,6 @@ struct NetworkInspectorView: View {
             Image(systemName: "ellipsis.circle")
         })
     }
-#else
-    @ViewBuilder
-    private var trailingNavigationBarItems: some View {
-        Button(action: { sharedTask = task }) {
-            Label("Share", systemImage: "square.and.arrow.up")
-        }
-        .popover(item: $sharedTask, attachmentAnchor: .point(.center), arrowEdge: .top) { ShareNetworkTaskView(task: $0) }
-    }
-#endif
 }
 
 #if DEBUG
