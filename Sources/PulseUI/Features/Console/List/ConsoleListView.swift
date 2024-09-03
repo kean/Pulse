@@ -2,14 +2,14 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
 
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleListView: View {
     @EnvironmentObject var environment: ConsoleEnvironment
     @EnvironmentObject var filters: ConsoleFiltersViewModel
@@ -19,7 +19,7 @@ struct ConsoleListView: View {
     }
 }
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 15, visionOS 1.0, *)
 private struct _InternalConsoleListView: View {
     private let environment: ConsoleEnvironment
 
@@ -81,39 +81,6 @@ private struct _ConsoleListView: View {
             }
         }
         .listStyle(.plain)
-    }
-}
-#endif
-
-#if os(macOS)
-@available(iOS 15, macOS 13, visionOS 1.0, *)
-private struct _ConsoleListView: View {
-    @EnvironmentObject private var environment: ConsoleEnvironment
-    @EnvironmentObject private var listViewModel: ConsoleListViewModel
-    @EnvironmentObject private var searchViewModel: ConsoleSearchViewModel
-
-    @State private var shareItems: ShareItems?
-
-    @Environment(\.isSearching) private var isSearching
-
-    var body: some View {
-        VStack(spacing: 0) {
-            List {
-                if isSearching {
-                    ConsoleSearchListContentView()
-                } else {
-                    ConsoleListContentView()
-                }
-            }
-            .listRowSeparator(.hidden)
-            .scrollContentBackground(.hidden)
-
-            if isSearching {
-                ConsoleSearchToolbar()
-            } else {
-                ConsoleToolbarView()
-            }
-        }
     }
 }
 #endif

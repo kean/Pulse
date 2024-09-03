@@ -2,29 +2,25 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 15, visionOS 1, *)
 struct ConsoleSearchListContentView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
     var body: some View {
-#if os(iOS) || os(visionOS)
         ConsoleSearchToolbar()
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden, edges: .top)
-#endif
         ConsoleSearchSuggestionsView()
-#if os(iOS) || os(visionOS)
         if viewModel.isNewResultsButtonShown {
             showNewResultsPromptView
         }
-#endif
         ConsoleSearchResultsListContentView()
     }
 
@@ -40,25 +36,21 @@ struct ConsoleSearchListContentView: View {
             .background(Color.accentColor)
             .cornerRadius(8)
         }
-#if os(iOS) || os(visionOS)
         .listRowSeparator(.hidden)
-#endif
         .listRowBackground(Color.separator.opacity(0.2))
         .frame(maxWidth: .infinity, alignment: .center)
         .listRowBackground(Color.clear)
     }
 }
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 15, visionOS 1, *)
 struct ConsoleSearchResultsListContentView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
     var body: some View {
-#if os(iOS) || os(visionOS)
         if !viewModel.results.isEmpty {
             PlainListGroupSeparator()
         }
-#endif
         ForEach(viewModel.results) { result in
             let isLast = result.id == viewModel.results.last?.id
             ConsoleSearchResultView(viewModel: result, isSeparatorNeeded: viewModel.parameters.term != nil && !isLast)

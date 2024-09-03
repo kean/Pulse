@@ -63,19 +63,7 @@
 //                    Button(action: { isSharingStore = true }) {
 //                        Image(systemName: "square.and.arrow.up")
 //                    }
-//                    .help("Share a session")
-//                    .popover(isPresented: $isSharingStore, arrowEdge: .bottom) {
-//                        ShareStoreView(onDismiss: {})
-//                            .frame(width: 240).fixedSize()
-//                    }
-//
-//                    Button(action: { isShowingFilters = true }) {
-//                        Label("Show Filters", systemImage: "line.3.horizontal.decrease.circle")
-//                    }
-//                    .help("Show Filters")
-//                    .popover(isPresented: $isShowingFilters) {
-//                        ConsoleFiltersView().frame(width: 300).fixedSize()
-//                    }
+//         
 //
 //
 //            }

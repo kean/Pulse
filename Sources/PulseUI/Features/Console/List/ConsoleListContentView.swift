@@ -7,7 +7,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleListContentView: View {
     @EnvironmentObject var viewModel: ConsoleListViewModel
 
@@ -26,7 +26,7 @@ struct ConsoleListContentView: View {
                 let objectID = entity.objectID
                 ConsoleEntityCell(entity: entity)
                     .id(objectID)
-#if os(iOS) || os(visionOS) || os(macOS)
+#if os(iOS) || os(visionOS)
                     .onAppear { viewModel.onAppearCell(with: objectID) }
                     .onDisappear { viewModel.onDisappearCell(with: objectID) }
 #endif
@@ -55,8 +55,8 @@ struct ConsoleListContentView: View {
     }
 }
 
-#if os(iOS) || os(macOS) || os(visionOS)
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+#if os(iOS) || os(visionOS)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleStaticList: View {
     let entities: [NSManagedObject]
 

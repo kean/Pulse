@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
@@ -26,10 +26,6 @@ struct ConsoleSearchToolbar: View {
             searchOptionsView
         }
         .buttonStyle(.plain)
-#if os(macOS)
-        .padding(.horizontal)
-        .frame(height: 34, alignment: .center)
-#endif
     }
 
     private var searchOptionsView: some View {
@@ -59,9 +55,6 @@ struct ConsoleSearchScopesPicker: View {
                     viewModel.scopes.remove(scope)
                 }
             }), label: { Text(scope.title).lineLimit(1) })
-    #if os(macOS)
-            .frame(maxWidth: .infinity, alignment: .leading)
-    #endif
         }
     }
 }

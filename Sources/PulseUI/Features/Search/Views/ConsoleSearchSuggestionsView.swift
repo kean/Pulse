@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
@@ -16,17 +16,11 @@ struct ConsoleSearchSuggestionsView: View {
     var body: some View {
         let suggestions = viewModel.suggestionsViewModel!
         if !suggestions.searches.isEmpty {
-#if os(macOS)
-            PlainListSectionHeaderSeparator(title: "Recent Searches").padding(.top, 16)
-#endif
             makeList(with: Array(suggestions.searches.prefix(3)))
             buttonClearSearchHistory
         }
 
         if viewModel.parameters.isEmpty {
-#if os(macOS)
-            PlainListSectionHeaderSeparator(title: "Scopes").padding(.top, 16)
-#endif
             ConsoleSearchScopesPicker(viewModel: viewModel)
         }
     }
@@ -42,10 +36,8 @@ struct ConsoleSearchSuggestionsView: View {
                 .font(.subheadline)
             }.buttonStyle(.plain)
         }
-#if os(iOS) || os(visionOS)
         .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 20))
         .listRowSeparator(.hidden, edges: .bottom)
-#endif
     }
 
     private func makeList(with suggestions: [ConsoleSearchSuggestion]) -> some View {
@@ -53,10 +45,6 @@ struct ConsoleSearchSuggestionsView: View {
             ConsoleSearchSuggestionView(suggestion: suggestion) {
                 viewModel.perform(suggestion)
             }
-#if os(macOS)
-            .searchCompletion(suggestion.id.uuidString)
-            .buttonStyle(.plain)
-#endif
         }
     }
 }

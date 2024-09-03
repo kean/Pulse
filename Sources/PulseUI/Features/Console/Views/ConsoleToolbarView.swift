@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
@@ -14,11 +14,6 @@ struct ConsoleToolbarView: View {
     @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
-#if os(macOS)
-        horizontal
-            .padding(.horizontal)
-            .frame(height: 34, alignment: .center)
-#else
         if #available(iOS 16.0, *) {
             ViewThatFits {
                 horizontal
@@ -28,7 +23,6 @@ struct ConsoleToolbarView: View {
         } else {
             horizontal
         }
-#endif
     }
 
     private var horizontal: some View {
@@ -138,15 +132,6 @@ struct ConsoleListOptionsView: View {
     @EnvironmentObject private var filters: ConsoleFiltersViewModel
 
     var body: some View {
-#if os(macOS)
-        Button(action: { filters.options.isOnlyErrors.toggle() }) {
-            Image(systemName: filters.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                .foregroundColor(filters.options.isOnlyErrors ? .red : .primary)
-        }
-        .buttonStyle(.plain)
-        .keyboardShortcut("e", modifiers: [.command, .shift])
-        .help("Toggle Show Only Errors (⇧⌘E)")
-#else
         Button(action: { filters.options.isOnlyErrors.toggle() }) {
             Text(Image(systemName: filters.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon"))
                 .font(.body)
@@ -155,7 +140,6 @@ struct ConsoleListOptionsView: View {
         .cornerRadius(4)
         .padding(.leading, 1)
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-#endif
     }
 }
 
