@@ -25,7 +25,7 @@ struct NetworkInspectorTransferInfoView: View {
         }
         .frame(maxWidth: .infinity)
     }
-#elseif os(macOS)
+#else
     var body: some View {
         HStack {
             Spacer()
