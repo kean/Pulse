@@ -14,7 +14,7 @@ struct PulseDemo_iOS: App {
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                ConsoleView(store: .demo)
+                ConsoleView(store: .shared)
             }
         }
     }
@@ -35,18 +35,21 @@ private final class AppViewModel: ObservableObject {
 
 
 private func sendRequest() {
+     // testClosures()
     // testSwiftConcurrency()
-
-//    let task = session.dataTask(with: URLRequest(url: URL(string: "https://github.com/kean/Nuke/archive/refs/tags/11.0.0.zip")!))
-//    task.resume()
 }
 
 private func testClosures() {
     let session = URLSessionProxy(configuration: .default)
-    let task = session.dataTask(with: URLRequest(url: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!)) { data, _, _ in
+    let dataTask = session.dataTask(with: URLRequest(url: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!)) { data, _, _ in
         NSLog("didFinish: \(data?.count ?? 0)")
     }
-    task.resume()
+    dataTask.resume()
+
+    let downloadTask = session.downloadTask(with: URLRequest(url: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!)) { url, _, _ in
+        NSLog("didFinish: \(String(describing: url))")
+    }
+    downloadTask.resume()
 }
 
 private func testSwiftConcurrency() {
@@ -55,8 +58,15 @@ private func testSwiftConcurrency() {
         let session = URLSessionProxy(configuration: .default, delegate: demoDelegate, delegateQueue: nil)
 //        let session = URLSession(configuration: .default)
 
-        let (data, _) = try await session.data(from: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!) //, delegate: demoDelegate)
+        let (data, _) = try await session.data(from: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!)
         NSLog("didFinish: \(data.count)")
+    }
+
+    Task {
+        let session = URLSessionProxy(configuration: .default)
+
+        let (url, _) = try await session.download(from: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!, delegate: nil)
+        NSLog("didFinish: \(url)")
     }
 }
 
