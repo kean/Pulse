@@ -57,7 +57,7 @@ final class RichTextViewModel: ObservableObject {
             }.store(in: &cancellables)
     }
 
-    func prepare(_ context: SearchContext?) {
+    func prepare(_ context: TextViewSearchContext?) {
         guard let context = context else { return }
 
         // Not updated self.searchTerm because searchable doesn't like that
