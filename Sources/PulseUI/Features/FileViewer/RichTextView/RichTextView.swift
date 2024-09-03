@@ -121,15 +121,4 @@ private func makePreviewViewModel() -> RichTextViewModel {
 }
 #endif
 
-private struct TextViewSearchContextKey: EnvironmentKey {
-    static var defaultValue: RichTextViewModel.SearchContext?
-}
-
-extension EnvironmentValues {
-    var textViewSearchContext: RichTextViewModel.SearchContext? {
-        get { self[TextViewSearchContextKey.self] }
-        set { self[TextViewSearchContextKey.self] = newValue }
-    }
-}
-
 #endif

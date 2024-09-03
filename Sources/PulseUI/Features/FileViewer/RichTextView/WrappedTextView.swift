@@ -2,12 +2,10 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
 
 import SwiftUI
 import Combine
-
-#if os(iOS) || os(visionOS)
 
 struct WrappedTextView: UIViewRepresentable {
     let viewModel: RichTextViewModel
@@ -59,58 +57,6 @@ struct WrappedTextView: UIViewRepresentable {
     }
 }
 
-#elseif os(macOS)
-
-struct WrappedTextView: NSViewRepresentable {
-    let viewModel: RichTextViewModel
-
-    @ObservedObject private var settings = UserSettings.shared
-
-    final class Coordinator: NSObject, NSTextViewDelegate {
-        var onLinkTapped: ((URL) -> Bool)?
-        var cancellables: [AnyCancellable] = []
-
-        func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
-            guard let url = link as? URL else {
-                return false
-            }
-            if let onLinkTapped = onLinkTapped, onLinkTapped(url) {
-                return true
-            }
-            return false
-        }
-    }
-
-    func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = UXTextView.scrollableTextView()
-        let textView = scrollView.documentView as! UXTextView
-
-        scrollView.hasVerticalScroller = true
-        scrollView.autohidesScrollers = true
-
-        configureTextView(textView)
-        textView.delegate = context.coordinator
-
-        textView.attributedText = viewModel.originalText
-
-        viewModel.textView = textView
-
-        return scrollView
-    }
-
-    func updateNSView(_ scrollView: NSScrollView, context: Context) {
-        let textView = scrollView.documentView as! NSTextView
-        textView.isAutomaticLinkDetectionEnabled = settings.isLinkDetectionEnabled && viewModel.isLinkDetectionEnabled
-    }
-
-    func makeCoordinator() -> Coordinator {
-        let coordinator = Coordinator()
-        coordinator.onLinkTapped = viewModel.onLinkTapped
-        return coordinator
-    }
-}
-#endif
-
 private func configureTextView(_ textView: UXTextView) {
     textView.isSelectable = true
     textView.isEditable = false
@@ -118,21 +64,14 @@ private func configureTextView(_ textView: UXTextView) {
         .underlineStyle: 1
     ]
     textView.backgroundColor = .clear
-
-#if os(iOS) || os(visionOS)
     textView.alwaysBounceVertical = true
     textView.autocorrectionType = .no
     textView.autocapitalizationType = .none
     textView.adjustsFontForContentSizeCategory = true
     textView.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
-#endif
+
 #if os(iOS)
     textView.keyboardDismissMode = .interactive
-#endif
-
-#if os(macOS)
-    textView.isAutomaticSpellingCorrectionEnabled = false
-    textView.textContainerInset = NSSize(width: 10, height: 10)
 #endif
 }
 

@@ -2,11 +2,11 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS) || os(visionOS)
-
 import SwiftUI
 import Pulse
 import Combine
+
+#if os(iOS) || os(visionOS)
 
 final class RichTextViewModel: ObservableObject {
     // Search
@@ -65,14 +65,10 @@ final class RichTextViewModel: ObservableObject {
         didUpdateMatches(matches, string: textStorage)
         if context.matchIndex < matches.count {
             DispatchQueue.main.async {
-#if os(iOS) || os(visionOS)
                 self.textView?.layoutManager.allowsNonContiguousLayout = false // Remove this workaround
                 UIView.performWithoutAnimation {
                     self.updateMatchIndex(context.matchIndex)
                 }
-#else
-                self.updateMatchIndex(context.matchIndex)
-#endif
             }
         }
     }
@@ -181,26 +177,16 @@ final class RichTextViewModel: ObservableObject {
             highlight(range: matches[previousMatch].range)
         }
         highlight(range: matches[selectedMatchIndex].range, isFocused: true)
-
-#if os(macOS)
-        // A workaround for macOS where it doesn't always redraw itself correctly
-        textView?.setNeedsDisplay(textView?.bounds ?? .zero)
-#endif
     }
 
     private func clearMatches() {
         for match in matches {
             let range = match.range
-#if os(macOS)
-            textStorage.addAttribute(.foregroundColor, value: match.originalForegroundColor, range: range)
-            textStorage.removeAttribute(.underlineStyle, range: range)
-#else
             textStorage.addAttribute(.foregroundColor, value: match.originalForegroundColor, range: range)
             textStorage.removeAttribute(.backgroundColor, range: range)
             if let backgroundColor = match.originalBackgroundColor {
                 textStorage.addAttribute(.backgroundColor, value: backgroundColor, range: range)
             }
-#endif
         }
     }
 
@@ -221,9 +207,19 @@ private func search(searchTerm: String, in string: NSString, options: StringSear
 
 #endif
 
-extension RichTextViewModel {
-    struct SearchContext {
-        let searchTerm: ConsoleSearchTerm
-        let matchIndex: Int
+private struct TextViewSearchContextKey: EnvironmentKey {
+    static var defaultValue: TextViewSearchContext?
+}
+
+extension EnvironmentValues {
+    var textViewSearchContext: TextViewSearchContext? {
+        get { self[TextViewSearchContextKey.self] }
+        set { self[TextViewSearchContextKey.self] = newValue }
     }
 }
+
+struct TextViewSearchContext {
+    let searchTerm: ConsoleSearchTerm
+    let matchIndex: Int
+}
+

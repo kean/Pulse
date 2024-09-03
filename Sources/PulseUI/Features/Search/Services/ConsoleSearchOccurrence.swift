@@ -17,11 +17,11 @@ final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
     var line: Int { match.lineNumber }
     var range: NSRange { NSRange(match.range, in: match.line) }
     lazy var preview = ConsoleSearchOccurrence.makePreview(for: match, attributes: previewAttibutes)
-    let searchContext: RichTextViewModel.SearchContext
+    let searchContext: TextViewSearchContext
 
     init(scope: ConsoleSearchScope,
          match: ConsoleSearchMatch,
-         searchContext: RichTextViewModel.SearchContext) {
+         searchContext: TextViewSearchContext) {
         self.scope = scope
         self.match = match
         self.searchContext = searchContext
