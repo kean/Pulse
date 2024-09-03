@@ -41,10 +41,6 @@ private struct _ConsoleView: View {
                 ConsoleMainView(environment: environment)
                     .navigationSplitViewColumnWidth(min: 320, ideal: 420, max: 640)
             },
-            content: {
-                EmptyView()
-                    .navigationSplitViewColumnWidth(320)
-            },
             detail: {
                 EmptyView()
             }
