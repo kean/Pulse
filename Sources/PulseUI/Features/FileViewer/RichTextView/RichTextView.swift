@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(macOS) || os(iOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
 
 import SwiftUI
 import CoreData
@@ -24,7 +24,6 @@ struct RichTextView: View {
         return copy
     }
 
-#if os(iOS) || os(visionOS)
     var body: some View {
         contents
             .onAppear { viewModel.prepare(searchContext) }
@@ -102,35 +101,15 @@ struct RichTextView: View {
             }
         }
     }
-#else
-    var body: some View {
-        VStack(spacing: 0) {
-            WrappedTextView(viewModel: viewModel)
-                .id(ObjectIdentifier(viewModel))
-            if !viewModel.isToolbarHidden {
-                RichTextViewSearchToobar(viewModel: viewModel)
-            }
-        }
-        .onAppear { viewModel.prepare(searchContext) }
-    }
-#endif
 }
 
 #if DEBUG
 struct RichTextView_Previews: PreviewProvider {
     static var previews: some View {
-        let textView = RichTextView(viewModel: makePreviewViewModel())
-#if os(macOS)
-        textView
-            .background(Color(.textBackgroundColor))
-            .frame(height: 600)
-            .previewLayout(.sizeThatFits)
-#else
         NavigationView {
-            textView
+            RichTextView(viewModel: makePreviewViewModel())
                 .inlineNavigationTitle("Rich Text View")
         }
-        #endif
     }
 }
 

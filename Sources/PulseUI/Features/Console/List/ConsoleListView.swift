@@ -50,21 +50,14 @@ private struct _InternalConsoleListView: View {
 
     @ViewBuilder private var contents: some View {
         _ConsoleListView()
-#if os(macOS)
-            .searchable(text: $searchBarViewModel.text, placement: .sidebar)
-#else
             .environment(\.defaultMinListRowHeight, 8)
             .searchable(text: $searchBarViewModel.text)
             .textInputAutocapitalization(.never)
-#endif
             .onSubmit(of: .search, searchViewModel.value.onSubmitSearch)
             .disableAutocorrection(true)
     }
 }
 
-#endif
-
-#if os(iOS) || os(visionOS)
 @available(iOS 15, visionOS 1.0, *)
 private struct _ConsoleListView: View {
     @Environment(\.isSearching) private var isSearching
@@ -83,4 +76,5 @@ private struct _ConsoleListView: View {
         .listStyle(.plain)
     }
 }
+
 #endif
