@@ -25,7 +25,7 @@ private final class AppViewModel: ObservableObject {
 
     init() {
 //        URLSessionProxyDelegate.enableAutomaticRegistration()
-        URLSessionProxy.enable()
+//        URLSessionProxy.enable()
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
             sendRequest()
         }
