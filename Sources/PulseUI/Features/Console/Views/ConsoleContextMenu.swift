@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(visionOS) || os(macOS)
+#if os(iOS) || os(visionOS)
 
 import SwiftUI
 import CoreData
@@ -21,11 +21,9 @@ struct ConsoleContextMenu: View {
                     Label("Sessions", systemImage: "list.bullet.clipboard")
                 }
             }
-#if os(iOS) || os(visionOS)
             Section {
                 ConsoleSortByMenu()
             }
-#endif
             Section {
                 Button(action: { router.isShowingSettings = true }) {
                     Label("Settings", systemImage: "gear")
@@ -60,11 +58,7 @@ struct ConsoleContextMenu: View {
     }
 
     private func openURL(_ url: URL) {
-#if os(macOS)
-        NSWorkspace.shared.open(url)
-#else
         UIApplication.shared.open(url)
-#endif
     }
 }
 

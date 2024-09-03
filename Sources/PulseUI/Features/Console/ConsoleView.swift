@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
+#if !os(macOS)
+
 import SwiftUI
 import CoreData
 import Pulse
@@ -24,3 +26,5 @@ extension ConsoleView {
         self.init(environment: .init(store: store, mode: mode))
     }
 }
+
+#endif

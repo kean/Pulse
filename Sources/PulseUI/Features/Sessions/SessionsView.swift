@@ -8,16 +8,13 @@ import SwiftUI
 import CoreData
 import Combine
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 15, visionOS 1.0, *)
 struct SessionsView: View {
     @State private var selection: Set<UUID> = []
     @State private var sharedSessions: SelectedSessionsIDs?
-
-#if os(iOS) || os(visionOS)
     @State private var editMode: EditMode = .inactive
-#endif
 
     @EnvironmentObject private var environment: ConsoleEnvironment
     @EnvironmentObject private var filters: ConsoleFiltersViewModel
@@ -35,7 +32,6 @@ struct SessionsView: View {
     @ViewBuilder
     private var content: some View {
         list
-#if os(iOS) || os(visionOS)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(editMode.isEditing ? "Done" : "Edit") {
@@ -55,29 +51,15 @@ struct SessionsView: View {
                     ShareStoreView(sessions: sessions.ids, onDismiss: { sharedSessions = nil })
                 }.backport.presentationDetents([.medium, .large])
             }
-#else
-            .popover(item: $sharedSessions, arrowEdge: .leading) { sessions in
-                ShareStoreView(sessions: sessions.ids, onDismiss: { sharedSessions = nil })
-                    .frame(width: 240).fixedSize()
-            }
-#endif
     }
 
     private var list: some View {
         SessionListView(selection: $selection, sharedSessions: $sharedSessions)
-#if os(iOS) || os(visionOS)
             .environment(\.editMode, $editMode)
             .onChange(of: selection) {
                 guard !editMode.isEditing, !$0.isEmpty else { return }
                 showInConsole(sessions: $0)
             }
-#else
-            .contextMenu(forSelectionType: UUID.self, menu: contextMenu)
-            .onChange(of: selection) {
-                guard filters.criteria.shared.sessions.selection != $0 else { return }
-                filters.select(sessions: $0)
-            }
-#endif
     }
 
 #if os(iOS) || os(visionOS)
@@ -121,40 +103,18 @@ struct SessionsView: View {
         router.isShowingSessions = false
     }
 #endif
-
-#if os(macOS)
-    @ViewBuilder
-    private func contextMenu(for selection: Set<UUID>) -> some View {
-        Button(action: { sharedSessions = SelectedSessionsIDs(ids: selection) }, label: {
-            Label("Share", systemImage: "square.and.arrow.up")
-        })
-        .disabled(selection.isEmpty)
-
-        if !(store.options.contains(.readonly)) {
-            Button(role: .destructive, action: {
-                store.removeSessions(withIDs: selection)
-                self.selection = []
-            }, label: { Label("Remove", systemImage: "trash") })
-        }
-    }
-#endif
 }
 
 #if DEBUG
-@available(iOS 15.0, macOS 13, visionOS 1.0, *)
+@available(iOS 15.0, visionOS 1.0, *)
 struct Previews_SessionsView_Previews: PreviewProvider {
     static let environment = ConsoleEnvironment(store: .mock)
 
     static var previews: some View {
-#if os(iOS) || os(visionOS)
         NavigationView {
             SessionsView()
                 .injecting(environment)
         }
-#else
-        SessionsView()
-            .injecting(environment)
-#endif
     }
 }
 #endif

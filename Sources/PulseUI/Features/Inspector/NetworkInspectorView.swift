@@ -38,21 +38,17 @@ struct NetworkInspectorView: View {
     }
 #else
     var body: some View {
-        NavigationSplitView(sidebar: {
-            List {
-                contents
-                    .listRowSeparator(.hidden)
+        List {
+            contents
+                .listRowSeparator(.hidden)
+        }
+        .scrollContentBackground(.hidden)
+        .animation(.default, value: task.state)
+        .toolbar {
+            ToolbarItemGroup(placement: .automatic) {
+                trailingNavigationBarItems
             }
-            .scrollContentBackground(.hidden)
-            .animation(.default, value: task.state)
-            .toolbar {
-                ToolbarItemGroup(placement: .automatic) {
-                    trailingNavigationBarItems
-                }
-            }
-        }, detail: {
-            EmptyView()
-        })
+        }
     }
 #endif
 
