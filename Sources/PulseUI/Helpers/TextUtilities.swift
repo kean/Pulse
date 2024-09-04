@@ -111,6 +111,13 @@ enum TextUtilities {
         let bounds = UIGraphicsGetPDFContextBounds()
         for i in 0  ..< renderer.numberOfPages {
             UIGraphicsBeginPDFPage()
+            
+            if isDarkMode, let context = UIGraphicsGetCurrentContext() {
+                let backgroundColor = UIColor(red: 44/255.0, green: 42/255.0, blue: 40/255.0, alpha: 1.0)
+                context.setFillColor(backgroundColor.cgColor)
+                context.fill(bounds)
+            }
+            
             renderer.drawPage(at: i, in: bounds)
         }
         UIGraphicsEndPDFContext()
