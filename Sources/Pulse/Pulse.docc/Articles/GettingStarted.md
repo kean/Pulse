@@ -100,7 +100,15 @@ Add the following to your app's plist file:
 
 ### 4.2. Enable Remote Logging
 
-Open the Pulse console from the app, go to Settings, enable "Remote Logging", and select a device running Pulse Pro to connect to.
+- **Option 1 (Recommended)** Enable automatic connection to Pulse apps using ``RemoteLogger/isAutomaticConnectionEnabled``:
+
+```swift
+#if DEBUG
+RemoteLogger.shared.isAutomaticConnectionEnabled = true
+#endif
+```
+
+- **Option 2 (Manual)**. Open the Pulse console from the app, go to "Settings", enable "Remote Logging", and select your Mac.
 
 ![Enabling remote logging](remote-logging.png)
 
