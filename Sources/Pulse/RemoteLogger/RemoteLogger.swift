@@ -104,6 +104,17 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         }
     }
 
+    /// If enabled, the logger will automatically connect to the first available
+    /// Pulse Mac app and remember it for the next runs.
+    ///
+    /// - warning: Never use this option in production as, since discovery
+    /// requires Bluetooth, it will trigger a prompt on the first app run.
+    public var isAutomaticConnectionEnabled = false {
+        didSet {
+            isEnabled = true
+        }
+    }
+
     public static let shared = RemoteLogger()
 
     /// - parameter store: The store to be synced with the server. By default,
@@ -270,6 +281,9 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         guard let name = self.knownServers.first(where: { servers[$0] != nil }),
               let server = servers[name] else {
+            if isAutomaticConnectionEnabled, let server = self.servers.first {
+                connect(to: server)
+            }
             return
         }
 

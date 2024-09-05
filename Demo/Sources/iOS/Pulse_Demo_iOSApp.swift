@@ -14,16 +14,19 @@ struct PulseDemo_iOS: App {
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                ConsoleView(store: .shared)
+                ConsoleView(store: .demo)
             }
         }
     }
 }
 
+@MainActor
 private final class AppViewModel: ObservableObject {
     init() {
-        // - warning: If you are testing it, make sure to switch the demo to use
-        // the shared store.
+        // This code registers the store with the `RemoteLogger` (important!)
+        LoggerStore.shared = .demo
+
+        RemoteLogger.shared.isAutomaticConnectionEnabled = true
 
         // NetworkLogger.enableProxy()
 
