@@ -5,7 +5,7 @@
 import SwiftUI
 import Pulse
 
-#if os(watchOS) || os(tvOS)
+#if os(watchOS) || os(tvOS) || os(macOS)
 
 struct RichTextView: View {
     let viewModel: RichTextViewModel
@@ -41,7 +41,11 @@ final class RichTextViewModel: ObservableObject {
     }
 
     init(string: NSAttributedString, contentType: NetworkLogger.ContentType? = nil) {
+#if os(macOS)
+        self.attributedString = try? AttributedString(string, including: \.appKit)
+#else
         self.attributedString = try? AttributedString(string, including: \.uiKit)
+#endif
         self.text = string.string
     }
 }

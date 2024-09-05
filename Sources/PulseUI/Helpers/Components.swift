@@ -20,7 +20,11 @@ struct Components {
 
     @available(iOS 15, macOS 13, visionOS 1, *)
     static func makeConsoleEntityCell(entity: NSManagedObject) -> some View {
+#if os(macOS)
+        EmptyView()
+#else
         ConsoleEntityCell(entity: entity)
+#endif
     }
 
     static func makePinView(for task: NetworkTaskEntity) -> some View {

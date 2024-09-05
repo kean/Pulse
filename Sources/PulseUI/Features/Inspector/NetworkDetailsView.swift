@@ -48,14 +48,3 @@ final class NetworkDetailsViewModel {
         self.makeString = closure
     }
 }
-
-#if os(macOS)
-final class RichTextViewModel: ObservableObject {
-    let isEmpty = true
-
-    init(string: String) {}
-    init(string: NSAttributedString) {}
-    init(string: NSAttributedString, contentType: NetworkLogger.ContentType?) {}
-
-}
-#endif

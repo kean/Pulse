@@ -116,7 +116,7 @@ struct PlainListGroupSeparator: View {
 
 #if os(iOS) || os(visionOS) || os(macOS)
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 15, macOS 13, visionOS 1, *)
 struct PlainListSectionHeader<Content: View>: View {
     var title: String?
     @ViewBuilder let content: () -> Content
@@ -144,14 +144,14 @@ struct PlainListSectionHeader<Content: View>: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 15, macOS 13, visionOS 1, *)
 extension PlainListSectionHeader where Content == Text {
     init(title: String) {
         self.init(title: title, content: { Text(title) })
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 15, visionOS 1, *)
 struct PlainListSeeAllView: View {
     let count: Int
 
