@@ -71,7 +71,7 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
         session.uploadTask(with: request, fromFile: fileURL)
     }
 
-    @available(iOS 17, tvOS 17, macOS 14, watchOS 9, *)
+    @available(iOS 17, tvOS 17, macOS 14, watchOS 10, *)
     public func uploadTask(withResumeData resumeData: Data) -> URLSessionUploadTask {
         session.uploadTask(withResumeData: resumeData)
     }
@@ -159,7 +159,7 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
         return task
     }
 
-    @available(iOS 17, tvOS 17, macOS 14, watchOS 9, *)
+    @available(iOS 17, tvOS 17, macOS 14, watchOS 10, *)
     public func uploadTask(withResumeData resumeData: Data, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionUploadTask {
         let box = Mutex<URLSessionUploadTask?>(nil)
         let task = session.uploadTask(withResumeData: resumeData) { [logger] data, response, error in

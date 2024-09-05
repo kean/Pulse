@@ -15,7 +15,7 @@ public protocol URLSessionProtocol {
 
     func uploadTask(with request: URLRequest, from bodyData: Data) -> URLSessionUploadTask
 
-    @available(iOS 17, tvOS 17, macOS 14, watchOS 9, *)
+    @available(iOS 17, tvOS 17, macOS 14, watchOS 10, *)
     func uploadTask(withResumeData resumeData: Data) -> URLSessionUploadTask
 
     func uploadTask(withStreamedRequest request: URLRequest) -> URLSessionUploadTask
@@ -44,7 +44,7 @@ public protocol URLSessionProtocol {
 
     func uploadTask(with request: URLRequest, from bodyData: Data?, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionUploadTask
 
-    @available(iOS 17, tvOS 17, macOS 14, watchOS 9, *)
+    @available(iOS 17, tvOS 17, macOS 14, watchOS 10, *)
     func uploadTask(withResumeData resumeData: Data, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionUploadTask
 
     func downloadTask(with request: URLRequest, completionHandler: @escaping @Sendable (URL?, URLResponse?, (any Error)?) -> Void) -> URLSessionDownloadTask
