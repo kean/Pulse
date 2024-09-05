@@ -1,3 +1,46 @@
+# Pulse 5.x
+
+## Pulse 5.0
+
+*Sep 4, 2024*
+
+### Announcement
+
+Pulse [macOS and iOS apps](https://pulselogger.com) are now [available on the App Store](https://apps.apple.com/us/app/pulse-network-logger/id6661031747). The apps are indispensable for viewing logs collected by the Pulse SDK and debugging your apps in real-time with features like response mocking. You can learn more about the apps in the [announcement](https://pulselogger.com/2024/08/31/pulse-is-on-the-app-store/).
+
+
+### Requirements
+
+- Swift 5.10 (Xcode 15.3)
+ -iOS 15, tvOS 15, macOS 12, watchOS 8, visionOS 1
+
+### Changes
+
+Pulse SDK 5.0 greatly simplifies the integration experience and introduces two new ways for capturing network traffic.
+
+- Add compatibility with Swift 6 (not official until Xcode 16 RC ships)
+- Reduce the size of the framework by nearly 15%
+- Add a new `PulseProxy` module for automatic capturing of all network traffic from the app with a single line – the quickest way to try Pulse
+- Add new `URLSessionProtocol` and `URLSessionProxy` as a new recommended way to track network traffic and enable other Pulse features like response mocking
+- Learn more about the new network logging method in the fully rewritten [Getting Started](https://kean-docs.github.io/pulse/documentation/pulse/gettingstarted/) and [Network Logging & Debugging](https://kean-docs.github.io/pulse/documentation/pulse/networklogging-article) guides
+- Add `RemoteLogger.isAutomaticConnectionEnabled` property to allow automatic connection to Pulse apps
+- Add and document the new public `MockingURLProtocol` used to enable network debugging features of Pulse apps. It is registered automatically with the new `URLSessionProxy`
+- Add `@MainActor` to a few main-thread confined types like `RemoteLogger`
+- Add new `UserSettings` properties: `isRemoteLoggingHidden` and `allowedShareStoreOutputs`, 
+- Increase the default `LoggerStore` size limit from 128 MB to 256 MB and response body size limit from 5 MB to 8 MB
+- Add support for changing `LoggerStore.shared.configuration` to make it easier to configure the default store
+`NetworkLogger.shared` and `LoggerStore.shared` can now be both replaced with your custom instances and in any order with any other operations.
+- Update`RemoteLogger.Connection` to perform work on the background queue so that Pulse now runs almost no code on the main queue
+- Make `LoggerStore.info` an async method
+- Fix export of PDF in dark mode (https://github.com/kean/Pulse/pull/288), thanks to @ilyalehchylin
+`LoggerStore/export` no longer returns `LoggerStore.Info`
+- Add `.create` and `.sweep` options to the default `LoggerStore `init`
+- Remove the console for MacOS as it is no longer feasible to maintain the reusable code between Pulse SDK and Pulse standalone app for Mac. If you are using the console for macOS, please consider using the standalone Pulse app.
+- Remove some of the text-based search filters, which wasn’t the right UX for a phone. In upcoming versions, it will be replaced with convenient controls.
+- Remove deprecated `LoggerStore.copy(to:)` and `LoggerStore.pins`
+- Remove support for exporting store as a package (`DocumentType.package`)
+- Bug fixes and performance improvements
+
 # Pulse 4.x
 
 ## Pulse 4.2.7
