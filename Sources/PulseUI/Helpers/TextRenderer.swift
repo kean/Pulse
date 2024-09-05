@@ -447,6 +447,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
                 .previewLayout(.fixed(width: 1160, height: 2000)) // Disable interaction to view it
                 .previewDisplayName("HTML (Raw)")
 
+#if !os(tvOS)
             WebView(data: html, contentType: "application/html")
                 .edgesIgnoringSafeArea([.bottom])
                 .previewDisplayName("HTML")
@@ -454,6 +455,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             PDFKitRepresentedView(document: PDFDocument(data: try! TextUtilities.pdf(from: string))!)
                 .edgesIgnoringSafeArea([.all])
                 .previewDisplayName("PDF")
+#endif
         }
     }
 }
