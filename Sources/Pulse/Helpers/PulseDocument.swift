@@ -28,7 +28,7 @@ final class PulseDocument {
     }
 
     /// - warning: Model has to be loaded only once.
-    static let model: NSManagedObjectModel = {
+    nonisolated(unsafe) static let model: NSManagedObjectModel = {
         let model = NSManagedObjectModel()
         let blob = NSEntityDescription(class: PulseBlobEntity.self)
         blob.properties = [
