@@ -10,11 +10,7 @@ struct ImageViewer: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Image(uxImage: viewModel.image)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(maxWidth: viewModel.image.size.width, maxHeight: viewModel.image.size.height)
-                .border(Color.separator, width: 0.5)
+            ImageThumbnailView(viewModel: viewModel)
 
             HStack {
                 TextView(string: TextRenderer().render(viewModel.info))
@@ -23,6 +19,18 @@ struct ImageViewer: View {
 
             Spacer()
         }.padding()
+    }
+}
+
+struct ImageThumbnailView: View {
+    let viewModel: ImagePreviewViewModel
+
+    var body: some View {
+        Image(uxImage: viewModel.image)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(maxWidth: viewModel.image.size.width * 0.5, maxHeight: viewModel.image.size.height * 0.5)
+            .border(Color.separator, width: 0.5)
     }
 }
 
