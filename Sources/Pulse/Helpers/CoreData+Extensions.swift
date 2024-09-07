@@ -97,7 +97,7 @@ extension NSEntityDescription {
 }
 
 extension NSAttributeDescription {
-    convenience init(name: String, type: NSAttributeType, _ configure: (NSAttributeDescription) -> Void = { _ in }) {
+    convenience init(_ name: String, _ type: NSAttributeType, _ configure: (NSAttributeDescription) -> Void = { _ in }) {
         self.init()
         self.name = name
         self.attributeType = type
@@ -111,8 +111,8 @@ enum RelationshipType {
 }
 
 extension NSRelationshipDescription {
-    convenience init(name: String,
-                     type: RelationshipType,
+    convenience init(_ name: String,
+                     _ type: RelationshipType,
                      deleteRule: NSDeleteRule = .cascadeDeleteRule,
                      entity: NSEntityDescription) {
         self.init()
