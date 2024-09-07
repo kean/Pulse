@@ -498,7 +498,7 @@ extension LoggerStore {
             return data
         }
         guard let thumbnail = Graphics.makeThumbnail(from: data, targetSize: 512),
-              let data = Graphics.encode(thumbnail) else {
+              let data = Graphics.encode(thumbnail, compressionQuality: 0.7) else {
             return data
         }
         return data

@@ -35,7 +35,7 @@ enum Graphics {
         return PlatformImage(cgImage: image)
     }
 
-    static func encode(_ image: PlatformImage) -> Data? {
+    static func encode(_ image: PlatformImage, compressionQuality: CGFloat = 0.8) -> Data? {
         guard let source = image.cgImage else {
             return nil
         }
@@ -49,7 +49,7 @@ enum Graphics {
             return nil
         }
         let options: NSDictionary = [
-            kCGImageDestinationLossyCompressionQuality: 0.33
+            kCGImageDestinationLossyCompressionQuality: compressionQuality
         ]
         CGImageDestinationAddImage(destination, source, options)
         CGImageDestinationFinalize(destination)
