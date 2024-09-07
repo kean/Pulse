@@ -491,7 +491,7 @@ extension LoggerStore {
     }
 
     private func preprocessData(_ data: Data, contentType: NetworkLogger.ContentType?) -> Data {
-        guard data.count > 5000 else { // 5 KB is ok
+        guard data.count > 20_000 else { // 20 KB is ok
             return data
         }
         guard configuration.isStoringOnlyImageThumbnails && (contentType?.isImage ?? false) else {
