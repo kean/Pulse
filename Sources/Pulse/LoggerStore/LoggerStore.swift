@@ -491,14 +491,15 @@ extension LoggerStore {
     }
 
     private func preprocessData(_ data: Data, contentType: NetworkLogger.ContentType?) -> Data {
-        guard data.count > 20_000 else { // 20 KB is ok
+        guard data.count > 15_000 else { // 15 KB is ok
             return data
         }
         guard configuration.isStoringOnlyImageThumbnails && (contentType?.isImage ?? false) else {
             return data
         }
-        guard let thumbnail = Graphics.makeThumbnail(from: data, targetSize: 512),
-              let data = Graphics.encode(thumbnail, compressionQuality: 0.7) else {
+        let options = configuration.imageThumbnailOptions
+        guard let thumbnail = Graphics.makeThumbnail(from: data, targetSize: options.maximumPixelSize),
+              let data = Graphics.encode(thumbnail, compressionQuality: options.compressionQuality) else {
             return data
         }
         return data

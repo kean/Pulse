@@ -74,6 +74,9 @@ extension LoggerStore {
         /// If `true`, the images added to the store as saved as small thumbnails.
         public var isStoringOnlyImageThumbnails = true
 
+        /// Defines how to generate the thumbnails for the images from network responses.
+        public var imageThumbnailOptions = ThumbnailOptions()
+
         /// Limit the maximum response size stored by the logger. The default
         /// value is `8 MB`. The same limit applies to requests.
         public var responseBodySizeLimit: Int = 8 * 1048576
@@ -103,5 +106,12 @@ extension LoggerStore {
         public init(sizeLimit: Int64 = 256 * 1_000_000) {
             self.sizeLimit = sizeLimit
         }
+    }
+
+    /// The configuration options for storing thumbnails for network responses
+    /// containing media.
+    public struct ThumbnailOptions {
+        public var maximumPixelSize: CGFloat = 512
+        public var compressionQuality: CGFloat = 0.5
     }
 }
