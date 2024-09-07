@@ -63,17 +63,24 @@ struct ImagePreviewViewModel {
             }
         }
 
-        var info: [(String, String?)] = [
-            ("Resolution", originalImageSize.map { "\(Int($0.width)) × \(Int($0.height)) px" }),
+        let info: [(String, String?)] = [
+            ("Resolution", originalImageSize.map(formattedResolution)),
             ("Size", ByteCountFormatter.string(fromByteCount: context.originalSize)),
             ("Type", context.contentType?.rawValue),
-            ("Displayed", isShowingOriginal ? "original image" : "preview (original not saved)")
+            ("Source", isShowingOriginal ? "Original" : "Thumbnail (\(formattedResolution(with: image.size)))")
         ]
-        if !isShowingOriginal {
-            info.append(("Preview Size (Decompressed)", ByteCountFormatter.string(fromByteCount: Int64(data.count))))
-        }
 
         self.image = image
         self.info = KeyValueSectionViewModel(title: "Image", color: .pink, items: info)
     }
+}
+
+private extension CGSize {
+    func scaled(by scale: CGFloat) -> CGSize {
+        CGSize(width: width * scale, height: width * height)
+    }
+}
+
+private func formattedResolution(with pixelSize: CGSize) -> String {
+    "\(Int(pixelSize.width)) × \(Int(pixelSize.height)) px"
 }
