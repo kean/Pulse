@@ -85,7 +85,7 @@ struct ConsoleTaskCell: View {
                 Text(ConsoleViewDelegate.getTitle(for: task) ?? "–")
                     .font(ConsoleConstants.fontBody)
                     .foregroundColor(.primary)
-                    .lineLimit(settings.lineLimit)
+                    .lineLimit(settings.consoleTaskDisplayOptions.contentLineLimit)
 
                 Spacer()
             }
@@ -103,23 +103,26 @@ struct ConsoleTaskCell: View {
             time
         }
 #elseif os(iOS) || os(visionOS)
-        infoText
-            .lineLimit(1)
+        infoText?
+            .lineLimit(settings.consoleTaskDisplayOptions.detailsLineLimit)
             .font(ConsoleConstants.fontInfo)
             .foregroundColor(.secondary)
             .padding(.top, 2)
 #else
-        infoText
+        infoText?
             .lineLimit(1)
             .font(ConsoleConstants.fontTitle)
             .foregroundColor(.secondary)
 #endif
     }
 
-    private var infoText: Text {
+    private var infoText: Text? {
+        guard settings.consoleTaskDisplayOptions.isShowingDetails else {
+            return nil
+        }
         var text = Text("")
         var isEmpty = true
-        for detail in settings.consoleTaskDisplayOptions.details {
+        for detail in settings.consoleTaskDisplayOptions.detailsFields {
             if let value = makeText(for: detail) {
                 if !isEmpty {
                     text = text + Text("   ")
@@ -128,15 +131,33 @@ struct ConsoleTaskCell: View {
                 text = text + value
             }
         }
-        return text
+        return isEmpty ? nil : text
     }
 
     private func makeText(for detail: ConsoleTaskDisplayOptions.Field) -> Text? {
         switch detail {
-        case .method: Text(task.httpMethod ?? "GET")
-        case .requestSize: makeInfoText("arrow.up", byteCount(for: task.requestBodySize))
-        case .responseSize: makeInfoText("arrow.down", byteCount(for: task.responseBodySize))
-        case .duration: ConsoleFormatter.duration(for: task).map { makeInfoText("clock", $0) }
+        case .method: 
+            Text(task.httpMethod ?? "GET")
+        case .requestSize: 
+            makeInfoText("arrow.up", byteCount(for: task.requestBodySize))
+        case .responseSize: 
+            makeInfoText("arrow.down", byteCount(for: task.responseBodySize))
+        case .responseContentType:
+            task.responseContentType.map(NetworkLogger.ContentType.init).map {
+                Text($0.lastComponent.uppercased())
+            }
+        case .duration:
+            ConsoleFormatter.duration(for: task).map { makeInfoText("clock", $0) }
+        case .host: 
+            task.host.map { Text($0) }
+        case .statusCode: 
+            task.statusCode != 0 ? Text(task.statusCode.description) : nil
+        case .taskType: 
+            NetworkLogger.TaskType(rawValue: task.taskType).map {
+                Text($0.urlSessionTaskClassName)
+            }
+        case .taskDescription:
+            task.taskDescription.map { Text($0) }
         }
     }
 

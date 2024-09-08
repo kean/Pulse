@@ -526,6 +526,10 @@ extension NetworkLogger {
         public var isImage: Bool { type.hasPrefix("image/") }
         public var isHTML: Bool { type.contains("html") }
         public var isEncodedForm: Bool { type == "application/x-www-form-urlencoded" }
+
+        public var lastComponent: String {
+            type.components(separatedBy: "/").last ?? type
+        }
     }
 }
 

@@ -9,24 +9,15 @@ import Pulse
 
 struct SettingsConsoleCellDesignView: View {
     @EnvironmentObject private var settings: UserSettings
-    @State private var isShowingFieldPicker = false
 
     var body: some View {
         VStack(spacing: 0) {
             preview
 
             Form {
-                options
-                details
+                SettingsConsoleTaskOptionsView(options: $settings.consoleTaskDisplayOptions)
             }
             .environment(\.editMode, .constant(.active))
-        }
-        .sheet(isPresented: $isShowingFieldPicker) {
-            NavigationView {
-                ConsoleFieldPicker(currentSelection: Set(settings.consoleTaskDisplayOptions.details)) {
-                    settings.consoleTaskDisplayOptions.details.append($0)
-                }
-            }
         }
         .toolbar {
             ToolbarItem(placement: .destructiveAction) {
@@ -58,29 +49,55 @@ struct SettingsConsoleCellDesignView: View {
         .padding(.top, 16)
         .background(Color(.secondarySystemBackground))
     }
+}
 
-    private var options: some View {
-        Section("Options") {
-            Stepper("Line Limit: \(settings.consoleTaskDisplayOptions.lineLimit)", value: $settings.lineLimit, in: 1...20)
+private struct SettingsConsoleTaskOptionsView: View {
+    @Binding var options: ConsoleTaskDisplayOptions
+
+    @State private var isShowingFieldPicker = false
+
+    var body: some View {
+        Section("Content") {
+            content
+        }
+        Section("Details") {
+            details
         }
     }
 
+    @ViewBuilder
+    private var content: some View {
+        Stepper("Line Limit: \(options.contentLineLimit)", value: $options.contentLineLimit, in: 1...20)
+    }
+
+    @ViewBuilder
     private var details: some View {
-        Section("Details") {
-            ForEach($settings.consoleTaskDisplayOptions.details) { field in
-                Text(field.wrappedValue.title)
+        Toggle("Show Details", isOn: $options.isShowingDetails)
+
+        if options.isShowingDetails {
+            Stepper("Line Limit: \(options.detailsLineLimit)", value: $options.detailsLineLimit, in: 1...20)
+
+            ForEach(options.detailsFields) { field in
+                Text(field.title)
             }
             .onMove { from, to in
-                settings.consoleTaskDisplayOptions.details.move(fromOffsets: from, toOffset: to)
+                options.detailsFields.move(fromOffsets: from, toOffset: to)
             }
             .onDelete { indexSet in
-                settings.consoleTaskDisplayOptions.details.remove(atOffsets: indexSet)
+                options.detailsFields.remove(atOffsets: indexSet)
             }
             Button {
                 isShowingFieldPicker = true
             } label: {
                 Label("Add Field", systemImage: "plus.circle")
                     .offset(x: -2, y: 0)
+            }
+            .sheet(isPresented: $isShowingFieldPicker) {
+                NavigationView {
+                    ConsoleFieldPicker(currentSelection: Set(options.detailsFields)) {
+                        options.detailsFields.append($0)
+                    }
+                }
             }
         }
     }

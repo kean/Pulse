@@ -77,16 +77,31 @@ public final class UserSettings: ObservableObject {
 
 public struct ConsoleTaskDisplayOptions: Codable {
     /// The line limit for messages in the console. By default, `3`.
-    public var lineLimit: Int = 3
+    public var contentLineLimit: Int = 3
+
+    // MARK: - Details
+
+    /// By default, `true`.
+    public var isShowingDetails = true
+
+    /// The line limit for messages in the console. By default, `1`.
+    public var detailsLineLimit: Int = 1
 
     /// Fields to display below the main text label.
-    public var details: [Field]
+    public var detailsFields: [Field]
 
     public enum Field: Codable, Identifiable, CaseIterable {
         case method
         case requestSize
         case responseSize
+        case responseContentType
         case duration
+        case host
+        case statusCode
+        /// The type of the task, e.g. "Data" or "Download"
+        case taskType
+        /// The `taskDescription` value of `URLSessionTask`.
+        case taskDescription
 
         public var id: Field { self }
 
@@ -95,15 +110,20 @@ public struct ConsoleTaskDisplayOptions: Codable {
             case .method: "Method"
             case .requestSize: "Request Size"
             case .responseSize: "Response Size"
+            case .responseContentType: "Response Content Type"
             case .duration: "Duration"
+            case .host: "Host"
+            case .statusCode: "Status Code"
+            case .taskType: "Task Type"
+            case .taskDescription: "Task Description"
             }
         }
     }
 
     public init(
-        details: [Field] = [.method, .requestSize, .responseSize, .duration]
+        detailsFields: [Field] = [.method, .requestSize, .responseSize, .duration]
     ) {
-        self.details = details
+        self.detailsFields = detailsFields
     }
 }
 
