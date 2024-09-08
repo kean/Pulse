@@ -117,14 +117,27 @@ struct ConsoleTaskCell: View {
     }
 
     private var infoText: Text {
-        var text = Text(task.httpMethod ?? "GET")
-        if task.state != .pending {
-            text = text + Text("    ") +
-            makeInfoText("arrow.up", byteCount(for: task.requestBodySize)) + Text("    ") +
-            makeInfoText("arrow.down", byteCount(for: task.responseBodySize)) + Text("     ") +
-            makeInfoText("clock", ConsoleFormatter.duration(for: task) ?? "–")
+        var text = Text("")
+        var isEmpty = true
+        for detail in settings.consoleTaskDisplayOptions.details {
+            if let value = makeText(for: detail) {
+                if !isEmpty {
+                    text = text + Text("   ")
+                }
+                isEmpty = false
+                text = text + value
+            }
         }
         return text
+    }
+
+    private func makeText(for detail: ConsoleTaskDisplayOptions.Field) -> Text? {
+        switch detail {
+        case .method: Text(task.httpMethod ?? "GET")
+        case .requestSize: makeInfoText("arrow.up", byteCount(for: task.requestBodySize))
+        case .responseSize: makeInfoText("arrow.down", byteCount(for: task.responseBodySize))
+        case .duration: ConsoleFormatter.duration(for: task).map { makeInfoText("clock", $0) }
+        }
     }
 
     private func makeInfoText(_ image: String, _ text: String) -> Text {

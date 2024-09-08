@@ -28,14 +28,8 @@ public final class UserSettings: ObservableObject {
 
     /// HTTP headers to display in a Console. By default, empty.
     public var displayHeaders: [String] {
-        get {
-            let data = rawDisplayHeaders.data(using: .utf8) ?? Data()
-            return (try? JSONDecoder().decode([String].self, from: data)) ?? []
-        }
-        set {
-            guard let data = try? JSONEncoder().encode(newValue) else { return }
-            rawDisplayHeaders = String(data: data, encoding: .utf8) ?? "[]"
-        }
+        get { decode(rawDisplayHeaders) ?? [] }
+        set { rawDisplayHeaders = encode(newValue) ?? "[]" }
     }
 
     @AppStorage("com.github.kean.pulse.display.headers")
@@ -48,14 +42,8 @@ public final class UserSettings: ObservableObject {
 
     /// The allowed sharing options.
     public var allowedShareStoreOutputs: [ShareStoreOutput] {
-        get {
-            let data = rawAllowedShareStoreOutputs.data(using: .utf8) ?? Data()
-            return (try? JSONDecoder().decode([ShareStoreOutput].self, from: data)) ?? []
-        }
-        set { 
-            guard let data = try? JSONEncoder().encode(newValue) else { return }
-            rawAllowedShareStoreOutputs = String(data: data, encoding: .utf8) ?? "[]"
-        }
+        get { decode(rawAllowedShareStoreOutputs) ?? [] }
+        set { rawAllowedShareStoreOutputs = encode(newValue) ?? "[]" }
     }
 
     @AppStorage("com.github.kean.pulse.allowedShareStoreOutputs")
@@ -64,4 +52,67 @@ public final class UserSettings: ObservableObject {
     /// If enabled, the console stops showing the remote logging option.
     @AppStorage("com.github.kean.pulse.isRemoteLoggingAllowed")
     public var isRemoteLoggingHidden = false
+
+    /// Task cell display options.
+    public var consoleTaskDisplayOptions: ConsoleTaskDisplayOptions {
+        get {
+            if let options = cachedConsoleTaskDisplayOptions {
+                return options
+            }
+            let options = decode(rawConsoleTaskDisplayOptions) ?? ConsoleTaskDisplayOptions()
+            cachedConsoleTaskDisplayOptions = options
+            return options
+        }
+        set {
+            cachedConsoleTaskDisplayOptions = newValue
+            rawConsoleTaskDisplayOptions = encode(newValue) ?? "{}"
+        }
+    }
+
+    var cachedConsoleTaskDisplayOptions: ConsoleTaskDisplayOptions?
+
+    @AppStorage("com.github.kean.pulse.consoleTaskDisplayOptions")
+    var rawConsoleTaskDisplayOptions: String = "{}"
+}
+
+public struct ConsoleTaskDisplayOptions: Codable {
+    /// The line limit for messages in the console. By default, `3`.
+    public var lineLimit: Int = 3
+
+    /// Fields to display below the main text label.
+    public var details: [Field]
+
+    public enum Field: Codable, Identifiable, CaseIterable {
+        case method
+        case requestSize
+        case responseSize
+        case duration
+
+        public var id: Field { self }
+
+        var title: String {
+            switch self {
+            case .method: "Method"
+            case .requestSize: "Request Size"
+            case .responseSize: "Response Size"
+            case .duration: "Duration"
+            }
+        }
+    }
+
+    public init(
+        details: [Field] = [.method, .requestSize, .responseSize, .duration]
+    ) {
+        self.details = details
+    }
+}
+
+private func decode<T: Decodable>(_ string: String) -> T? {
+    let data = string.data(using: .utf8) ?? Data()
+    return (try? JSONDecoder().decode(T.self, from: data))
+}
+
+private func encode<T: Encodable>(_ value: T) -> String? {
+    guard let data = try? JSONEncoder().encode(value) else { return nil }
+    return String(data: data, encoding: .utf8)
 }

@@ -9,23 +9,29 @@ import Pulse
 
 struct SettingsConsoleCellDesignView: View {
     @EnvironmentObject private var settings: UserSettings
-
-    @FetchRequest(sortDescriptors: [SortDescriptor(\.createdAt, order: .forward)])
-    var tasks: FetchedResults<NetworkTaskEntity>
+    @State private var isShowingFieldPicker = false
 
     var body: some View {
         VStack(spacing: 0) {
             preview
+
             Form {
-                Section("Options") {
-                    Stepper("Line Limit: \(settings.lineLimit)", value: $settings.lineLimit, in: 1...20)
+                options
+                details
+            }
+            .environment(\.editMode, .constant(.active))
+        }
+        .sheet(isPresented: $isShowingFieldPicker) {
+            NavigationView {
+                ConsoleFieldPicker(currentSelection: Set(settings.consoleTaskDisplayOptions.details)) {
+                    settings.consoleTaskDisplayOptions.details.append($0)
                 }
             }
         }
         .toolbar {
             ToolbarItem(placement: .destructiveAction) {
                 Button("Reset") {
-                    // TODO: implement
+                    settings.consoleTaskDisplayOptions = .init()
                 }
             }
         }
@@ -36,20 +42,84 @@ struct SettingsConsoleCellDesignView: View {
             Text("Preview".uppercased())
                 .font(.footnote)
                 .foregroundStyle(.secondary)
-                .padding(.horizontal)
+                .padding(.horizontal, 40)
                 .padding(.bottom, 8)
 
             if let previewTask = StorePreview.previewTask {
                 Divider()
-                    .padding(.leading)
                 ConsoleTaskCell(task: previewTask, isDisclosureNeeded: true)
                     .padding()
+                    .background(Color(.systemBackground))
                 Divider()
             } else {
                 Text("Failed to load the preview")
             }
         }
-        .background(Color(.systemBackground))
+        .padding(.top, 16)
+        .background(Color(.secondarySystemBackground))
+    }
+
+    private var options: some View {
+        Section("Options") {
+            Stepper("Line Limit: \(settings.consoleTaskDisplayOptions.lineLimit)", value: $settings.lineLimit, in: 1...20)
+        }
+    }
+
+    private var details: some View {
+        Section("Details") {
+            ForEach($settings.consoleTaskDisplayOptions.details) { field in
+                Text(field.wrappedValue.title)
+            }
+            .onMove { from, to in
+                settings.consoleTaskDisplayOptions.details.move(fromOffsets: from, toOffset: to)
+            }
+            .onDelete { indexSet in
+                settings.consoleTaskDisplayOptions.details.remove(atOffsets: indexSet)
+            }
+            Button {
+                isShowingFieldPicker = true
+            } label: {
+                Label("Add Field", systemImage: "plus.circle")
+                    .offset(x: -2, y: 0)
+            }
+        }
+    }
+}
+
+private struct ConsoleFieldPicker: View {
+    @State var selection: ConsoleTaskDisplayOptions.Field?
+    let currentSelection: Set<ConsoleTaskDisplayOptions.Field>
+    let onSelection: (ConsoleTaskDisplayOptions.Field) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Form {
+            Picker("Field", selection: $selection) {
+                let remainingCases = ConsoleTaskDisplayOptions.Field.allCases.filter {
+                    !currentSelection.contains($0)
+                }
+                ForEach(remainingCases) { field in
+                    Text(field.title)
+                        .tag(Optional.some(field))
+                }
+            }
+            .pickerStyle(.inline)
+        }
+        .onChange(of: selection) { value in
+            if let value {
+                dismiss()
+                onSelection(value)
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") {
+                    dismiss()
+                }
+            }
+        }
+        .navigationTitle("Add Field")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -75,7 +145,10 @@ enum StorePreview {
         // TODO: add taskDescription support
         store.storeRequest(request, response: response, error: nil, data: Data(count: 412), taskDescription: nil)
 
-        return try? store.tasks().first
+        let task = try? store.tasks().first
+        // It's a bit hard to pass this info
+        task?.duration = 150
+        return task
     }()
 }
 
