@@ -29,9 +29,9 @@ struct ConsoleSearchResultView: View {
             let total = occurrences.count > ConsoleSearchMatch.limit ? "\(ConsoleSearchMatch.limit)+" : "\(occurrences.count)"
             NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel).injecting(environment)) {
                 Text("Total Results: ")
-                    .font(ConsoleConstants.fontBody) +
+                    .font(.callout) +
                 Text(total)
-                    .font(ConsoleConstants.fontBody)
+                    .font(.callout)
                     .foregroundColor(.secondary)
             }
         }

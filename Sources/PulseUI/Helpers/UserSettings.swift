@@ -54,78 +54,104 @@ public final class UserSettings: ObservableObject {
     public var isRemoteLoggingHidden = false
 
     /// Task cell display options.
-    public var consoleTaskDisplayOptions: ConsoleTaskDisplayOptions {
+    public var displayOptions: DisplayOptions {
         get {
-            if let options = cachedConsoleTaskDisplayOptions {
+            if let options = cachedDisplayOptions {
                 return options
             }
-            let options = decode(rawConsoleTaskDisplayOptions) ?? ConsoleTaskDisplayOptions()
-            cachedConsoleTaskDisplayOptions = options
+            let options = decode(rawDisplayOptions) ?? DisplayOptions()
+            cachedDisplayOptions = options
             return options
         }
         set {
-            cachedConsoleTaskDisplayOptions = newValue
-            rawConsoleTaskDisplayOptions = encode(newValue) ?? "{}"
+            cachedDisplayOptions = newValue
+            rawDisplayOptions = encode(newValue) ?? "{}"
         }
     }
 
-    var cachedConsoleTaskDisplayOptions: ConsoleTaskDisplayOptions?
+    var cachedDisplayOptions: DisplayOptions?
 
-    @AppStorage("com.github.kean.pulse.consoleTaskDisplayOptions")
-    var rawConsoleTaskDisplayOptions: String = "{}"
-}
+    @AppStorage("com.github.kean.pulse.DisplayOptions")
+    var rawDisplayOptions: String = "{}"
 
-public struct ConsoleTaskDisplayOptions: Codable {
-    /// The line limit for messages in the console. By default, `3`.
-    public var contentLineLimit: Int = 3
+    /// Configuration
+    public struct DisplayOptions: Codable {
+        // MARK: - Content
 
-    // MARK: - Details
+        /// By default, ``FontSize/regular``.
+        public var contentFontSize: Int = defaultContentFontSize
 
-    /// By default, `true`.
-    public var isShowingDetails = true
+        /// The line limit for messages in the console. By default, `3`.
+        public var contentLineLimit: Int = 3
 
-    /// The line limit for messages in the console. By default, `1`.
-    public var detailsLineLimit: Int = 1
+        // MARK: - Details
 
-    /// Fields to display below the main text label.
-    public var detailsFields: [Field]
+        /// By default, `true`.
+        public var isShowingDetails = true
 
-    public enum Field: Codable, Identifiable, CaseIterable {
-        case method
-        case requestSize
-        case responseSize
-        case responseContentType
-        case duration
-        case host
-        case statusCode
-        /// The type of the task, e.g. "Data" or "Download"
-        case taskType
-        /// The `taskDescription` value of `URLSessionTask`.
-        case taskDescription
+        /// The line limit for messages in the console. By default, `1`.
+        public var detailsLineLimit: Int = 1
 
-        public var id: Field { self }
+        /// Fields to display below the main text label.
+        public var detailsFields: [Field]
 
-        var title: String {
-            switch self {
-            case .method: "Method"
-            case .requestSize: "Request Size"
-            case .responseSize: "Response Size"
-            case .responseContentType: "Response Content Type"
-            case .duration: "Duration"
-            case .host: "Host"
-            case .statusCode: "Status Code"
-            case .taskType: "Task Type"
-            case .taskDescription: "Task Description"
+        public enum Field: Codable, Identifiable, CaseIterable {
+            case method
+            case requestSize
+            case responseSize
+            case responseContentType
+            case duration
+            case host
+            case statusCode
+            /// The type of the task, e.g. "Data" or "Download"
+            case taskType
+            /// The `taskDescription` value of `URLSessionTask`.
+            case taskDescription
+
+            public var id: Field { self }
+
+            var title: String {
+                switch self {
+                case .method: "Method"
+                case .requestSize: "Request Size"
+                case .responseSize: "Response Size"
+                case .responseContentType: "Response Content Type"
+                case .duration: "Duration"
+                case .host: "Host"
+                case .statusCode: "Status Code"
+                case .taskType: "Task Type"
+                case .taskDescription: "Task Description"
+                }
             }
         }
-    }
 
-    public init(
-        detailsFields: [Field] = [.method, .requestSize, .responseSize, .duration]
-    ) {
-        self.detailsFields = detailsFields
+        public enum FontSize: CGFloat, Codable {
+            case extraSmall = 0.8
+            case small = 0.9
+            case regular = 1.0
+            case large = 1.1
+            case extraLarge = 1.2
+        }
+
+        public init(
+            detailsFields: [Field] = [.method, .requestSize, .responseSize, .duration]
+        ) {
+            self.detailsFields = detailsFields
+        }
     }
 }
+
+#if os(watchOS)
+let defaultContentFontSize = 15
+#elseif os(macOS)
+let defaultContentFontSize = 13
+#elseif os(iOS) || os(visionOS)
+let defaultContentFontSize = 16
+#elseif os(tvOS)
+let defaultContentFontSize = 25
+#endif
+
+typealias DisplayOptions = UserSettings.DisplayOptions
 
 private func decode<T: Decodable>(_ string: String) -> T? {
     let data = string.data(using: .utf8) ?? Data()

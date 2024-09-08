@@ -12,6 +12,7 @@ struct ConsoleTaskCell: View {
     @ObservedObject var task: NetworkTaskEntity
     var isDisclosureNeeded = false
 
+    @ScaledMetric(relativeTo: .body) private var fontMultiplier = 1.0
     @ObservedObject private var settings: UserSettings = .shared
     @Environment(\.store) private var store: LoggerStore
 
@@ -83,13 +84,17 @@ struct ConsoleTaskCell: View {
         VStack(spacing: 3) {
             HStack {
                 Text(ConsoleViewDelegate.getTitle(for: task) ?? "–")
-                    .font(ConsoleConstants.fontBody)
+                    .font(contentFont)
                     .foregroundColor(.primary)
-                    .lineLimit(settings.consoleTaskDisplayOptions.contentLineLimit)
+                    .lineLimit(settings.displayOptions.contentLineLimit)
 
                 Spacer()
             }
         }
+    }
+
+    private var contentFont: Font {
+        .system(size: CGFloat(settings.displayOptions.contentFontSize) * fontMultiplier)
     }
 
     @ViewBuilder
@@ -97,14 +102,14 @@ struct ConsoleTaskCell: View {
 #if os(watchOS)
         HStack {
             Text(task.httpMethod ?? "GET")
-                .font(ConsoleConstants.fontBody)
+                .font(contentFont)
                 .foregroundColor(.secondary)
             Spacer()
             time
         }
 #elseif os(iOS) || os(visionOS)
         infoText?
-            .lineLimit(settings.consoleTaskDisplayOptions.detailsLineLimit)
+            .lineLimit(settings.displayOptions.detailsLineLimit)
             .font(ConsoleConstants.fontInfo)
             .foregroundColor(.secondary)
             .padding(.top, 2)
@@ -117,12 +122,12 @@ struct ConsoleTaskCell: View {
     }
 
     private var infoText: Text? {
-        guard settings.consoleTaskDisplayOptions.isShowingDetails else {
+        guard settings.displayOptions.isShowingDetails else {
             return nil
         }
         var text = Text("")
         var isEmpty = true
-        for detail in settings.consoleTaskDisplayOptions.detailsFields {
+        for detail in settings.displayOptions.detailsFields {
             if let value = makeText(for: detail) {
                 if !isEmpty {
                     text = text + Text("   ")
@@ -134,7 +139,7 @@ struct ConsoleTaskCell: View {
         return isEmpty ? nil : text
     }
 
-    private func makeText(for detail: ConsoleTaskDisplayOptions.Field) -> Text? {
+    private func makeText(for detail: DisplayOptions.Field) -> Text? {
         switch detail {
         case .method: 
             Text(task.httpMethod ?? "GET")
@@ -228,20 +233,6 @@ struct MockBadgeView: View {
 #if os(tvOS)
             .padding(-2)
 #endif
-    }
-}
-
-private struct ConsoleProgressText: View {
-    let title: String
-    @ObservedObject var viewModel: ProgressViewModel
-
-    var body: some View {
-        (Text(title) +
-         Text("   ") +
-         Text(viewModel.details ?? ""))
-            .font(ConsoleConstants.fontBody.smallCaps())
-            .lineLimit(1)
-            .foregroundColor(.secondary)
     }
 }
 

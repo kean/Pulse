@@ -12,13 +12,14 @@ struct ConsoleMessageCell: View {
     let message: LoggerMessageEntity
     var isDisclosureNeeded = false
 
+    @ScaledMetric(relativeTo: .body) private var fontMultiplier = 1.0
     @ObservedObject private var settings: UserSettings = .shared
 
     var body: some View {
         let contents = VStack(alignment: .leading, spacing: 4) {
             header.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             Text(message.text)
-                .font(ConsoleConstants.fontBody)
+                .font(.system(size: CGFloat(settings.displayOptions.contentFontSize) * fontMultiplier))
                 .foregroundColor(.textColor(for: message.logLevel))
                 .lineLimit(settings.lineLimit)
         }
@@ -124,18 +125,14 @@ struct ConsoleConstants {
 #if os(watchOS)
     static let fontTitle = Font.system(size: 14)
     static let fontInfo = Font.system(size: 14)
-    static let fontBody = Font.system(size: 15)
 #elseif os(macOS)
     static let fontTitle = Font.subheadline
     static let fontInfo = Font.subheadline
-    static let fontBody = Font.body
 #elseif os(iOS) || os(visionOS)
     static let fontTitle = Font.subheadline.monospacedDigit()
     static let fontInfo = Font.caption.monospacedDigit()
-    static let fontBody = Font.callout
 #else
     static let fontTitle = Font.caption
     static let fontInfo = Font.caption
-    static let fontBody = Font.caption
 #endif
 }

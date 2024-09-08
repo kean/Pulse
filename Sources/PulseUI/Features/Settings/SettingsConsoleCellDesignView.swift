@@ -15,14 +15,14 @@ struct SettingsConsoleCellDesignView: View {
             preview
 
             Form {
-                SettingsConsoleTaskOptionsView(options: $settings.consoleTaskDisplayOptions)
+                SettingsConsoleTaskOptionsView(options: $settings.displayOptions)
             }
             .environment(\.editMode, .constant(.active))
         }
         .toolbar {
             ToolbarItem(placement: .destructiveAction) {
                 Button("Reset") {
-                    settings.consoleTaskDisplayOptions = .init()
+                    settings.displayOptions = .init()
                 }
             }
         }
@@ -52,7 +52,7 @@ struct SettingsConsoleCellDesignView: View {
 }
 
 private struct SettingsConsoleTaskOptionsView: View {
-    @Binding var options: ConsoleTaskDisplayOptions
+    @Binding var options: DisplayOptions
 
     @State private var isShowingFieldPicker = false
 
@@ -65,9 +65,13 @@ private struct SettingsConsoleTaskOptionsView: View {
         }
     }
 
+    typealias FontSize = DisplayOptions.FontSize
+
     @ViewBuilder
     private var content: some View {
         Stepper("Line Limit: \(options.contentLineLimit)", value: $options.contentLineLimit, in: 1...20)
+
+        Stepper("Font Size: \(options.contentFontSize)\(options.contentFontSize == defaultContentFontSize ? " (Default)" : "")", value: $options.contentFontSize, in: (defaultContentFontSize-3)...(defaultContentFontSize+3))
     }
 
     @ViewBuilder
@@ -75,6 +79,7 @@ private struct SettingsConsoleTaskOptionsView: View {
         Toggle("Show Details", isOn: $options.isShowingDetails)
 
         if options.isShowingDetails {
+
             Stepper("Line Limit: \(options.detailsLineLimit)", value: $options.detailsLineLimit, in: 1...20)
 
             ForEach(options.detailsFields) { field in
@@ -102,17 +107,18 @@ private struct SettingsConsoleTaskOptionsView: View {
         }
     }
 }
+              
 
 private struct ConsoleFieldPicker: View {
-    @State var selection: ConsoleTaskDisplayOptions.Field?
-    let currentSelection: Set<ConsoleTaskDisplayOptions.Field>
-    let onSelection: (ConsoleTaskDisplayOptions.Field) -> Void
+    @State var selection: DisplayOptions.Field?
+    let currentSelection: Set<DisplayOptions.Field>
+    let onSelection: (DisplayOptions.Field) -> Void
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         Form {
             Picker("Field", selection: $selection) {
-                let remainingCases = ConsoleTaskDisplayOptions.Field.allCases.filter {
+                let remainingCases = DisplayOptions.Field.allCases.filter {
                     !currentSelection.contains($0)
                 }
                 ForEach(remainingCases) { field in
