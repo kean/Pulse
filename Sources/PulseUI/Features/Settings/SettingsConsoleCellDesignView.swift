@@ -69,9 +69,9 @@ private struct SettingsConsoleTaskOptionsView: View {
 
     @ViewBuilder
     private var content: some View {
-        Stepper("Line Limit: \(options.contentLineLimit)", value: $options.contentLineLimit, in: 1...20)
-
         Stepper("Font Size: \(options.contentFontSize)\(options.contentFontSize == defaultContentFontSize ? " (Default)" : "")", value: $options.contentFontSize, in: (defaultContentFontSize-3)...(defaultContentFontSize+3))
+
+        Stepper("Line Limit: \(options.contentLineLimit)", value: $options.contentLineLimit, in: 1...20)
     }
 
     @ViewBuilder
@@ -79,6 +79,7 @@ private struct SettingsConsoleTaskOptionsView: View {
         Toggle("Show Details", isOn: $options.isShowingDetails)
 
         if options.isShowingDetails {
+            Stepper("Font Size: \(options.detailsFontSize)\(options.detailsFontSize == defaultDefailsFontSize ? " (Default)" : "")", value: $options.detailsFontSize, in: (defaultDefailsFontSize-3)...(defaultDefailsFontSize+3))
 
             Stepper("Line Limit: \(options.detailsLineLimit)", value: $options.detailsLineLimit, in: 1...20)
 

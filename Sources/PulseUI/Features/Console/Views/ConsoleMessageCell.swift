@@ -12,14 +12,14 @@ struct ConsoleMessageCell: View {
     let message: LoggerMessageEntity
     var isDisclosureNeeded = false
 
-    @ScaledMetric(relativeTo: .body) private var fontMultiplier = 1.0
+    @ScaledMetric(relativeTo: .body) private var fontMultiplier = 17.0
     @ObservedObject private var settings: UserSettings = .shared
 
     var body: some View {
         let contents = VStack(alignment: .leading, spacing: 4) {
             header.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             Text(message.text)
-                .font(.system(size: CGFloat(settings.displayOptions.contentFontSize) * fontMultiplier))
+                .font(contentFont)
                 .foregroundColor(.textColor(for: message.logLevel))
                 .lineLimit(settings.lineLimit)
         }
@@ -36,7 +36,7 @@ struct ConsoleMessageCell: View {
             Text(title)
                 .lineLimit(1)
 #if os(iOS) || os(visionOS)
-                .font(ConsoleConstants.fontInfo.weight(.medium))
+                .font(detailsFont.weight(.medium))
 #else
                 .font(ConsoleConstants.fontTitle.weight(.medium))
 #endif
@@ -46,7 +46,7 @@ struct ConsoleMessageCell: View {
             HStack(spacing: 3) {
                 Text(ConsoleMessageCell.timeFormatter.string(from: message.createdAt))
                     .lineLimit(1)
-                    .font(ConsoleConstants.fontInfo)
+                    .font(detailsFont)
                     .monospacedDigit()
                     .foregroundColor(.secondary)
                 if isDisclosureNeeded {
@@ -66,6 +66,18 @@ struct ConsoleMessageCell: View {
 
     var titleColor: Color {
         message.logLevel >= .warning ? .textColor(for: message.logLevel) : .secondary
+    }
+
+    // MARK: - Helpers
+
+    private var contentFont: Font {
+        let baseSize = CGFloat(settings.displayOptions.contentFontSize)
+        return Font.system(size: baseSize * (fontMultiplier / 17.0))
+    }
+
+    private var detailsFont: Font {
+        let baseSize = CGFloat(settings.displayOptions.detailsFontSize)
+        return Font.system(size: baseSize * (fontMultiplier / 17.0)).monospacedDigit()
     }
 
     static let timeFormatter: DateFormatter = {
@@ -124,15 +136,11 @@ struct ConsoleMessageCell_Previews: PreviewProvider {
 struct ConsoleConstants {
 #if os(watchOS)
     static let fontTitle = Font.system(size: 14)
-    static let fontInfo = Font.system(size: 14)
 #elseif os(macOS)
     static let fontTitle = Font.subheadline
-    static let fontInfo = Font.subheadline
 #elseif os(iOS) || os(visionOS)
     static let fontTitle = Font.subheadline.monospacedDigit()
-    static let fontInfo = Font.caption.monospacedDigit()
 #else
     static let fontTitle = Font.caption
-    static let fontInfo = Font.caption
 #endif
 }

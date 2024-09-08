@@ -75,7 +75,7 @@ struct ConsoleTaskCell: View {
     private var time: some View {
         Text(ConsoleMessageCell.timeFormatter.string(from: task.createdAt))
             .lineLimit(1)
-            .font(ConsoleConstants.fontInfo)
+            .font(detailsFont)
             .foregroundColor(.secondary)
             .monospacedDigit()
     }
@@ -93,10 +93,6 @@ struct ConsoleTaskCell: View {
         }
     }
 
-    private var contentFont: Font {
-        .system(size: CGFloat(settings.displayOptions.contentFontSize) * fontMultiplier)
-    }
-
     @ViewBuilder
     private var details: some View {
 #if os(watchOS)
@@ -110,7 +106,7 @@ struct ConsoleTaskCell: View {
 #elseif os(iOS) || os(visionOS)
         infoText?
             .lineLimit(settings.displayOptions.detailsLineLimit)
-            .font(ConsoleConstants.fontInfo)
+            .font(detailsFont)
             .foregroundColor(.secondary)
             .padding(.top, 2)
 #else
@@ -166,15 +162,6 @@ struct ConsoleTaskCell: View {
         }
     }
 
-    private func makeInfoText(_ image: String, _ text: String) -> Text {
-        Text(Image(systemName: image)).fontWeight(.light) + Text(" " + text)
-    }
-
-    private func byteCount(for size: Int64) -> String {
-        guard size > 0 else { return "0 KB" }
-        return ByteCountFormatter.string(fromByteCount: size)
-    }
-
     @ViewBuilder
     private var requestHeaders: some View {
         let headerValueMap = settings.displayHeaders.reduce(into: [String: String]()) { partialResult, header in
@@ -194,6 +181,27 @@ struct ConsoleTaskCell: View {
             .padding(.top, 6)
             .padding(.trailing, -7)
         }
+    }
+
+    // MARK: - Helpers
+
+    private var contentFont: Font {
+        let baseSize = CGFloat(settings.displayOptions.contentFontSize)
+        return Font.system(size: baseSize * fontMultiplier)
+    }
+    
+    private var detailsFont: Font {
+        let baseSize = CGFloat(settings.displayOptions.detailsFontSize)
+        return Font.system(size: baseSize * fontMultiplier).monospacedDigit()
+    }
+
+    private func makeInfoText(_ image: String, _ text: String) -> Text {
+        Text(Image(systemName: image)).fontWeight(.light) + Text(" " + text)
+    }
+
+    private func byteCount(for size: Int64) -> String {
+        guard size > 0 else { return "0 KB" }
+        return ByteCountFormatter.string(fromByteCount: size)
     }
 }
 
@@ -218,7 +226,7 @@ struct MockBadgeView: View {
 #elseif os(tvOS)
             .font(.caption2)
 #else
-            .font(ConsoleConstants.fontInfo)
+            .font(ConsoleConstants.fontTitle)
             .fontWeight(.medium)
 #endif
             .foregroundStyle(Color.white)

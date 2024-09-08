@@ -89,6 +89,9 @@ public final class UserSettings: ObservableObject {
         /// By default, `true`.
         public var isShowingDetails = true
 
+        /// By default, ``FontSize/regular``.
+        public var detailsFontSize: Int = defaultDefailsFontSize
+
         /// The line limit for messages in the console. By default, `1`.
         public var detailsLineLimit: Int = 1
 
@@ -143,12 +146,16 @@ public final class UserSettings: ObservableObject {
 
 #if os(watchOS)
 let defaultContentFontSize = 15
+let defaultDefailsFontSize = 13
 #elseif os(macOS)
 let defaultContentFontSize = 13
+let defaultDefailsFontSize = 11
 #elseif os(iOS) || os(visionOS)
 let defaultContentFontSize = 16
+let defaultDefailsFontSize = 13
 #elseif os(tvOS)
 let defaultContentFontSize = 25
+let defaultDefailsFontSize = 20
 #endif
 
 typealias DisplayOptions = UserSettings.DisplayOptions

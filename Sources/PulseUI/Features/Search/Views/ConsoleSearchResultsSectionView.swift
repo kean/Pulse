@@ -15,6 +15,8 @@ struct ConsoleSearchResultView: View {
     var limit: Int = 4
     var isSeparatorNeeded = false
 
+    @ScaledMetric(relativeTo: .body) private var fontMultiplier = 1.0
+    @ObservedObject private var settings: UserSettings = .shared
     @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
@@ -44,9 +46,10 @@ struct ConsoleSearchResultView: View {
     private func makeCell(for occurrence: ConsoleSearchOccurrence) -> some View {
         let contents = VStack(alignment: .leading, spacing: 4) {
             Text(occurrence.preview)
+                .font(contentFont)
                 .lineLimit(3)
             Text(occurrence.scope.title + " (\(occurrence.line):\(occurrence.range.lowerBound + 1))")
-                .font(ConsoleConstants.fontInfo)
+                .font(detailsFont)
                 .foregroundColor(.secondary)
         }
         if #unavailable(iOS 16) {
@@ -84,6 +87,16 @@ struct ConsoleSearchResultView: View {
         case .url, .message, .metadata:
             EmptyView()
         }
+    }
+
+    private var contentFont: Font {
+        let baseSize = CGFloat(settings.displayOptions.contentFontSize)
+        return Font.system(size: baseSize * fontMultiplier)
+    }
+
+    private var detailsFont: Font {
+        let baseSize = CGFloat(settings.displayOptions.detailsFontSize)
+        return Font.system(size: baseSize * fontMultiplier).monospacedDigit()
     }
 }
 
