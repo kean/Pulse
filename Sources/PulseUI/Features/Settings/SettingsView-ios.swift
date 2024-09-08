@@ -25,13 +25,14 @@ public struct SettingsView: View {
                store === RemoteLogger.shared.store {
                 RemoteLoggerSettingsView(viewModel: .shared)
             }
-            Section {
-                NavigationLink(destination: StoreDetailsView(source: .store(store)), label: {
-                    Text("Store Info")
-                })
-            }
-            Section(header: Text("Appearance")) {
-                Stepper("Line Limit: \(settings.lineLimit)", value: $settings.lineLimit, in: 1...20)
+            Section("Appearance") {
+                NavigationLink {
+                    SettingsConsoleCellDesignView()
+                        .environmentObject(settings)
+                } label: {
+                    Text("Cell Design")
+                }
+
                 Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)
             }
             Section(header: Text("List headers"), footer: Text("These headers will be included in the list view")) {
@@ -55,6 +56,11 @@ public struct SettingsView: View {
                     .disabled(newHeaderName.isEmpty)
                 }
             }
+            Section("Other") {
+                NavigationLink(destination: StoreDetailsView(source: .store(store)), label: {
+                    Text("Store Info")
+                })
+            }
         }
         .animation(.default, value: logger.selectedServerName)
         .animation(.default, value: logger.servers)
@@ -66,8 +72,10 @@ public struct SettingsView: View {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            SettingsView(store: .demo)
-                .injecting(ConsoleEnvironment(store: .demo))
+            SettingsView(store: StorePreview.store!)
+                .environmentObject(UserSettings.shared)
+                .injecting(ConsoleEnvironment(store: StorePreview.store!))
+                .navigationTitle("Settings")
         }
     }
 }
