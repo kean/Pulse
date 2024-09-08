@@ -37,6 +37,7 @@ struct ImageThumbnailView: View {
 struct ImagePreviewViewModel {
     let image: UXImage
     let info: KeyValueSectionViewModel
+    let context: FileViewerViewModelContext
 
     init(image: UXImage, data: Data, context: FileViewerViewModelContext) {
         func intValue(for key: String) -> Int? {
@@ -67,11 +68,12 @@ struct ImagePreviewViewModel {
             ("Resolution", originalImageSize.map(formattedResolution)),
             ("Size", ByteCountFormatter.string(fromByteCount: context.originalSize)),
             ("Type", context.contentType?.rawValue),
-            ("Source", isShowingOriginal ? "Original" : "Thumbnail (\(formattedResolution(with: image.size)))")
+            ("Stored", isShowingOriginal ? "Original" : "Thumbnail (\(formattedResolution(with: image.size)))")
         ]
 
         self.image = image
         self.info = KeyValueSectionViewModel(title: "Image", color: .pink, items: info)
+        self.context = context
     }
 }
 

@@ -19,6 +19,24 @@ import ImageIO
 #endif
 
 enum Graphics {
+    static func resize(_ image: UIImage, to size: CGSize) -> PlatformImage? {
+#if os(macOS)
+        let newImage = NSImage(size: newSize)
+        newImage.lockFocus()
+        let sourceRect = NSMakeRect(0, 0, size.width, size.height)
+        let destRect = NSMakeRect(0, 0, newSize.width, newSize.height)
+        draw(in: destRect, from: sourceRect, operation: .sourceOver, fraction: CGFloat(1))
+        newImage.unlockFocus()
+        return newImage
+#else
+        UIGraphicsBeginImageContextWithOptions(size, false, 1.0)
+        image.draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        let thumbnail = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return thumbnail
+#endif
+    }
+
     /// Creates an image thumbnail. Uses significantly less memory than other options.
     static func makeThumbnail(from data: Data, targetSize: CGFloat) -> PlatformImage? {
         guard let source = CGImageSourceCreateWithData(data as CFData, [kCGImageSourceShouldCache: false] as CFDictionary) else {

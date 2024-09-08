@@ -96,9 +96,8 @@ private func getAppIcon() -> Data? {
           let files = primaryIcons["CFBundleIconFiles"] as? [String],
           let lastIcon = files.last,
           let image = PlatformImage(named: lastIcon),
-          let data = Graphics.encode(image),
-          let thumbnail = Graphics.makeThumbnail(from: data, targetSize: 32) else { return nil }
-    return Graphics.encode(thumbnail)
+          let thumbnail = Graphics.resize(image, to: CGSize(width: 44, height: 44)) else { return nil }
+    return Graphics.encode(thumbnail, compressionQuality: 0.9)
 }
 
 #if os(iOS) || os(tvOS) || os(visionOS)

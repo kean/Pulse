@@ -3,6 +3,7 @@
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import Pulse
+import Foundation
 
 struct FileViewerViewModelContext {
     var contentType: NetworkLogger.ContentType?
@@ -10,6 +11,7 @@ struct FileViewerViewModelContext {
     var metadata: [String: String]?
     var isResponse = true
     var error: NetworkLogger.DecodingError?
+    var sourceURL: URL?
 }
 
 extension NetworkTaskEntity {
@@ -29,7 +31,8 @@ extension NetworkTaskEntity {
             originalSize: responseBodySize,
             metadata: metadata,
             isResponse: true,
-            error: decodingError
+            error: decodingError,
+            sourceURL: currentRequest?.url.flatMap(URL.init)
         )
     }
 
