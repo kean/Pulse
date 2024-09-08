@@ -72,6 +72,31 @@ private struct SettingsConsoleTaskOptionsView: View {
         Stepper("Font Size: \(options.contentFontSize)\(options.contentFontSize == defaultContentFontSize ? " (Default)" : "")", value: $options.contentFontSize, in: (defaultContentFontSize-3)...(defaultContentFontSize+3))
 
         Stepper("Line Limit: \(options.contentLineLimit)", value: $options.contentLineLimit, in: 1...20)
+
+        Toggle("Show Task Description", isOn: $options.showTaskDescription)
+
+        NavigationLink {
+            // TODO: navigation link 
+            List(selection: $options.contentComponents) {
+                ForEach(UserSettings.DisplayOptions.ContentComponent.allCases) {
+                    Text($0.rawValue).tag($0.rawValue)
+                }
+            }
+            .navigationTitle("Components")
+            .navigationBarTitleDisplayMode(.inline)
+        } label: {
+            HStack {
+                Text("URL Components")
+                Spacer()
+                if options.contentComponents.count == 1 {
+                    Text(options.contentComponents.first!.rawValue)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(options.contentComponents.count.description)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -153,7 +178,7 @@ enum StorePreview {
     static let previewTask: NetworkTaskEntity? = {
         guard let store else { return nil }
 
-        let url = URL(string: "https://api.example.com/v2.1/sites/91023547/users/49032328/profile?locale=en&fields=id,firstName,lastName,email,avatarURL")!
+        let url = URL(string: "https://user:password@api.example.com:443/v2.1/sites/91023547/users/49032328/profile?locale=en&fields=id,firstName,lastName,email,avatarURL#me")!
 
         var request = URLRequest(url: url)
         request.setValue("Pulse", forHTTPHeaderField: "User-Agent")

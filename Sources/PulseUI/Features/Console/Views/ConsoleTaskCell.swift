@@ -25,7 +25,7 @@ struct ConsoleTaskCell: View {
 
         let contents = VStack(alignment: .leading, spacing: spacing) {
             title.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-            message
+            content
 #if !os(macOS)
             details
 #endif
@@ -80,17 +80,11 @@ struct ConsoleTaskCell: View {
             .monospacedDigit()
     }
 
-    private var message: some View {
-        VStack(spacing: 3) {
-            HStack {
-                Text(ConsoleViewDelegate.getTitle(for: task) ?? "–")
-                    .font(contentFont)
-                    .foregroundColor(.primary)
-                    .lineLimit(settings.displayOptions.contentLineLimit)
-
-                Spacer()
-            }
-        }
+    private var content: some View {
+        Text(task.getFormattedContent(options: settings.displayOptions) ?? "–")
+            .font(contentFont)
+            .lineLimit(settings.displayOptions.contentLineLimit)
+            .foregroundColor(.primary)
     }
 
     @ViewBuilder

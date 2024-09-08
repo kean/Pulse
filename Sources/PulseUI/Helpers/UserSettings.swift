@@ -78,6 +78,13 @@ public final class UserSettings: ObservableObject {
     public struct DisplayOptions: Codable {
         // MARK: - Content
 
+        /// If task description is available, show it instead of the `URL`.
+        public var showTaskDescription = false
+
+        /// Defines what components to display in the list. By default, shows
+        /// only path.
+        public var contentComponents: Set<ContentComponent> = [.path]
+
         /// By default, ``FontSize/regular``.
         public var contentFontSize: Int = defaultContentFontSize
 
@@ -97,6 +104,12 @@ public final class UserSettings: ObservableObject {
 
         /// Fields to display below the main text label.
         public var detailsFields: [Field]
+
+        public enum ContentComponent: String, Identifiable, CaseIterable, Codable {
+            case scheme, user, password, host, port, path, query, fragment
+
+            public var id: ContentComponent { self }
+        }
 
         public enum Field: Codable, Identifiable, CaseIterable {
             case method
@@ -152,7 +165,7 @@ let defaultContentFontSize = 13
 let defaultDefailsFontSize = 11
 #elseif os(iOS) || os(visionOS)
 let defaultContentFontSize = 16
-let defaultDefailsFontSize = 13
+let defaultDefailsFontSize = 12
 #elseif os(tvOS)
 let defaultContentFontSize = 25
 let defaultDefailsFontSize = 20
