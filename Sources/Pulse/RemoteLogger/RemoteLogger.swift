@@ -450,8 +450,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         let body = PacketClientHello(
             version: Version.currentProtocolVersion.description,
             deviceId: getDeviceId() ?? getFallbackDeviceId(),
-            deviceInfo: .make(),
-            appInfo: .make(),
+            deviceInfo: .current,
+            appInfo: .current,
             session: store?.session
         )
         connection?.send(code: .clientHello, entity: body)

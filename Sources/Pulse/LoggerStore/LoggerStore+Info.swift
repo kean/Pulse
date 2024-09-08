@@ -79,15 +79,13 @@ enum AppInfo {
 }
 
 extension LoggerStore.Info.AppInfo {
-    static func make() -> LoggerStore.Info.AppInfo {
-        LoggerStore.Info.AppInfo(
-            bundleIdentifier: AppInfo.bundleIdentifier,
-            name: AppInfo.appName,
-            version: AppInfo.appVersion,
-            build: AppInfo.appBuild,
-            icon: getAppIcon()?.base64EncodedString()
-        )
-    }
+    static let current = LoggerStore.Info.AppInfo(
+        bundleIdentifier: AppInfo.bundleIdentifier,
+        name: AppInfo.appName,
+        version: AppInfo.appVersion,
+        build: AppInfo.appBuild,
+        icon: getAppIcon()?.base64EncodedString()
+    )
 }
 
 private func getAppIcon() -> Data? {
@@ -110,7 +108,7 @@ func getDeviceId() -> UUID? {
 
 extension LoggerStore.Info.DeviceInfo {
     @MainActor
-static func make() -> LoggerStore.Info.DeviceInfo {
+    static let current: LoggerStore.Info.DeviceInfo = {
         let device = UIDevice.current
         return LoggerStore.Info.DeviceInfo(
             name: device.name,
@@ -119,7 +117,7 @@ static func make() -> LoggerStore.Info.DeviceInfo {
             systemName: device.systemName,
             systemVersion: device.systemVersion
         )
-    }
+    }()
 }
 #elseif os(watchOS)
 import WatchKit
@@ -131,7 +129,7 @@ func getDeviceId() -> UUID? {
 
 extension LoggerStore.Info.DeviceInfo {
     @MainActor
-static func make() -> LoggerStore.Info.DeviceInfo {
+    static let current: LoggerStore.Info.DeviceInfo = {
         let device = WKInterfaceDevice.current()
         return LoggerStore.Info.DeviceInfo(
             name: device.name,
@@ -140,14 +138,14 @@ static func make() -> LoggerStore.Info.DeviceInfo {
             systemName: device.systemName,
             systemVersion: device.systemVersion
         )
-    }
+    }()
 }
 #else
 import AppKit
 
 extension LoggerStore.Info.DeviceInfo {
     @MainActor
-static func make() -> LoggerStore.Info.DeviceInfo {
+    static let current: LoggerStore.Info.DeviceInfo = {
         return LoggerStore.Info.DeviceInfo(
             name: Host.current().name ?? "unknown",
             model: "unknown",
@@ -155,7 +153,7 @@ static func make() -> LoggerStore.Info.DeviceInfo {
             systemName: "macOS",
             systemVersion: ProcessInfo().operatingSystemVersionString
         )
-    }
+    }()
 }
 
 @MainActor

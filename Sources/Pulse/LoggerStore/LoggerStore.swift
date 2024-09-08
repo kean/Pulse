@@ -178,7 +178,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         var createSession = false
         if options.contains(.create) && !options.contains(.readonly) && configuration.isAutoStartingSession {
             perform { _ in
-                self.saveEntity(for: self.session, info: .make())
+                self.saveEntity(for: self.session, info: .current)
             }
             createSession = true
         }
@@ -791,7 +791,7 @@ extension LoggerStore {
         try? deleteEntities(for: LoggerMessageEntity.fetchRequest())
         try? deleteEntities(for: LoggerBlobHandleEntity.fetchRequest())
         try? deleteEntities(for: LoggerSessionEntity.fetchRequest())
-        saveEntity(for: session, info: .make())
+        saveEntity(for: session, info: .current)
 
         try? Files.removeItem(at: blobsURL)
         Files.createDirectoryIfNeeded(at: blobsURL)
@@ -1133,7 +1133,7 @@ extension LoggerStore {
     ///
     /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
     public func info() async throws -> Info {
-        let deviceInfo = await LoggerStore.Info.DeviceInfo.make()
+        let deviceInfo = await LoggerStore.Info.DeviceInfo.current
         return try await container.performBackgroundTask { context in
             return try self._info(in: context, deviceInfo: deviceInfo)
         }
@@ -1157,7 +1157,7 @@ extension LoggerStore {
             totalStoreSize: try storeURL.directoryTotalSize(),
             blobsSize: try getBlobsSize(),
             blobsDecompressedSize: try getBlobsSize(isDecompressed: true),
-            appInfo: .make(),
+            appInfo: .current,
             deviceInfo: deviceInfo
         )
     }
