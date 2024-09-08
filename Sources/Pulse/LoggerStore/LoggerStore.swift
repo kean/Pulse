@@ -756,12 +756,47 @@ extension LoggerStore {
 // MARK: - LoggerStore (Accessing Messages)
 
 extension LoggerStore {
-    /// Returns all recorded messages, least recent messages come first.
+    /// Returns messages stored in the logger.
+    ///
+    /// - note: The result includes log messages with associated tasks. If you
+    /// want to exclude them, pass `NSPredicate(format: "task == NULL")` as a predicate
+    ///
+    /// - parameter sortDescriptors: Sort descriptors. By default, sort by
+    /// ``NetworkTaskEntity/createdAt`` in the chronological order.
+    /// - parameter predicate: By default, `nil`.
+    public func messages(
+        sortDescriptors: [SortDescriptor<LoggerMessageEntity>] = [SortDescriptor(\.createdAt, order: .forward)],
+        predicate: NSPredicate? = nil
+    ) throws -> [LoggerMessageEntity] {
+        try viewContext.fetch(LoggerMessageEntity.self) {
+            $0.sortDescriptors = sortDescriptors.map(NSSortDescriptor.init)
+            $0.predicate = predicate
+        }
+    }
+
+    /// Returns tasks stored in the logger.
+    ///
+    /// - parameter sortDescriptors: Sort descriptors. By default, sort by
+    /// ``NetworkTaskEntity/createdAt`` in the chronological order.
+    /// - parameter predicate: By default, `nil`.
+    public func tasks(
+        sortDescriptors: [SortDescriptor<NetworkTaskEntity>] = [SortDescriptor(\.createdAt, order: .forward)],
+        predicate: NSPredicate? = nil
+    ) throws -> [NetworkTaskEntity] {
+        try viewContext.fetch(NetworkTaskEntity.self) {
+            $0.sortDescriptors = sortDescriptors.map(NSSortDescriptor.init)
+            $0.predicate = predicate
+        }
+    }
+
+    /// Deprecated in Pulse 5.1.
+    @available(*, deprecated, message: "Replaced with `message(sortDescriptors:predicate)`")
     public func allMessages() throws -> [LoggerMessageEntity] {
         try viewContext.fetch(LoggerMessageEntity.self, sortedBy: \.createdAt)
     }
 
-    /// Returns all recorded network requests, least recent messages come first.
+    /// Deprecated in Pulse 5.1.
+    @available(*, deprecated, message: "Replaced with `tasks(sortDescriptors:predicate)`")
     public func allTasks() throws -> [NetworkTaskEntity] {
         try viewContext.fetch(NetworkTaskEntity.self, sortedBy: \.createdAt)
     }

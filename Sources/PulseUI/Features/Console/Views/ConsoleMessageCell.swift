@@ -112,7 +112,7 @@ extension Color {
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleMessageCell_Previews: PreviewProvider {
     static var previews: some View {
-        ConsoleMessageCell(message: try! LoggerStore.mock.allMessages()[0])
+        ConsoleMessageCell(message: try! LoggerStore.mock.messages()[0])
             .injecting(ConsoleEnvironment(store: .mock))
             .padding()
             .previewLayout(.sizeThatFits)

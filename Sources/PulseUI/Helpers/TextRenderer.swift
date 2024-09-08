@@ -437,7 +437,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             RichTextView(viewModel: .init(string: stringWithColor))
                 .previewDisplayName("Task (Color)")
 
-            RichTextView(viewModel: .init(string: NSAttributedString(string: ShareStoreTask(entities: try! LoggerStore.mock.allMessages(), store: .mock, output: .plainText, completion: { _ in }).share().items[0] as! String)))
+            RichTextView(viewModel: .init(string: NSAttributedString(string: ShareStoreTask(entities: try! LoggerStore.mock.messages(), store: .mock, output: .plainText, completion: { _ in }).share().items[0] as! String)))
                 .previewDisplayName("Task (Plain)")
 
             RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task.orderedTransactions[0]) }))

@@ -16,8 +16,8 @@
 
 ### Accessing Logs
 
-- ``allMessages()``
-- ``allTasks()``
+- ``messages(sortDescriptors:predicate:)``
+- ``tasks(sortDescriptors:predicate:)``
 
 ### Exporting Logs
 
@@ -61,3 +61,8 @@
 - ``Metadata``
 - ``Session-swift.struct``
 - ``Version-swift.struct``
+
+### Deprecated
+
+- ``allMessages()``
+- ``allTasks()``

@@ -121,7 +121,7 @@ struct ConsoleFiltersView_Previews: PreviewProvider {
 @available(iOS 15, macOS 13, visionOS 1.0, *)
 private func makePreview(isOnlyNetwork: Bool) -> some View {
     let store = LoggerStore.mock
-    let entities: [NSManagedObject] = try! isOnlyNetwork ? store.allTasks() : store.allMessages()
+    let entities: [NSManagedObject] = try! isOnlyNetwork ? store.tasks() : store.messages()
     let viewModel = ConsoleFiltersViewModel(options: .init())
     viewModel.entities.send(entities)
     viewModel.mode = isOnlyNetwork ? .network : .all

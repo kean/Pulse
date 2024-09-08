@@ -400,7 +400,7 @@ extension LoggerStore {
         var configuration = NetworkLogger.Configuration()
         configuration.isWaitingForDecoding = true
         _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self, configuration: configuration))
-        let task = (try! allTasks()).first { $0.url == task.originalRequest.url?.absoluteString }
+        let task = (try! tasks()).first { $0.url == task.originalRequest.url?.absoluteString }
         assert(task != nil)
         return task!
     }

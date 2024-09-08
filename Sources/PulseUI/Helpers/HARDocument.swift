@@ -18,7 +18,7 @@ struct HARDocument: Encodable {
     init(store: LoggerStore) throws {
         var entries: [Entry] = []
         var pages: [Page] = []
-        try Dictionary(grouping: store.allTasks(), by: \.url).values.forEach { networkTasks in
+        try Dictionary(grouping: store.tasks(), by: \.url).values.forEach { networkTasks in
             let pageId = "page_\(pages.count)"
             pages.append(
                 .init(
@@ -29,7 +29,7 @@ struct HARDocument: Encodable {
             )
             entries.append(contentsOf: networkTasks.map { .init(entity: $0, pageId: pageId) })
         }
-        try store.allMessages().forEach { message in
+        try store.messages().forEach { message in
             if let task = message.task {
                 entries.append(.init(entity: task, pageId: "page_\(pages.count)"))
             }
