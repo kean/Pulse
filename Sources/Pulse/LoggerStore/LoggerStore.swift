@@ -117,10 +117,12 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     ///   and ``LoggerStore/Options-swift.struct/sweep`` options.
     ///   - configuration: The store configuration specifying size limit, etc.
     public init(storeURL: URL, options: Options = [.create, .sweep], configuration: Configuration = .init()) throws {
-        var isDirectory: ObjCBool = ObjCBool(false)
-        let fileExists = Files.fileExists(atPath: storeURL.path, isDirectory: &isDirectory)
-        guard (fileExists && isDirectory.boolValue) || options.contains(.create) else {
-            throw LoggerStore.Error.fileDoesntExist
+        if !options.contains(.inMemory) {
+            var isDirectory: ObjCBool = ObjCBool(false)
+            let fileExists = Files.fileExists(atPath: storeURL.path, isDirectory: &isDirectory)
+            guard (fileExists && isDirectory.boolValue) || options.contains(.create) else {
+                throw LoggerStore.Error.fileDoesntExist
+            }
         }
 
         self.storeURL = storeURL
@@ -131,7 +133,9 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         self.options = options
         self.configuration = configuration
 
-        if options.contains(.create) {
+        if options.contains(.inMemory) {
+            // Do nothing
+        } else if options.contains(.create) {
             if !Files.fileExists(atPath: storeURL.path) {
                 try Files.createDirectory(at: storeURL, withIntermediateDirectories: false)
             }
@@ -660,8 +664,10 @@ extension LoggerStore {
         entity.isUncompressed = compressedData == nil
         if processedData.count <= configuration.inlineLimit {
             entity.inlineData = processedData
-        } else {
+        } else if !options.contains(.inMemory) {
             try? processedData.write(to: makeBlobURL(for: key.hexString))
+        } else {
+            // File is too large for the in-memory store
         }
         return entity
     }
@@ -1181,6 +1187,7 @@ extension LoggerStore {
     }
 
     private func save(_ manifest: Manifest) throws {
+        guard !options.contains(.inMemory) else { return }
         try JSONEncoder().encode(manifest).write(to: manifestURL)
     }
 }

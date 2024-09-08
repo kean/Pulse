@@ -14,6 +14,8 @@ LoggerStore.shared.configuration.sizeLimit = 512 * 1_000_000
 
 > important: Make sure to change it at the app launch before sending any logs.
 
+> tip: Use ``LoggerStore/Options-swift.struct/inMemory`` if you want to prevent any logs from being recorded persistently
+
 ### Exporting Logs
 
 If you want to provide additional ways to share the logs recorded by the store, use ``LoggerStore/export(to:options:)``.

@@ -40,11 +40,11 @@ extension LoggerStore {
         /// disallow any other modifications.
         public static let readonly = Options(rawValue: 1 << 3)
 
-        /// Logs are not persistent on the device storage and new log file is created on each app session.
-        /// Core Data is configured with container type as `NSInMemoryStoreType
+        /// When this option is used, the store writes nothing on disk.
         ///
-        /// - warning: This options is not recommended for general use. Use it only when persistent logs do not suite
-        /// your use case, eg. for security reasons you can not store user logs on device storage
+        /// - note: The `storeURL` parameter can point to anything, including `/dev/null`.
+        /// There is no need to pass the ``create`` option. The ``sweep`` option
+        /// will still work with the in-memory store.
         public static let inMemory = Options(rawValue: 1 << 4)
     }
 
