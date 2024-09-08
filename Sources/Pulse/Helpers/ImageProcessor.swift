@@ -19,21 +19,24 @@ import ImageIO
 #endif
 
 enum Graphics {
-    static func resize(_ image: UIImage, to size: CGSize) -> PlatformImage? {
-#if os(macOS)
-        let newImage = NSImage(size: newSize)
-        newImage.lockFocus()
-        let sourceRect = NSMakeRect(0, 0, size.width, size.height)
-        let destRect = NSMakeRect(0, 0, newSize.width, newSize.height)
-        draw(in: destRect, from: sourceRect, operation: .sourceOver, fraction: CGFloat(1))
-        newImage.unlockFocus()
-        return newImage
-#else
+    static func resize(_ image: PlatformImage, to size: CGSize) -> PlatformImage? {
+#if canImport(UIKit)
         UIGraphicsBeginImageContextWithOptions(size, false, 1.0)
         image.draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
         let thumbnail = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return thumbnail
+#elseif canImport(AppKit)
+        let newImage = NSImage(size: size)
+        newImage.lockFocus()
+        image.draw(in: NSMakeRect(0, 0, size.width, size.height),
+             from: NSMakeRect(0, 0, image.size.width, image.size.height),
+             operation: .sourceOver,
+             fraction: CGFloat(1))
+        newImage.unlockFocus()
+        return newImage
+#else
+        return image
 #endif
     }
 
