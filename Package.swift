@@ -8,19 +8,19 @@ let package = Package(
         .tvOS(.v15),
         .macOS(.v12),
         .watchOS(.v8),
-        .visionOS(.v1)
+        .visionOS(.v1),
     ],
     products: [
         .library(name: "Pulse", targets: ["Pulse"]),
         .library(name: "PulseProxy", targets: ["PulseProxy"]),
-        .library(name: "PulseUI", targets: ["PulseUI"])
+        .library(name: "PulseUI", targets: ["PulseUI"]),
     ],
     targets: [
-        .target(name: "Pulse"),
+        .target(name: "Pulse", exclude: ["PrivacyInfo.xcprivacy"]),
         .target(name: "PulseProxy", dependencies: ["Pulse"]),
-        .target(name: "PulseUI", dependencies: ["Pulse"]),
+        .target(name: "PulseUI", dependencies: ["Pulse"], exclude: ["PrivacyInfo.xcprivacy"]),
     ],
     swiftLanguageVersions: [
-      .v5
+        .v5
     ]
 )
