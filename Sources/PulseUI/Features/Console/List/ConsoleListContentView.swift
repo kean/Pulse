@@ -32,6 +32,9 @@ struct ConsoleListContentView: View {
                     .onAppear { viewModel.onAppearCell(with: objectID) }
                     .onDisappear { viewModel.onDisappearCell(with: objectID) }
 #endif
+#if os(iOS)
+                    .listRowInsets(EdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 16))
+#endif
             }
         }
         footerView

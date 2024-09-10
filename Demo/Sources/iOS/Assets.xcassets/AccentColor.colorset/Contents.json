@@ -2,13 +2,8 @@
   "colors" : [
     {
       "color" : {
-        "color-space" : "srgb",
-        "components" : {
-          "alpha" : "1.000",
-          "blue" : "0.839",
-          "green" : "0.337",
-          "red" : "0.345"
-        }
+        "platform" : "osx",
+        "reference" : "systemBlueColor"
       },
       "idiom" : "universal"
     },
@@ -20,13 +15,8 @@
         }
       ],
       "color" : {
-        "color-space" : "srgb",
-        "components" : {
-          "alpha" : "1.000",
-          "blue" : "0.902",
-          "green" : "0.361",
-          "red" : "0.369"
-        }
+        "platform" : "osx",
+        "reference" : "systemBlueColor"
       },
       "idiom" : "universal"
     }

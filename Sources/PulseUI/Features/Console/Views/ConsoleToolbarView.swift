@@ -26,7 +26,7 @@ struct ConsoleToolbarView: View {
     }
 
     private var horizontal: some View {
-        HStack(alignment: .bottom, spacing: 0) {
+        HStack(alignment: .center, spacing: 0) {
             contents(isVertical: false)
         }
         .buttonStyle(.plain)
@@ -70,7 +70,7 @@ struct ConsoleModePicker: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 7) {
             ConsoleModeButton(title: "Network", details: CountFormatter.string(from: tasksCounter.count), isSelected: environment.mode == .network) {
                 environment.mode = .network
             }
@@ -108,20 +108,24 @@ struct ConsoleModeButton: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 4) {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(title)
-                    .foregroundColor(isSelected ? Color.accentColor : Color.secondary)
+                    .foregroundColor(isSelected ? Color.white : Color.secondary)
                     .font(.subheadline.weight(.medium))
                     .lineLimit(1)
                     .allowsTightening(true)
                 if let details = details {
-                    Text("(\(details))")
-                        .foregroundColor(isSelected ? Color.accentColor.opacity(0.7) : Color.secondary.opacity(0.7))
-                        .font(.subheadline)
+                    Text("\(details)")
+                        .foregroundColor(isSelected ? Color.white.opacity(0.7) : Color.secondary.opacity(0.7))
+                        .font(.footnote)
+                        .monospacedDigit()
                         .lineLimit(1)
                         .allowsTightening(true)
                 }
             }
+            .padding(EdgeInsets(top: 8, leading: 9, bottom: 8, trailing: 8))
+            .background(isSelected ? Color.accentColor : Color(.secondarySystemFill).opacity(0.8))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
         }
         .buttonStyle(.plain)
     }
@@ -135,7 +139,7 @@ struct ConsoleListOptionsView: View {
         Button(action: { filters.options.isOnlyErrors.toggle() }) {
             Text(Image(systemName: filters.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon"))
                 .font(.body)
-                .foregroundColor(.accentColor)
+                .foregroundColor(.red)
         }
         .cornerRadius(4)
         .padding(.leading, 1)

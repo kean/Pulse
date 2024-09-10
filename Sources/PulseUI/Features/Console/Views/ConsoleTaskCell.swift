@@ -39,7 +39,7 @@ struct ConsoleTaskCell: View {
         }
         .overlay(alignment: .leading) {
             StatusIndicatorView(state: task.state(in: store))
-                .offset(x: -14)
+                .offset(x: -15)
         }
         .overlay(alignment: .trailing) {
             if isDisclosureNeeded {
@@ -161,7 +161,7 @@ private struct StatusIndicatorView: View {
     var body: some View {
         Image(systemName: "circle.fill")
             .foregroundStyle(color)
-            .font(.system(size: 8))
+            .font(.system(size: 10))
             .clipShape(RoundedRectangle(cornerRadius: 3))
     }
 
