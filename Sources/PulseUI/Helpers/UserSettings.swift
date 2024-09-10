@@ -150,7 +150,7 @@ public final class UserSettings: ObservableObject {
         }
 
         public init(
-            detailsFields: [Field] = [.method, .requestSize, .responseSize, .duration]
+            detailsFields: [Field] = [.responseSize, .duration]
         ) {
             self.detailsFields = detailsFields
         }

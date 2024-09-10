@@ -302,7 +302,7 @@ private let mockReposBody = Bundle.main.url(forResource: "repos", withExtension:
 
 // MARK: - /CreateAPI (GET, redirect)
 
-private let mockCreateAPIOriginalRequest = URLRequest(url: "https://github.com/CreateAPI/Get")
+private let mockCreateAPIOriginalRequest = URLRequest(url: "https://github.com/createapi/get")
 
 private let mockCreateAPICurrentRequest = mockCreateAPIOriginalRequest.adding(headers: [
     "User-Agent": "Pulse Demo/2.0",
@@ -311,14 +311,14 @@ private let mockCreateAPICurrentRequest = mockCreateAPIOriginalRequest.adding(he
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
 ])
 
-private let mockCreateAPIRedirectRequest = URLRequest(url: "https://github.com/kean/Get").adding(headers: [
+private let mockCreateAPIRedirectRequest = URLRequest(url: "https://github.com/kean/get").adding(headers: [
     "User-Agent": "Pulse Demo/2.0",
     "Accept-Encoding": "gzip",
     "Accept-Language": "en-us",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
 ])
 
-private let mockCreateaAPIRedirectResponse = HTTPURLResponse(url: "https://github.com/CreateAPI/Get", statusCode: 301, headers: [
+private let mockCreateaAPIRedirectResponse = HTTPURLResponse(url: "https://github.com/createapi/get", statusCode: 301, headers: [
     "Content-Type": "text/html; charset=utf-8",
     "Location": "https://github.com/kean/Get",
     "Cache-Control": "no-cache",
@@ -326,7 +326,7 @@ private let mockCreateaAPIRedirectResponse = HTTPURLResponse(url: "https://githu
     "Server": "GitHub.com"
 ])
 
-private let mockCreateaAPIResponse = HTTPURLResponse(url: "https://github.com/kean/Get", statusCode: 200, headers: [
+private let mockCreateaAPIResponse = HTTPURLResponse(url: "https://github.com/kean/get", statusCode: 200, headers: [
     "Content-Type": "text/html; charset=utf-8",
     "Content-Length": "90",
     "Cache-Control": "no-store"
@@ -349,7 +349,7 @@ private let mockCreateaAPIBody = """
 // MARK: - PATCH
 
 private let mockPatchRepoOriginalRequest: URLRequest = {
-    var request = URLRequest(url: "https://github.com/repos/kean/Nuke", method: "PATCH")
+    var request = URLRequest(url: "https://github.com/repos/kean/nuke", method: "PATCH")
     request.httpBody = """
     name=ImageKit&description=Image%20Loading%Framework&private=false
     """.data(using: .utf8)
@@ -364,7 +364,7 @@ private let mockPatchRepoCurrentRequest = mockPatchRepoOriginalRequest.adding(he
     "Accept": "application/vnd.github+json"
 ])
 
-private let mockPatchRepoResponse = HTTPURLResponse(url: "https://github.com/repos/kean/Nuke", statusCode: 200, headers: [
+private let mockPatchRepoResponse = HTTPURLResponse(url: "https://github.com/repos/kean/nuke", statusCode: 200, headers: [
     "Content-Length": "165061",
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
@@ -447,7 +447,7 @@ private let mockPatchRepoDecodingError: Error = {
 
 // MARK: - Download (GET)
 
-private let mockDownloadNukeOriginalRequest = URLRequest(url: "https://github.com/kean/Nuke/archive/tags/11.0.0.zip")
+private let mockDownloadNukeOriginalRequest = URLRequest(url: "https://github.com/kean/nuke/archive/tags/11.0.0.zip")
 
 private let mockDownloadNukeCurrentRequest = mockDownloadNukeOriginalRequest.adding(headers: [
     "User-Agent": "Pulse Demo/2.0",
@@ -456,7 +456,7 @@ private let mockDownloadNukeCurrentRequest = mockDownloadNukeOriginalRequest.add
     "Accept": "*/*"
 ])
 
-private let mockDownloadNukeRedirectResponse = HTTPURLResponse(url: "https://codeload.github.com/kean/Nuke/zip/tags/11.0.0", statusCode: 302, headers: [
+private let mockDownloadNukeRedirectResponse = HTTPURLResponse(url: "https://codeload.github.com/kean/nuke/zip/tags/11.0.0", statusCode: 302, headers: [
     "Server": "GitHub.com",
     "Content-Type": "text/html; charset=utf-8",
     "Location": "https://codeload.github.com/kean/Nuke/zip/tags/11.0.0",
@@ -465,7 +465,7 @@ private let mockDownloadNukeRedirectResponse = HTTPURLResponse(url: "https://cod
     "Content-Security-Policy": "default-src 'none'; base-uri 'self'; block-all-mixed-content; child-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/; connect-src 'self' uploads.github.com objects-origin.githubusercontent.com www.githubstatus.com collector.github.com raw.githubusercontent.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com cdn.optimizely.com logx.optimizely.com/v1/events *.actions.githubusercontent.com wss://*.actions.githubusercontent.com online.visualstudio.com/api/v1/locations github-production-repository-image-32fea6.s3.amazonaws.com github-production-release-asset-2e65be.s3.amazonaws.com"
 ])
 
-private let mockDownloadNukeResponse = HTTPURLResponse(url: "https://codeload.github.com/kean/Nuke/zip/tags/11.0.0", statusCode: 200, headers: [
+private let mockDownloadNukeResponse = HTTPURLResponse(url: "https://codeload.github.com/kean/nuke/zip/tags/11.0.0", statusCode: 200, headers: [
     "Content-Type": "application/zip",
     "Content-Disposition": "attachment; filename=Nuke-11.0.0.zip",
     "Etag": "W/\\\"4358c3c3d9bd5a22f6d86b47cbe567417fa1efc8df6beaa54c1730caf6ad86da\\\"",

@@ -35,23 +35,18 @@ struct ConsoleMessageCell: View {
         HStack {
             Text(title)
                 .lineLimit(1)
-#if os(iOS) || os(visionOS)
-                .font(detailsFont.weight(.medium))
-#else
-                .font(ConsoleConstants.fontTitle.weight(.medium))
-#endif
+                .font(.footnote)
                 .foregroundColor(titleColor)
             Spacer()
             Components.makePinView(for: message)
             HStack(spacing: 3) {
-                Text(ConsoleMessageCell.timeFormatter.string(from: message.createdAt))
-                    .lineLimit(1)
-                    .font(detailsFont)
-                    .monospacedDigit()
-                    .foregroundColor(.secondary)
-                if isDisclosureNeeded {
-                    ListDisclosureIndicator()
-                }
+                ConsoleTimestampView(date: message.createdAt)
+                    .overlay(alignment: .trailing) {
+                        if isDisclosureNeeded {
+                            ListDisclosureIndicator()
+                                .offset(x: 11, y: 0)
+                        }
+                    }
             }
         }
     }
@@ -91,11 +86,9 @@ struct ConsoleMessageCell: View {
 struct ListDisclosureIndicator: View {
     var body: some View {
         Image(systemName: "chevron.right")
-            .foregroundColor(Color.separator)
             .lineLimit(1)
-            .font(ConsoleConstants.fontTitle)
-            .foregroundColor(.secondary)
-            .padding(.trailing, -12)
+            .font(.caption2.weight(.bold))
+            .foregroundColor(.secondary.opacity(0.33))
     }
 }
 
