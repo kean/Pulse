@@ -23,6 +23,7 @@ struct ConsoleListContentView: View {
             Text("Empty")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
+                .listRowInsets(EdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 16))
         } else {
             ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
                 let objectID = entity.objectID
@@ -33,11 +34,12 @@ struct ConsoleListContentView: View {
                     .onDisappear { viewModel.onDisappearCell(with: objectID) }
 #endif
 #if os(iOS)
-                    .listRowInsets(EdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 16))
+                    .listRowInsets(EdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 16))
 #endif
             }
         }
         footerView
+            .listRowInsets(EdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 16))
     }
 
     @ViewBuilder

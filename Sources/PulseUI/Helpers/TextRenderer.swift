@@ -447,7 +447,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
                 .previewLayout(.fixed(width: 1160, height: 2000)) // Disable interaction to view it
                 .previewDisplayName("HTML (Raw)")
 
-#if !os(tvOS)
+#if os(iOS)
             WebView(data: html, contentType: "application/html")
                 .edgesIgnoringSafeArea([.bottom])
                 .previewDisplayName("HTML")

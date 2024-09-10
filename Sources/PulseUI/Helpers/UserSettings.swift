@@ -102,8 +102,13 @@ public final class UserSettings: ObservableObject {
         /// The line limit for messages in the console. By default, `1`.
         public var detailsLineLimit: Int = 1
 
+#if os(macOS) || os(tvOS)
         /// Fields to display below the main text label.
-        public var detailsFields: [Field]
+        public var detailsFields: [Field] = [.responseSize, .duration, .host]
+#else
+        /// Fields to display below the main text label.
+        public var detailsFields: [Field] = [.responseSize, .duration]
+#endif
 
         public enum ContentComponent: String, Identifiable, CaseIterable, Codable {
             case scheme, user, password, host, port, path, query, fragment
@@ -149,26 +154,22 @@ public final class UserSettings: ObservableObject {
             case extraLarge = 1.2
         }
 
-        public init(
-            detailsFields: [Field] = [.responseSize, .duration]
-        ) {
-            self.detailsFields = detailsFields
-        }
+        public init() {}
     }
 }
 
 #if os(watchOS)
-let defaultContentFontSize = 15
-let defaultDefailsFontSize = 13
+let defaultContentFontSize = 17
+let defaultDefailsFontSize = 14
 #elseif os(macOS)
 let defaultContentFontSize = 13
 let defaultDefailsFontSize = 11
 #elseif os(iOS) || os(visionOS)
-let defaultContentFontSize = 16
-let defaultDefailsFontSize = 12
+let defaultContentFontSize = 17
+let defaultDefailsFontSize = 13
 #elseif os(tvOS)
-let defaultContentFontSize = 25
-let defaultDefailsFontSize = 20
+let defaultContentFontSize = 27
+let defaultDefailsFontSize = 21
 #endif
 
 typealias DisplayOptions = UserSettings.DisplayOptions

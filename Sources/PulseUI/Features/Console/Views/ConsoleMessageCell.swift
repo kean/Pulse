@@ -7,7 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 15, visionOS 1, *)
 struct ConsoleMessageCell: View {
     let message: LoggerMessageEntity
     var isDisclosureNeeded = false
@@ -38,15 +38,16 @@ struct ConsoleMessageCell: View {
                 .font(.footnote)
                 .foregroundColor(titleColor)
             Spacer()
+#if !os(watchOS)
             Components.makePinView(for: message)
-            HStack(spacing: 3) {
-                ConsoleTimestampView(date: message.createdAt)
-                    .overlay(alignment: .trailing) {
-                        if isDisclosureNeeded {
-                            ListDisclosureIndicator()
-                                .offset(x: 11, y: 0)
-                        }
-                    }
+            ConsoleTimestampView(date: message.createdAt)
+                .padding(.trailing, 3)
+#endif
+        }
+        .overlay(alignment: .trailing) {
+            if isDisclosureNeeded {
+                ListDisclosureIndicator()
+                    .offset(x: 8, y: 0)
             }
         }
     }
@@ -125,15 +126,3 @@ struct ConsoleMessageCell_Previews: PreviewProvider {
     }
 }
 #endif
-
-struct ConsoleConstants {
-#if os(watchOS)
-    static let fontTitle = Font.system(size: 14)
-#elseif os(macOS)
-    static let fontTitle = Font.subheadline
-#elseif os(iOS) || os(visionOS)
-    static let fontTitle = Font.subheadline.monospacedDigit()
-#else
-    static let fontTitle = Font.caption
-#endif
-}

@@ -474,7 +474,7 @@ private let mockDownloadNukeResponse = HTTPURLResponse(url: "https://codeload.gi
 
 // MARK: - Upload (POST)
 
-private let mockUploadPulseOriginalRequest = URLRequest(url: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be", method: "POST", headers: [
+private let mockUploadPulseOriginalRequest = URLRequest(url: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be/upload-we9zs7v.zip", method: "POST", headers: [
     "Content-Length": "21851748",
     "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryrv8XAHQPtQcWta3k"
 ])
@@ -486,7 +486,7 @@ private let mockUploadPulseCurrentRequest = mockUploadPulseOriginalRequest.addin
     "Accept": "*/*"
 ])
 
-private let mockUploadPulseResponse = HTTPURLResponse(url: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be", statusCode: 204, headers: [
+private let mockUploadPulseResponse = HTTPURLResponse(url: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be/upload-we9zs7v.zip", statusCode: 204, headers: [
     "Vary": "Origin",
     "Access-Control-Allow-Origin": "https://github.com"
 ])

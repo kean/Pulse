@@ -2,10 +2,10 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS)
-
 import SwiftUI
 import Pulse
+
+#if os(iOS)
 
 struct SettingsConsoleCellDesignView: View {
     @EnvironmentObject private var settings: UserSettings
@@ -172,6 +172,20 @@ private struct ConsoleFieldPicker: View {
     }
 }
 
+#if DEBUG
+#Preview {
+    NavigationView {
+        SettingsConsoleCellDesignView()
+            .injecting(ConsoleEnvironment(store: StorePreview.store!))
+            .environmentObject(UserSettings.shared)
+            .navigationTitle("Cell Design")
+            .navigationBarTitleDisplayMode(.inline)
+    }
+}
+#endif
+
+#endif
+
 enum StorePreview {
     static let store = try? LoggerStore(storeURL: URL(fileURLWithPath: "/dev/null"), options: [.synchronous, .inMemory])
 
@@ -200,17 +214,3 @@ enum StorePreview {
         return task
     }()
 }
-
-#if DEBUG
-#Preview {
-    NavigationView {
-        SettingsConsoleCellDesignView()
-            .injecting(ConsoleEnvironment(store: StorePreview.store!))
-            .environmentObject(UserSettings.shared)
-            .navigationTitle("Cell Design")
-            .navigationBarTitleDisplayMode(.inline)
-    }
-}
-#endif
-
-#endif

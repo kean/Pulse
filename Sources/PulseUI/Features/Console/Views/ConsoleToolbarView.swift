@@ -139,11 +139,13 @@ struct ConsoleListOptionsView: View {
         Button(action: { filters.options.isOnlyErrors.toggle() }) {
             Text(Image(systemName: filters.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon"))
                 .font(.body)
-                .foregroundColor(.red)
+                .foregroundColor(filters.options.isOnlyErrors ? .white : .secondary)
         }
         .cornerRadius(4)
-        .padding(.leading, 1)
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+        .padding(7)
+        .background(filters.options.isOnlyErrors ? .red : Color(.secondarySystemFill).opacity(0.8))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 

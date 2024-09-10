@@ -69,7 +69,8 @@ private struct _ConsoleListView: View {
                 ConsoleSearchListContentView()
             } else {
                 ConsoleToolbarView()
-                    .listRowSeparator(.hidden, edges: .top)
+                    .listRowSeparator(.hidden, edges: .all)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 8, trailing: 16))
                 ConsoleListContentView()
             }
         }
