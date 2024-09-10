@@ -16,9 +16,11 @@ let package = Package(
         .library(name: "PulseUI", targets: ["PulseUI"]),
     ],
     targets: [
-        .target(name: "Pulse", exclude: ["PrivacyInfo.xcprivacy"]),
+        .target(name: "Pulse", resources: [.process("PrivacyInfo.xcprivacy")]),
         .target(name: "PulseProxy", dependencies: ["Pulse"]),
-        .target(name: "PulseUI", dependencies: ["Pulse"], exclude: ["PrivacyInfo.xcprivacy"]),
+        .target(
+            name: "PulseUI", dependencies: ["Pulse"], resources: [.process("PrivacyInfo.xcprivacy")]
+        ),
     ],
     swiftLanguageVersions: [
         .v5
