@@ -34,4 +34,8 @@ struct Components {
     static func makePinView(for message: LoggerMessageEntity) -> some View {
         EmptyView()
     }
+
+    static func makeHighlightModifier() -> some ViewModifier {
+        EmptyModifier()
+    }
 }

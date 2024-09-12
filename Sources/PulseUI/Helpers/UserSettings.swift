@@ -76,6 +76,24 @@ public final class UserSettings: ObservableObject {
 
     /// Configuration
     public struct DisplayOptions: Codable {
+        // MARK: - Header
+
+        /// By default, `true`.
+        public var isShowingDetails = true
+
+        public var headerFontSize: Int = defaultHeaderFooterFontSize
+
+        /// The line limit for messages in the console. By default, `1`.
+        public var headerLineLimit: Int = 1
+
+#if os(macOS) || os(tvOS)
+        /// Fields to display below the main text label.
+        public var headerFields: [Field] = [.responseSize, .duration, .host]
+#else
+        /// Fields to display below the main text label.
+        public var headerFields: [Field] = [.responseSize, .duration]
+#endif
+
         // MARK: - Content
 
         /// If task description is available, show it instead of the `URL`.
@@ -85,30 +103,19 @@ public final class UserSettings: ObservableObject {
         /// only path.
         public var contentComponents: Set<ContentComponent> = [.path]
 
-        /// By default, ``FontSize/regular``.
         public var contentFontSize: Int = defaultContentFontSize
 
         /// The line limit for messages in the console. By default, `3`.
         public var contentLineLimit: Int = 3
 
-        // MARK: - Details
+        // MARK: - Footer
 
-        /// By default, `true`.
-        public var isShowingDetails = true
-
-        /// By default, ``FontSize/regular``.
-        public var detailsFontSize: Int = defaultDefailsFontSize
+        public var footerFontSize: Int = defaultHeaderFooterFontSize
 
         /// The line limit for messages in the console. By default, `1`.
-        public var detailsLineLimit: Int = 1
+        public var footerLineLimit: Int = 1
 
-#if os(macOS) || os(tvOS)
-        /// Fields to display below the main text label.
-        public var detailsFields: [Field] = [.responseSize, .duration, .host]
-#else
-        /// Fields to display below the main text label.
-        public var detailsFields: [Field] = [.responseSize, .duration]
-#endif
+        // MARK: Helpers
 
         public enum ContentComponent: String, Identifiable, CaseIterable, Codable {
             case scheme, user, password, host, port, path, query, fragment
@@ -160,16 +167,16 @@ public final class UserSettings: ObservableObject {
 
 #if os(watchOS)
 let defaultContentFontSize = 17
-let defaultDefailsFontSize = 14
+let defaultHeaderFooterFontSize = 14
 #elseif os(macOS)
 let defaultContentFontSize = 13
-let defaultDefailsFontSize = 11
+let defaultHeaderFooterFontSize = 11
 #elseif os(iOS) || os(visionOS)
 let defaultContentFontSize = 17
-let defaultDefailsFontSize = 13
+let defaultHeaderFooterFontSize = 13
 #elseif os(tvOS)
 let defaultContentFontSize = 27
-let defaultDefailsFontSize = 21
+let defaultHeaderFooterFontSize = 21
 #endif
 
 typealias DisplayOptions = UserSettings.DisplayOptions

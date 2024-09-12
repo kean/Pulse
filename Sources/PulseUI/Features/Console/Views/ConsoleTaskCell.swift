@@ -16,12 +16,19 @@ struct ConsoleTaskCell: View {
     @ObservedObject private var settings: UserSettings = .shared
     @Environment(\.store) private var store: LoggerStore
 
+    enum EditableArea {
+        case header, timestamp, content, footer
+    }
+
+    var highlightedArea: EditableArea?
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             header
-            content // .padding(.top, 4)
+            content.higlighted(highlightedArea == .content)
+
 #if os(iOS) || os(watchOS)
-            details
+            footer.higlighted(highlightedArea == .footer)
 #endif
         }
     }
@@ -41,9 +48,11 @@ struct ConsoleTaskCell: View {
             if task.isMocked {
                 MockBadgeView()
             }
-            info
+            info.higlighted(highlightedArea == .header)
+
             Spacer()
             ConsoleTimestampView(date: task.createdAt)
+                .higlighted(highlightedArea == .timestamp)
                 .padding(.trailing, 3)
         }
         .overlay(alignment: .leading) {
@@ -65,7 +74,7 @@ struct ConsoleTaskCell: View {
 #endif
     private var info: some View {
         let status: Text = Text(ConsoleFormatter.status(for: task, store: store))
-            .font(detailsFont.weight(.medium))
+            .font(makeFont(size: settings.displayOptions.headerFontSize).weight(.medium))
             .foregroundColor(task.state == .failure ? .red : .primary)
 
 #if os(watchOS)
@@ -76,17 +85,18 @@ struct ConsoleTaskCell: View {
             guard settings.displayOptions.isShowingDetails else {
                 return status
             }
-            let details = settings.displayOptions.detailsFields
+            let details = settings.displayOptions.headerFields
                 .compactMap(makeInfoText)
                 .joined(separator: " · ")
             guard !details.isEmpty else {
                 return status
             }
-            return status + Text(" · \(details)").font(detailsFont)
+            return status + Text(" · \(details)")
+                .font(makeFont(size: settings.displayOptions.headerFontSize))
         }
         return text
             .tracking(-0.1)
-            .lineLimit(1)
+            .lineLimit(settings.displayOptions.headerLineLimit)
             .foregroundStyle(.secondary)
 #endif
     }
@@ -114,18 +124,6 @@ struct ConsoleTaskCell: View {
         }
     }
 
-    // MARK: – Details
-
-    @ViewBuilder
-    private var details: some View {
-        if let host = task.host, !host.isEmpty {
-            Text(host)
-                .lineLimit(1)
-                .font(detailsFont)
-                .foregroundStyle(.secondary)
-        }
-    }
-
     // MARK: – Content
 
     private var content: some View {
@@ -134,13 +132,13 @@ struct ConsoleTaskCell: View {
                 return nil
             }
             return Text(method.appending(" "))
-                .font(contentFont.weight(.medium).smallCaps())
+                .font(makeFont(size: settings.displayOptions.contentFontSize).weight(.medium).smallCaps())
                 .tracking(-0.3)
         }
 
         var main: Text {
             Text(task.getFormattedContent(options: settings.displayOptions) ?? "–")
-                .font(contentFont)
+                .font(makeFont(size: settings.displayOptions.contentFontSize))
         }
 
         var text: Text {
@@ -155,21 +153,38 @@ struct ConsoleTaskCell: View {
             .lineLimit(settings.displayOptions.contentLineLimit)
     }
 
-    // MARK: - Helpers
+    // MARK: – Footer
 
-    private var contentFont: Font {
-        let baseSize = CGFloat(settings.displayOptions.contentFontSize)
-        return Font.system(size: baseSize * fontMultiplier)
+    @ViewBuilder
+    private var footer: some View {
+        if let host = task.host, !host.isEmpty {
+            Text(host)
+                .lineLimit(settings.displayOptions.footerLineLimit)
+                .font(makeFont(size: settings.displayOptions.footerFontSize))
+                .foregroundStyle(.secondary)
+        }
     }
 
-    private var detailsFont: Font {
-        let baseSize = CGFloat(settings.displayOptions.detailsFontSize)
-        return Font.system(size: baseSize * fontMultiplier).monospacedDigit()
+    // MARK: - Helpers
+
+    private func makeFont(size: Int) -> Font {
+        Font.system(size: CGFloat(size) * fontMultiplier)
     }
 
     private func byteCount(for size: Int64) -> String {
         guard size > 0 else { return "0 KB" }
         return ByteCountFormatter.string(fromByteCount: size)
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func higlighted(_ isHighlighted: Bool) -> some View {
+        if isHighlighted {
+            self.modifier(Components.makeHighlightModifier())
+        } else {
+            self
+        }
     }
 }
 

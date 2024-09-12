@@ -25,18 +25,6 @@ public struct SettingsView: View {
                store === RemoteLogger.shared.store {
                 RemoteLoggerSettingsView(viewModel: .shared)
             }
-#if os(iOS)
-            Section("Appearance") {
-                NavigationLink {
-                    SettingsConsoleCellDesignView()
-                        .environmentObject(settings)
-                } label: {
-                    Text("Cell Design")
-                }
-                
-                Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)
-            }
-#endif
             Section(header: Text("List headers"), footer: Text("These headers will be included in the list view")) {
                 ForEach(settings.displayHeaders, id: \.self) {
                     Text($0)

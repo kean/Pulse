@@ -72,7 +72,7 @@ struct ConsoleMessageCell: View {
     }
 
     private var detailsFont: Font {
-        let baseSize = CGFloat(settings.displayOptions.detailsFontSize)
+        let baseSize = CGFloat(settings.displayOptions.headerFontSize)
         return Font.system(size: baseSize * (fontMultiplier / 17.0)).monospacedDigit()
     }
 
