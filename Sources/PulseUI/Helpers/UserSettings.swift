@@ -54,12 +54,12 @@ public final class UserSettings: ObservableObject {
     public var isRemoteLoggingHidden = false
 
     /// Task cell display options.
-    public var displayOptions: ConsoleDisplayOptions {
+    public var listDisplayOptions: ConsoleListDisplaySettings {
         get {
             if let options = cachedDisplayOptions {
                 return options
             }
-            let options = decode(rawDisplayOptions) ?? ConsoleDisplayOptions()
+            let options = decode(rawDisplayOptions) ?? ConsoleListDisplaySettings()
             cachedDisplayOptions = options
             return options
         }
@@ -69,7 +69,7 @@ public final class UserSettings: ObservableObject {
         }
     }
 
-    var cachedDisplayOptions: ConsoleDisplayOptions?
+    var cachedDisplayOptions: ConsoleListDisplaySettings?
 
     @AppStorage("com.github.kean.pulse.DisplayOptions")
     var rawDisplayOptions: String = "{}"

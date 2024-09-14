@@ -74,7 +74,7 @@ struct ConsoleTaskCell: View {
 #endif
     private var info: some View {
         let status: Text = Text(ConsoleFormatter.status(for: task, store: store))
-            .font(makeFont(size: settings.displayOptions.headerFontSize).weight(.medium))
+            .font(makeFont(size: settings.listDisplayOptions.header.fontSize).weight(.medium))
             .foregroundColor(task.state == .failure ? .red : .primary)
 
 #if os(watchOS)
@@ -82,18 +82,18 @@ struct ConsoleTaskCell: View {
 #else
 
         var text: Text {
-            let details = settings.displayOptions.headerFields
+            let details = settings.listDisplayOptions.header.fields
                 .compactMap(task.makeInfoText)
                 .joined(separator: " · ")
             guard !details.isEmpty else {
                 return status
             }
             return status + Text(" · \(details)")
-                .font(makeFont(size: settings.displayOptions.headerFontSize))
+                .font(makeFont(size: settings.listDisplayOptions.header.fontSize))
         }
         return text
             .tracking(-0.1)
-            .lineLimit(settings.displayOptions.headerLineLimit)
+            .lineLimit(settings.listDisplayOptions.header.lineLimit)
             .foregroundStyle(.secondary)
 #endif
     }
@@ -106,13 +106,13 @@ struct ConsoleTaskCell: View {
                 return nil
             }
             return Text(method.appending(" "))
-                .font(makeFont(size: settings.displayOptions.contentFontSize).weight(.medium).smallCaps())
+                .font(makeFont(size: settings.listDisplayOptions.content.fontSize).weight(.medium).smallCaps())
                 .tracking(-0.3)
         }
 
         var main: Text {
-            Text(task.getFormattedContent(options: settings.displayOptions) ?? "–")
-                .font(makeFont(size: settings.displayOptions.contentFontSize))
+            Text(task.getFormattedContent(options: settings.listDisplayOptions) ?? "–")
+                .font(makeFont(size: settings.listDisplayOptions.content.fontSize))
         }
 
         var text: Text {
@@ -124,7 +124,7 @@ struct ConsoleTaskCell: View {
         }
 
         return text
-            .lineLimit(settings.displayOptions.contentLineLimit)
+            .lineLimit(settings.listDisplayOptions.content.lineLimit)
     }
 
     // MARK: – Footer
@@ -133,8 +133,8 @@ struct ConsoleTaskCell: View {
     private var footer: some View {
         if let host = task.host, !host.isEmpty {
             Text(host)
-                .lineLimit(settings.displayOptions.footerLineLimit)
-                .font(makeFont(size: settings.displayOptions.footerFontSize))
+                .lineLimit(settings.listDisplayOptions.footer.lineLimit)
+                .font(makeFont(size: settings.listDisplayOptions.footer.fontSize))
                 .foregroundStyle(.secondary)
         }
     }
@@ -147,8 +147,8 @@ struct ConsoleTaskCell: View {
 }
 
 private extension NetworkTaskEntity {
-    func makeInfoText(for detail: ConsoleDisplayOptions.Field) -> String? {
-        switch detail {
+    func makeInfoText(for field: ConsoleListDisplaySettings.TaskField) -> String? {
+        switch field {
         case .method:
             httpMethod
         case .requestSize:

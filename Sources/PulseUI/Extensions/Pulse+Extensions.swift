@@ -133,15 +133,15 @@ extension NetworkTaskEntity {
 #endif
 
 extension NetworkTaskEntity {
-    func getFormattedContent(options: ConsoleDisplayOptions) -> String? {
-        if options.showTaskDescription, let taskDescription, !taskDescription.isEmpty {
+    func getFormattedContent(options: ConsoleListDisplaySettings) -> String? {
+        if options.content.showTaskDescription, let taskDescription, !taskDescription.isEmpty {
             return taskDescription
         }
         guard let url else {
             return nil
         }
-        let displayed = options.contentComponents
-        if displayed.count == ConsoleDisplayOptions.ContentComponent.allCases.count {
+        let displayed = options.content.components
+        if displayed.count == ConsoleListDisplaySettings.URLComponent.allCases.count {
             return url
         }
         guard var components = URLComponents(string: url) else {

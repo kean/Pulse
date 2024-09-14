@@ -90,12 +90,12 @@ struct ConsoleSearchResultView: View {
     }
 
     private var contentFont: Font {
-        let baseSize = CGFloat(settings.displayOptions.contentFontSize)
+        let baseSize = CGFloat(settings.listDisplayOptions.content.fontSize)
         return Font.system(size: baseSize * fontMultiplier)
     }
 
     private var detailsFont: Font {
-        let baseSize = CGFloat(settings.displayOptions.headerFontSize)
+        let baseSize = CGFloat(settings.listDisplayOptions.header.fontSize)
         return Font.system(size: baseSize * fontMultiplier).monospacedDigit()
     }
 }
