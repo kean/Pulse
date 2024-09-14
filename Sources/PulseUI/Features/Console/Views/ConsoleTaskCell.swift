@@ -98,7 +98,7 @@ struct ConsoleTaskCell: View {
 #endif
     }
 
-    private func makeInfoText(for detail: DisplayOptions.Field) -> String? {
+    private func makeInfoText(for detail: ConsoleDisplayOptions.Field) -> String? {
         switch detail {
         case .method:
             task.httpMethod
