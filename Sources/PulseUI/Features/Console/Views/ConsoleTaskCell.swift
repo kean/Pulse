@@ -167,6 +167,10 @@ private extension NetworkTaskEntity {
             NetworkLogger.TaskType(rawValue: taskType)?.urlSessionTaskClassName
         case .taskDescription:
             taskDescription
+        case .requestHeaderField(let key):
+            (currentRequest?.headers ?? [:])[key]
+        case .responseHeaderField(let key):
+            (response?.headers ?? [:])[key]
         }
     }
 

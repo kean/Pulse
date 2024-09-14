@@ -65,7 +65,7 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
         public var id: URLComponent { self }
     }
 
-    public enum TaskField: Sendable, Codable, Hashable, Identifiable, CaseIterable {
+    public enum TaskField: Sendable, Codable, Hashable, Identifiable {
         case method
         case requestSize
         case responseSize
@@ -73,10 +73,10 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
         case duration
         case host
         case statusCode
-        /// The type of the task, e.g. "Data" or "Download"
         case taskType
-        /// The `taskDescription` value of `URLSessionTask`.
         case taskDescription
+        case requestHeaderField(key: String)
+        case responseHeaderField(key: String)
 
         public var id: TaskField { self }
 
@@ -91,6 +91,8 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
             case .statusCode: "Status Code"
             case .taskType: "Task Type"
             case .taskDescription: "Task Description"
+            case .requestHeaderField(let key): "Request Header \"\(key)\""
+            case .responseHeaderField(let key): "Response Header '\(key)\""
             }
         }
     }
