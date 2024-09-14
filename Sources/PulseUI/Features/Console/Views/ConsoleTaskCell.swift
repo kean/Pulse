@@ -83,7 +83,7 @@ struct ConsoleTaskCell: View {
 
         var text: Text {
             let details = settings.displayOptions.headerFields
-                .compactMap(makeInfoText)
+                .compactMap(task.makeInfoText)
                 .joined(separator: " · ")
             guard !details.isEmpty else {
                 return status
@@ -96,29 +96,6 @@ struct ConsoleTaskCell: View {
             .lineLimit(settings.displayOptions.headerLineLimit)
             .foregroundStyle(.secondary)
 #endif
-    }
-
-    private func makeInfoText(for detail: ConsoleDisplayOptions.Field) -> String? {
-        switch detail {
-        case .method:
-            task.httpMethod
-        case .requestSize:
-            byteCount(for: task.requestBodySize)
-        case .responseSize:
-            byteCount(for: task.responseBodySize)
-        case .responseContentType:
-            task.responseContentType.map(NetworkLogger.ContentType.init)?.lastComponent.uppercased()
-        case .duration:
-            ConsoleFormatter.duration(for: task)
-        case .host:
-            task.host
-        case .statusCode:
-            task.statusCode != 0 ? task.statusCode.description : nil
-        case .taskType:
-            NetworkLogger.TaskType(rawValue: task.taskType)?.urlSessionTaskClassName
-        case .taskDescription:
-            task.taskDescription
-        }
     }
 
     // MARK: – Content
@@ -166,6 +143,31 @@ struct ConsoleTaskCell: View {
 
     private func makeFont(size: Int) -> Font {
         Font.system(size: CGFloat(size) * fontMultiplier)
+    }
+}
+
+private extension NetworkTaskEntity {
+    func makeInfoText(for detail: ConsoleDisplayOptions.Field) -> String? {
+        switch detail {
+        case .method:
+            httpMethod
+        case .requestSize:
+            byteCount(for: requestBodySize)
+        case .responseSize:
+            byteCount(for: responseBodySize)
+        case .responseContentType:
+            responseContentType.map(NetworkLogger.ContentType.init)?.lastComponent.uppercased()
+        case .duration:
+            ConsoleFormatter.duration(for: self)
+        case .host:
+            host
+        case .statusCode:
+            statusCode != 0 ? statusCode.description : nil
+        case .taskType:
+            NetworkLogger.TaskType(rawValue: taskType)?.urlSessionTaskClassName
+        case .taskDescription:
+            taskDescription
+        }
     }
 
     private func byteCount(for size: Int64) -> String {
