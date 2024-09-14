@@ -82,9 +82,6 @@ struct ConsoleTaskCell: View {
 #else
 
         var text: Text {
-            guard settings.displayOptions.isShowingDetails else {
-                return status
-            }
             let details = settings.displayOptions.headerFields
                 .compactMap(makeInfoText)
                 .joined(separator: " · ")

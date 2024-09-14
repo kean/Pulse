@@ -78,9 +78,6 @@ public final class UserSettings: ObservableObject {
     public struct DisplayOptions: Codable {
         // MARK: - Header
 
-        /// By default, `true`.
-        public var isShowingDetails = true
-
         public var headerFontSize: Int = defaultHeaderFooterFontSize
 
         /// The line limit for messages in the console. By default, `1`.
