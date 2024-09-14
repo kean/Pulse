@@ -79,22 +79,6 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
         case responseHeaderField(key: String)
 
         public var id: TaskField { self }
-
-        var title: String {
-            switch self {
-            case .method: "Method"
-            case .requestSize: "Request Size"
-            case .responseSize: "Response Size"
-            case .responseContentType: "Response Content Type"
-            case .duration: "Duration"
-            case .host: "Host"
-            case .statusCode: "Status Code"
-            case .taskType: "Task Type"
-            case .taskDescription: "Task Description"
-            case .requestHeaderField(let key): "Request Header \"\(key)\""
-            case .responseHeaderField(let key): "Response Header '\(key)\""
-            }
-        }
     }
 
     public init() {}
