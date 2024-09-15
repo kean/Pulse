@@ -6,21 +6,27 @@ import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
-struct ConsoleSessionsPickerView: View {
+@available(iOS 16, macOS 13, visionOS 1, *)
+package struct ConsoleSessionsPickerView: View {
     @Binding var selection: Set<UUID>
     @State private var isShowingPicker = false
 
     @Environment(\.store) private var store: LoggerStore
+
+#if os(iOS) || os(visionOS) || os(macOS)
+    package static var makeSessionPicker: (_ selection: Binding<Set<UUID>>) -> AnyView = {
+        AnyView(SessionPickerView(selection: $0))
+    }
+#endif
 
 #if os(watchOS) || os(tvOS)
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
     private var sessions: FetchedResults<LoggerSessionEntity>
 #endif
 
-    var body: some View {
+    package var body: some View {
 #if os(iOS) || os(visionOS)
-        NavigationLink(destination: Components.makeSessionPicker(selection: $selection)) {
+        NavigationLink(destination: ConsoleSessionsPickerView.makeSessionPicker($selection)) {
             InfoRow(title: "Sessions", details: selectedSessionTitle)
         }
 #elseif os(macOS)
@@ -32,7 +38,7 @@ struct ConsoleSessionsPickerView: View {
             Button("Select...") { isShowingPicker = true }
         }
         .popover(isPresented: $isShowingPicker, arrowEdge: .trailing) {
-            Components.makeSessionPicker(selection: $selection)
+            ConsoleSessionsPickerView.makeSessionPicker($selection)
                 .frame(width: 260, height: 370)
 
         }

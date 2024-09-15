@@ -7,7 +7,7 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 15, visionOS 1, *)
+@available(iOS 16, visionOS 1, *)
 extension NetworkInspectorView {
     @ViewBuilder
     static func makeRequestSection(task: NetworkTaskEntity, isCurrentRequest: Bool) -> some View {

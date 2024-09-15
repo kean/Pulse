@@ -8,7 +8,7 @@ import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct NetworkInspectorTransactionView: View {
     @ObservedObject var viewModel: NetworkInspectorTransactionViewModel
 
@@ -36,7 +36,7 @@ struct NetworkInspectorTransactionView: View {
         NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
     }
 
-    @available(iOS 15, visionOS 1.0, *)
+    @available(iOS 16, visionOS 1, *)
     private func transferSizeView(size: NetworkInspectorTransferInfoViewModel) -> some View {
         let font = TextHelper().font(style: .init(role: .subheadline, style: .monospacedDigital, width: .condensed))
         return (Text(Image(systemName: "arrow.down.circle")) +
@@ -58,17 +58,17 @@ struct NetworkInspectorTransactionView: View {
 
 // MARK: - ViewModel
 
-final class NetworkInspectorTransactionViewModel: ObservableObject, Identifiable {
-    let id: NSManagedObjectID
-    let title: String
-    let transaction: NetworkTransactionMetricsEntity
-    let statusViewModel: NetworkRequestStatusCellModel
-    let timingViewModel: TimingViewModel?
-    let requestViewModel: NetworkRequestInfoCellViewModel
-    let transferSizeViewModel: NetworkInspectorTransferInfoViewModel?
-    let details: () -> NSAttributedString
+package final class NetworkInspectorTransactionViewModel: ObservableObject, Identifiable {
+    package let id: NSManagedObjectID
+    package let title: String
+    package let transaction: NetworkTransactionMetricsEntity
+    package let statusViewModel: NetworkRequestStatusCellModel
+    package let timingViewModel: TimingViewModel?
+    package let requestViewModel: NetworkRequestInfoCellViewModel
+    package let transferSizeViewModel: NetworkInspectorTransferInfoViewModel?
+    package let details: () -> NSAttributedString
 
-    init(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
+    package init(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
         self.id = transaction.objectID
         self.title = transaction.fetchType.title
         self.transaction = transaction
@@ -92,7 +92,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject, Identifiable
 }
 
 #if DEBUG
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct NetworkInspectorTransactionView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

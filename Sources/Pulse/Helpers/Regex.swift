@@ -4,18 +4,19 @@
 
 import Foundation
 
-final class Regex: @unchecked Sendable {
+package final class Regex: @unchecked Sendable {
     private let regex: NSRegularExpression
 
-    struct Options: OptionSet {
-        let rawValue: Int
+    package struct Options: OptionSet {
+        package let rawValue: Int
+        package init(rawValue: Int) { self.rawValue = rawValue }
 
-        static let caseInsensitive = Options(rawValue: 1 << 0)
-        static let multiline = Options(rawValue: 1 << 1)
-        static let dotMatchesLineSeparators = Options(rawValue: 1 << 2)
+        package static let caseInsensitive = Options(rawValue: 1 << 0)
+        package static let multiline = Options(rawValue: 1 << 1)
+        package static let dotMatchesLineSeparators = Options(rawValue: 1 << 2)
     }
 
-    init(_ pattern: String, _ options: Options = []) throws {
+    package init(_ pattern: String, _ options: Options = []) throws {
         var ops = NSRegularExpression.Options()
         if options.contains(.caseInsensitive) { ops.insert(.caseInsensitive) }
         if options.contains(.multiline) { ops.insert(.anchorsMatchLines) }
@@ -24,7 +25,7 @@ final class Regex: @unchecked Sendable {
         self.regex = try NSRegularExpression(pattern: pattern, options: ops)
     }
 
-    func isMatch(_ s: String) -> Bool {
+    package func isMatch(_ s: String) -> Bool {
         let range = NSRange(s.startIndex..<s.endIndex, in: s)
         return regex.firstMatch(in: s, options: [], range: range) != nil
     }

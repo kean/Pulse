@@ -5,30 +5,30 @@
 import CoreData
 
 extension NSManagedObjectContext {
-    func fetch<T: NSManagedObject>(_ entity: T.Type, _ configure: (NSFetchRequest<T>) -> Void = { _ in }) throws -> [T] {
+    package func fetch<T: NSManagedObject>(_ entity: T.Type, _ configure: (NSFetchRequest<T>) -> Void = { _ in }) throws -> [T] {
         let request = NSFetchRequest<T>(entityName: String(describing: entity))
         configure(request)
         return try fetch(request)
     }
 
-    func fetch<T: NSManagedObject, Value>(_ entity: T.Type, sortedBy keyPath: KeyPath<T, Value>, ascending: Bool = true, _ configure: (NSFetchRequest<T>) -> Void = { _ in }) throws -> [T] {
+    package func fetch<T: NSManagedObject, Value>(_ entity: T.Type, sortedBy keyPath: KeyPath<T, Value>, ascending: Bool = true, _ configure: (NSFetchRequest<T>) -> Void = { _ in }) throws -> [T] {
         try fetch(entity) {
             $0.sortDescriptors = [NSSortDescriptor(keyPath: keyPath, ascending: ascending)]
         }
     }
 
-    func first<T: NSManagedObject>(_ entity: T.Type, _ configure: (NSFetchRequest<T>) -> Void = { _ in }) throws -> T? {
+    package func first<T: NSManagedObject>(_ entity: T.Type, _ configure: (NSFetchRequest<T>) -> Void = { _ in }) throws -> T? {
         try fetch(entity) {
             $0.fetchLimit = 1
             configure($0)
         }.first
     }
 
-    func count<T: NSManagedObject>(for entity: T.Type) throws -> Int {
+    package func count<T: NSManagedObject>(for entity: T.Type) throws -> Int {
         try count(for: NSFetchRequest<T>(entityName: String(describing: entity)))
     }
 
-    func performAndReturn<T>(_ closure: () throws -> T) throws -> T {
+    package func performAndReturn<T>(_ closure: () throws -> T) throws -> T {
         var result: Result<T, Error>?
         performAndWait {
             result = Result { try closure() }
@@ -48,7 +48,7 @@ extension NSPersistentContainer {
         return container
     }
 
-    func loadStore() throws {
+    package func loadStore() throws {
         var loadError: Swift.Error?
         loadPersistentStores { description, error in
             if let error = error {
@@ -130,8 +130,8 @@ extension NSRelationshipDescription {
     }
 }
 
-enum KeyValueEncoding {
-    static func encodeKeyValuePairs(_ pairs: [String: String]?, sanitize: Bool = false) -> String {
+package enum KeyValueEncoding {
+    package static func encodeKeyValuePairs(_ pairs: [String: String]?, sanitize: Bool = false) -> String {
         var output = ""
         let sorted = (pairs ?? [:]).sorted { $0.key < $1.key }
         for (name, value) in sorted {
@@ -143,7 +143,7 @@ enum KeyValueEncoding {
         return output
     }
 
-    static func decodeKeyValuePairs(_ string: String) -> [String: String] {
+    package static func decodeKeyValuePairs(_ string: String) -> [String: String] {
         let pairs = string.components(separatedBy: "\n")
         var output: [String: String] = [:]
         for pair in pairs {

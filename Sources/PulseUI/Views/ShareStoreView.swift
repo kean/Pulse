@@ -9,8 +9,8 @@ import CoreData
 import Pulse
 import Combine
 
-@available(iOS 15, macOS 13, watchOS 9, visionOS 1.0, *)
-struct ShareStoreView: View {
+@available(iOS 16, macOS 13, watchOS 9, visionOS 1, *)
+package struct ShareStoreView: View {
     /// Preselected sessions.
     var sessions: Set<UUID> = []
     var onDismiss: () -> Void
@@ -21,7 +21,12 @@ struct ShareStoreView: View {
 
     @Environment(\.store) private var store: LoggerStore
 
-    var body: some View {
+    package init(sessions: Set<UUID> = [], onDismiss: @escaping () -> Void) {
+        self.sessions = sessions
+        self.onDismiss = onDismiss
+    }
+
+    package var body: some View {
         content
             .onAppear {
                 if !sessions.isEmpty {
@@ -155,7 +160,7 @@ struct ShareStoreView: View {
 }
 
 #if DEBUG
-@available(iOS 15, macOS 13, watchOS 9, visionOS 1.0, *)
+@available(iOS 16, macOS 13, watchOS 9, visionOS 1, *)
 struct ShareStoreView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS) || os(visionOS)

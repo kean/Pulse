@@ -8,7 +8,7 @@ import CoreData
 import Combine
 
 extension Character {
-    init?(_ code: unichar) {
+    package init?(_ code: unichar) {
         guard let scalar = UnicodeScalar(code) else {
             return nil
         }
@@ -16,15 +16,15 @@ extension Character {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 extension AttributedString {
-    init(_ string: String, _ configure: (inout AttributeContainer) -> Void) {
+    package init(_ string: String, _ configure: (inout AttributeContainer) -> Void) {
         var attributes = AttributeContainer()
         configure(&attributes)
         self.init(string, attributes: attributes)
     }
 
-    mutating func append(_ string: String, _ configure: (inout AttributeContainer) -> Void) {
+    package mutating func append(_ string: String, _ configure: (inout AttributeContainer) -> Void) {
         var attributes = AttributeContainer()
         configure(&attributes)
         self.append(AttributedString(string, attributes: attributes))
@@ -32,13 +32,13 @@ extension AttributedString {
 }
 
 extension NSManagedObject {
-    func reset() {
+    package func reset() {
         managedObjectContext?.refresh(self, mergeChanges: false)
     }
 }
 
 extension NSManagedObjectContext {
-    func getDistinctValues(entityName: String, property: String) -> Set<String> {
+    package func getDistinctValues(entityName: String, property: String) -> Set<String> {
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
         request.resultType = .dictionaryResultType
         request.returnsDistinctResults = true
@@ -51,7 +51,7 @@ extension NSManagedObjectContext {
 }
 
 extension tls_ciphersuite_t {
-    var description: String {
+    package var description: String {
         switch self {
         case .RSA_WITH_3DES_EDE_CBC_SHA: return "RSA_WITH_3DES_EDE_CBC_SHA"
         case .RSA_WITH_AES_128_CBC_SHA: return "RSA_WITH_AES_128_CBC_SHA"
@@ -85,7 +85,7 @@ extension tls_ciphersuite_t {
 }
 
 extension tls_protocol_version_t {
-    var description: String {
+    package var description: String {
         switch self {
         case .TLSv10: return "TLS 1.0"
         case .TLSv11: return "TLS 1.1"
@@ -98,7 +98,7 @@ extension tls_protocol_version_t {
     }
 }
 
-func descriptionForURLErrorCode(_ code: Int) -> String {
+package func descriptionForURLErrorCode(_ code: Int) -> String {
     switch code {
     case NSURLErrorUnknown: return "Unknown"
     case NSURLErrorCancelled: return "Cancelled"
@@ -154,7 +154,7 @@ func descriptionForURLErrorCode(_ code: Int) -> String {
 }
 
 extension URLRequest.CachePolicy {
-    var description: String {
+    package var description: String {
         switch self {
         case .useProtocolCachePolicy: return "useProtocolCachePolicy"
         case .reloadIgnoringLocalCacheData: return "reloadIgnoringLocalCacheData"

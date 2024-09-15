@@ -12,14 +12,18 @@ import PDFKit
 #endif
 
 /// Low-level attributed string creation API.
-final class TextRenderer {
-    struct Options {
-        var color: ColorMode = .full
+package final class TextRenderer {
+    package struct Options {
+        package var color: ColorMode
 
-        static let sharing = Options(color: .automatic)
+        package init(color: ColorMode = .full) {
+            self.color = color
+        }
+
+        package static let sharing = Options(color: .automatic)
     }
 
-    enum ColorMode: String, RawRepresentable {
+    package enum ColorMode: String, RawRepresentable {
         case monochrome
         case automatic
         case full
@@ -33,35 +37,35 @@ final class TextRenderer {
     var renderedBodies: [NSManagedObjectID: NSAttributedString] = [:]
     private var string = NSMutableAttributedString()
 
-    init(options: Options = .init()) {
+    package init(options: Options = .init()) {
         self.options = options
         self.helper = TextHelper()
     }
 
-    func make(_ render: (TextRenderer) -> Void) -> NSAttributedString {
+    package func make(_ render: (TextRenderer) -> Void) -> NSAttributedString {
         render(self)
         return make()
     }
 
-    func make() -> NSMutableAttributedString {
+    package func make() -> NSMutableAttributedString {
         defer { string = NSMutableAttributedString() }
         return string
     }
 
-    func addSpacer() {
+    package func addSpacer() {
         string.append(spacer())
     }
 
-    func spacer() -> NSAttributedString {
+    package func spacer() -> NSAttributedString {
         NSAttributedString(string: "\n", attributes: helper.spacerAttributes)
     }
 
-    func render(_ message: LoggerMessageEntity) {
+    package func render(_ message: LoggerMessageEntity) {
         string.append(ConsoleFormatter.subheadline(for: message) + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
         string.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
     }
 
-    func renderCompact(_ message: LoggerMessageEntity) {
+    package func renderCompact(_ message: LoggerMessageEntity) {
         var details = ConsoleFormatter.time(for: message.createdAt)
         if let label = ConsoleFormatter.label(for: message) {
             details += "\(ConsoleFormatter.separator)\(label)\(ConsoleFormatter.separator)"
@@ -85,7 +89,7 @@ final class TextRenderer {
         }
     }
 
-    func render(_ task: NetworkTaskEntity, content: NetworkContent, store: LoggerStore) {
+    package func render(_ task: NetworkTaskEntity, content: NetworkContent, store: LoggerStore) {
         if content.contains(.largeHeader) {
             renderLargeHeader(for: task, store: store)
         } else if content.contains(.header) {
@@ -182,7 +186,7 @@ final class TextRenderer {
         addSpacer()
     }
 
-    func renderCompact(_ task: NetworkTaskEntity, store: LoggerStore) {
+    package func renderCompact(_ task: NetworkTaskEntity, store: LoggerStore) {
         let isTitleColored = task.state == .failure && options.color != .monochrome
         let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
         let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
@@ -199,7 +203,7 @@ final class TextRenderer {
         string.append((task.httpMethod ?? "GET") + " " + (task.url ?? "–") + "\n", urlAttributes)
     }
 
-    func render(_ transaction: NetworkTransactionMetricsEntity) {
+    package func render(_ transaction: NetworkTransactionMetricsEntity) {
         do {
             let status = StatusLabelViewModel(transaction: transaction)
             let method = transaction.request.httpMethod ?? "GET"
@@ -233,7 +237,7 @@ final class TextRenderer {
         string.deleteCharacters(in: NSRange(location: string.length - 1, length: 1))
     }
 
-    func render(subheadline: String) -> NSAttributedString {
+    package func render(subheadline: String) -> NSAttributedString {
         render(subheadline + "\n", role: .subheadline, color: .secondaryLabel)
     }
 
@@ -263,17 +267,17 @@ final class TextRenderer {
         }
     }
 
-    func render(json: Any, error: NetworkLogger.DecodingError? = nil) -> NSAttributedString {
+    package func render(json: Any, error: NetworkLogger.DecodingError? = nil) -> NSAttributedString {
         TextRendererJSON(json: json, error: error, options: options).render()
     }
 
-    func render(_ blob: LoggerBlobHandleEntity, _ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
+    package func render(_ blob: LoggerBlobHandleEntity, _ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         let string = render(data, contentType: contentType, error: error)
         renderedBodies[blob.objectID] = string
         return string
     }
 
-    func render(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
+    package func render(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
             return render(json: json, error: error)
         }
@@ -307,7 +311,7 @@ final class TextRenderer {
         return KeyValueSectionViewModel.makeQueryItems(for: queryItems)
     }
 
-    func render(_ sections: [KeyValueSectionViewModel]) {
+    package func render(_ sections: [KeyValueSectionViewModel]) {
         for (index, section) in sections.enumerated() {
             string.append(render(section))
             if index != sections.endIndex - 1 {
@@ -316,7 +320,7 @@ final class TextRenderer {
         }
     }
 
-    func render(_ section: KeyValueSectionViewModel, details: String? = nil, style: TextFontStyle = .monospaced) -> NSAttributedString {
+    package func render(_ section: KeyValueSectionViewModel, details: String? = nil, style: TextFontStyle = .monospaced) -> NSAttributedString {
         let details = details.map { "(\($0))" }
         let title = [section.title, details].compactMap { $0 }.joined(separator: " ")
 
@@ -332,7 +336,7 @@ final class TextRenderer {
         return string
     }
 
-    func render(_ values: [(String, String?)]?, color: Color, style: TextFontStyle = .monospaced) -> NSAttributedString {
+    package func render(_ values: [(String, String?)]?, color: Color, style: TextFontStyle = .monospaced) -> NSAttributedString {
         guard let values = values, !values.isEmpty else {
             return NSAttributedString(string: "–\n", attributes: helper.attributes(role: .body2, style: style))
         }
@@ -385,15 +389,15 @@ final class TextRenderer {
         return output
     }
 
-    func preformatted(_ string: String, color: UXColor? = nil) -> NSAttributedString {
+    package func preformatted(_ string: String, color: UXColor? = nil) -> NSAttributedString {
         render(string, role: .body2, style: .monospaced, color: color ?? .label)
     }
 
-    func append(_ string: NSAttributedString) {
+    package func append(_ string: NSAttributedString) {
         self.string.append(string)
     }
 
-    func render(
+    package func render(
         _ string: String,
         role: TextRole,
         style: TextFontStyle = .proportional,
@@ -407,9 +411,9 @@ final class TextRenderer {
 }
 
 extension NSAttributedString.Key {
-    static let objectId = NSAttributedString.Key("pulse-object-id-key")
-    static let isTechnical = NSAttributedString.Key("pulse-technical-substring-key")
-    static let subheadline = NSAttributedString.Key("pulse-subheadline-key")
+    package static let objectId = NSAttributedString.Key("pulse-object-id-key")
+    package static let isTechnical = NSAttributedString.Key("pulse-technical-substring-key")
+    package static let subheadline = NSAttributedString.Key("pulse-subheadline-key")
 }
 
 // MARK: - Previews
@@ -463,35 +467,36 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
 private let task = LoggerStore.preview.entity(for: .login)
 #endif
 
-struct NetworkContent: OptionSet {
-    let rawValue: Int16
+package struct NetworkContent: OptionSet {
+    package let rawValue: Int16
+    package init(rawValue: Int16) { self.rawValue = rawValue }
 
-    static let header = NetworkContent(rawValue: 1 << 0)
-    static let largeHeader = NetworkContent(rawValue: 1 << 1)
-    static let taskDetails = NetworkContent(rawValue: 1 << 2)
-    static let requestComponents = NetworkContent(rawValue: 1 << 3)
-    static let requestQueryItems = NetworkContent(rawValue: 1 << 4)
-    static let errorDetails = NetworkContent(rawValue: 1 << 5)
-    static let originalRequestHeaders = NetworkContent(rawValue: 1 << 6)
-    static let currentRequestHeaders = NetworkContent(rawValue: 1 << 7)
-    static let requestOptions = NetworkContent(rawValue: 1 << 8)
-    static let requestBody = NetworkContent(rawValue: 1 << 9)
-    static let responseHeaders = NetworkContent(rawValue: 1 << 10)
-    static let responseBody = NetworkContent(rawValue: 1 << 11)
+    package static let header = NetworkContent(rawValue: 1 << 0)
+    package static let largeHeader = NetworkContent(rawValue: 1 << 1)
+    package static let taskDetails = NetworkContent(rawValue: 1 << 2)
+    package static let requestComponents = NetworkContent(rawValue: 1 << 3)
+    package static let requestQueryItems = NetworkContent(rawValue: 1 << 4)
+    package static let errorDetails = NetworkContent(rawValue: 1 << 5)
+    package static let originalRequestHeaders = NetworkContent(rawValue: 1 << 6)
+    package static let currentRequestHeaders = NetworkContent(rawValue: 1 << 7)
+    package static let requestOptions = NetworkContent(rawValue: 1 << 8)
+    package static let requestBody = NetworkContent(rawValue: 1 << 9)
+    package static let responseHeaders = NetworkContent(rawValue: 1 << 10)
+    package static let responseBody = NetworkContent(rawValue: 1 << 11)
 
-    static let sharing: NetworkContent = [
+    package static let sharing: NetworkContent = [
         largeHeader, taskDetails, errorDetails, currentRequestHeaders, requestBody, responseHeaders, responseBody
     ]
 
-    static let preview: NetworkContent = [
+    package static let preview: NetworkContent = [
         largeHeader, taskDetails, errorDetails, responseBody
     ]
 
-    static let summary: NetworkContent = [
+    package static let summary: NetworkContent = [
         largeHeader, taskDetails, errorDetails, requestComponents, requestQueryItems, errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, responseHeaders
     ]
 
-    static let all: NetworkContent = [
+    package static let all: NetworkContent = [
         largeHeader, taskDetails, errorDetails, requestComponents, requestQueryItems, errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, requestBody, responseHeaders, responseBody
     ]
 }

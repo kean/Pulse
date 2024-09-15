@@ -6,7 +6,7 @@ import Foundation
 import Network
 
 extension RemoteLogger {
-    enum PacketCode: UInt8, Equatable {
+    package enum PacketCode: UInt8, Equatable {
         // Handshake
         case clientHello = 0 // PacketClientHello
         case serverHello = 1 // ServerHelloResponse
@@ -29,18 +29,18 @@ extension RemoteLogger {
         case message = 13
     }
 
-    struct PacketClientHello: Codable {
-        let version: String?
-        let deviceId: UUID
-        let deviceInfo: LoggerStore.Info.DeviceInfo
-        let appInfo: LoggerStore.Info.AppInfo
-        let session: LoggerStore.Session? // Added: 3.5.7
+    package struct PacketClientHello: Codable {
+        package let version: String?
+        package let deviceId: UUID
+        package let deviceInfo: LoggerStore.Info.DeviceInfo
+        package let appInfo: LoggerStore.Info.AppInfo
+        package let session: LoggerStore.Session? // Added: 3.5.7
     }
 
-    struct Empty: Codable {
+    package struct Empty: Codable {
     }
 
-    struct PacketNetworkMessage {
+    package struct PacketNetworkMessage {
         private struct Manifest: Codable {
             let messageSize: UInt32
             let requestBodySize: UInt32
@@ -53,7 +53,7 @@ extension RemoteLogger {
             }
         }
 
-        static func encode(_ event: LoggerStore.Event.NetworkTaskCompleted) throws -> Data {
+        package static func encode(_ event: LoggerStore.Event.NetworkTaskCompleted) throws -> Data {
             var contents = [Data]()
 
             var slimEvent = event
@@ -79,7 +79,7 @@ extension RemoteLogger {
             return data
         }
 
-        static func decode(_ data: Data) throws -> LoggerStore.Event.NetworkTaskCompleted {
+        package static func decode(_ data: Data) throws -> LoggerStore.Event.NetworkTaskCompleted {
             guard data.count >= Manifest.size else {
                 throw PacketParsingError.notEnoughData // Should never happen
             }
@@ -113,14 +113,14 @@ extension RemoteLogger {
         }
     }
 
-    struct Message {
-        struct Header {
-            let id: UInt32
-            let options: Options
-            let pathSize: UInt32
-            let dataSize: UInt32
+    package struct Message {
+        package struct Header {
+            package let id: UInt32
+            package let options: Options
+            package let pathSize: UInt32
+            package let dataSize: UInt32
 
-            init?(_ data: Data) {
+            package init?(_ data: Data) {
                 guard data.count >= headerSize else { return nil }
                 self.id = UInt32(data.from(0, size: 4))
                 self.options = Options(rawValue: data[4])
@@ -129,16 +129,17 @@ extension RemoteLogger {
             }
         }
 
-        struct Options: OptionSet {
-            let rawValue: UInt8
+        package struct Options: OptionSet {
+            package let rawValue: UInt8
+            package init(rawValue: UInt8) { self.rawValue = rawValue }
 
-            static let response = Options(rawValue: 1 << 0)
+            package static let response = Options(rawValue: 1 << 0)
         }
 
-        let id: UInt32
-        let options: Options
-        let path: Path
-        let data: Data
+        package let id: UInt32
+        package let options: Options
+        package let path: Path
+        package let data: Data
 
         // - id (UInt32)
         // - options (UInt8)
@@ -146,7 +147,7 @@ extension RemoteLogger {
         // - data size (UInt32)
         private static let headerSize = 13
 
-        static func encode(_ message: Message) throws -> Data {
+        package static func encode(_ message: Message) throws -> Data {
             guard let path = try? JSONEncoder().encode(message.path) else {
                 throw URLError(.unknown, userInfo: [:]) // Should never happen
             }
@@ -163,7 +164,7 @@ extension RemoteLogger {
             return data
         }
 
-        static func decode(_ data: Data) throws -> Message {
+        package static func decode(_ data: Data) throws -> Message {
             guard let header = Header(data) else {
                 throw PacketParsingError.notEnoughData // Should never happen
             }
@@ -176,12 +177,12 @@ extension RemoteLogger {
         }
     }
 
-    enum PacketParsingError: Error {
+    package enum PacketParsingError: Error {
         case notEnoughData
         case unsupportedContentSize
     }
 
-    enum Path: Codable {
+    package enum Path: Codable {
         case updateMocks
         case getMockedResponse(mockID: UUID)
         /// Payload: ``LoggerStore/Event/MessageCreated``.
@@ -190,33 +191,45 @@ extension RemoteLogger {
         case openTaskDetails
     }
 
-    struct ServerHelloResponse: Codable {
-        let version: String
+    package struct ServerHelloResponse: Codable {
+        package let version: String
+
+        package init(version: String) {
+            self.version = version
+        }
     }
 }
 
 extension RemoteLogger.Connection {
-    func send(code: RemoteLogger.PacketCode, data: Data) {
+    package func send(code: RemoteLogger.PacketCode, data: Data) {
         send(code: code.rawValue, data: data)
     }
 
-    func send<T: Encodable>(code: RemoteLogger.PacketCode, entity: T) {
+    package func send<T: Encodable>(code: RemoteLogger.PacketCode, entity: T) {
         send(code: code.rawValue, entity: entity)
     }
 
-    func send(code: RemoteLogger.PacketCode) {
+    package func send(code: RemoteLogger.PacketCode) {
         send(code: code.rawValue, entity: RemoteLogger.Empty())
     }
 }
 
-struct URLSessionMock: Hashable, Codable {
-    let mockID: UUID
-    var pattern: String
-    var method: String?
-    var skip: Int?
-    var count: Int?
+package struct URLSessionMock: Hashable, Codable {
+    package let mockID: UUID
+    package var pattern: String
+    package var method: String?
+    package var skip: Int?
+    package var count: Int?
 
-    func isMatch(_ request: URLRequest) -> Bool {
+    package init(mockID: UUID, pattern: String, method: String? = nil, skip: Int? = nil, count: Int? = nil) {
+        self.mockID = mockID
+        self.pattern = pattern
+        self.method = method
+        self.skip = skip
+        self.count = count
+    }
+
+    package func isMatch(_ request: URLRequest) -> Bool {
         if let lhs = request.httpMethod, let rhs = method,
            lhs.uppercased() != rhs.uppercased() {
             return false
@@ -227,7 +240,7 @@ struct URLSessionMock: Hashable, Codable {
         return isMatch(url)
     }
 
-    func isMatch(_ url: String) -> Bool {
+    package func isMatch(_ url: String) -> Bool {
         guard let regex = try? Regex(pattern, [.caseInsensitive]) else {
             return false
         }
@@ -235,11 +248,18 @@ struct URLSessionMock: Hashable, Codable {
     }
 }
 
-struct URLSessionMockedResponse: Codable {
-    let errorCode: Int?
-    let statusCode: Int?
-    let headers: [String: String]?
-    var body: String?
+package struct URLSessionMockedResponse: Codable {
+    package let errorCode: Int?
+    package let statusCode: Int?
+    package let headers: [String: String]?
+    package var body: String?
+
+    package init(errorCode: Int?, statusCode: Int?, headers: [String : String]?, body: String? = nil) {
+        self.errorCode = errorCode
+        self.statusCode = statusCode
+        self.headers = headers
+        self.body = body
+    }
 }
 
 // MARK: - Helpers (Binary Protocol)

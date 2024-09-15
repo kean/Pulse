@@ -96,7 +96,7 @@ extension LoggerStore {
         /// is ignored completely.
         public var willHandleEvent: @Sendable (Event) -> Event? = { $0 }
 
-        var isAutoStartingSession = true
+        package var isAutoStartingSession = true
 
         /// Initializes the configuration.
         ///

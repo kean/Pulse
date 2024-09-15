@@ -7,8 +7,7 @@ import Pulse
 import Combine
 import CoreData
 
-@available(iOS 15, visionOS 1, *)
-struct ConsoleTaskCell: View {
+package struct ConsoleTaskCell: View {
     @ObservedObject var task: NetworkTaskEntity
     var isDisclosureNeeded = false
 
@@ -16,19 +15,26 @@ struct ConsoleTaskCell: View {
     @ObservedObject private var settings: UserSettings = .shared
     @Environment(\.store) private var store: LoggerStore
 
-    enum EditableArea {
-        case header, timestamp, content, footer
+    package enum EditableArea {
+        case header, content, footer
     }
 
-    var highlightedArea: EditableArea?
+    package var highlightedArea: EditableArea?
 
-    var body: some View {
+    package init(task: NetworkTaskEntity, isDisclosureNeeded: Bool = false, highlightedArea: EditableArea? = nil) {
+        self.task = task
+        self.isDisclosureNeeded = isDisclosureNeeded
+        self.highlightedArea = highlightedArea
+    }
+
+    package var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             header
-            content.higlighted(highlightedArea == .content)
-
+            makeContent(settings: settings.listDisplayOptions.content)
+                .higlighted(highlightedArea == .content)
 #if os(iOS) || os(watchOS)
-            footer.higlighted(highlightedArea == .footer)
+            makeFooter(settings: settings.listDisplayOptions.footer)
+                .higlighted(highlightedArea == .footer)
 #endif
         }
     }
@@ -51,8 +57,10 @@ struct ConsoleTaskCell: View {
             info.higlighted(highlightedArea == .header)
 
             Spacer()
+#if canImport(RiftSupport)
+            PinView(task: task)
+#endif
             ConsoleTimestampView(date: task.createdAt)
-                .higlighted(highlightedArea == .timestamp)
                 .padding(.trailing, 3)
         }
         .overlay(alignment: .leading) {
@@ -60,7 +68,7 @@ struct ConsoleTaskCell: View {
 #if os(tvOS)
                 .offset(x: -20)
 #else
-                .offset(x: -15)
+                .offset(x: -14)
 #endif
         }
         .overlay(alignment: .trailing) {
@@ -100,19 +108,20 @@ struct ConsoleTaskCell: View {
 
     // MARK: – Content
 
-    private var content: some View {
+    private func makeContent(settings: ConsoleListDisplaySettings.ContentSettings) -> some View {
+        let design: Font.Design? = settings.isMonospaced ? .monospaced : nil
         var method: Text? {
-            guard settings.listDisplayOptions.content.showMethod, let method = task.httpMethod else {
+            guard settings.showMethod, let method = task.httpMethod else {
                 return nil
             }
             return Text(method.appending(" "))
-                .font(makeFont(size: settings.listDisplayOptions.content.fontSize).weight(.medium).smallCaps())
-                .tracking(-0.3)
+                .font(makeFont(size: settings.fontSize, design: design).weight(.medium).smallCaps())
+                .tracking(-0.2)
         }
 
         var main: Text {
-            Text(task.getFormattedContent(options: settings.listDisplayOptions) ?? "–")
-                .font(makeFont(size: settings.listDisplayOptions.content.fontSize))
+            Text(task.getFormattedContent(settings: settings) ?? "–")
+                .font(makeFont(size: settings.fontSize, design: design))
         }
 
         var text: Text {
@@ -124,75 +133,69 @@ struct ConsoleTaskCell: View {
         }
 
         return text
-            .lineLimit(settings.listDisplayOptions.content.lineLimit)
+            .lineLimit(settings.lineLimit)
     }
 
     // MARK: – Footer
 
     @ViewBuilder
-    private var footer: some View {
-        if let host = task.host, !host.isEmpty {
-            Text(host)
-                .lineLimit(settings.listDisplayOptions.footer.lineLimit)
-                .font(makeFont(size: settings.listDisplayOptions.footer.fontSize))
+    private func makeFooter(settings: ConsoleListDisplaySettings.FooterSettings) -> some View {
+        let design: Font.Design? = settings.isMonospaced ? .monospaced : nil
+        let fields = settings.fields.compactMap(task.makeInfoText)
+        if !fields.isEmpty {
+            Text(fields.joined(separator: " · "))
+                .lineLimit(settings.lineLimit)
+                .font(makeFont(size: settings.fontSize, design: design))
                 .foregroundStyle(.secondary)
+        }
+        let additional = settings.additionalFields.compactMap(task.makeInfoItem)
+        if !additional.isEmpty {
+            Divider().opacity(0.5).padding(.vertical, 2)
+            VStack(alignment: .leading, spacing: 4) {
+                ForEach(additional) { field in
+                    (Text(field.title + ": ").fontWeight(.medium) + Text(field.value))
+                        .lineLimit(settings.lineLimit)
+                        .font(makeFont(size: settings.fontSize, design: design))
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
     }
 
     // MARK: - Helpers
 
-    private func makeFont(size: Int) -> Font {
-        Font.system(size: CGFloat(size) * fontMultiplier)
-    }
-}
-
-private extension NetworkTaskEntity {
-    func makeInfoText(for field: ConsoleListDisplaySettings.TaskField) -> String? {
-        switch field {
-        case .method:
-            httpMethod
-        case .requestSize:
-            byteCount(for: requestBodySize)
-        case .responseSize:
-            byteCount(for: responseBodySize)
-        case .responseContentType:
-            responseContentType.map(NetworkLogger.ContentType.init)?.lastComponent.uppercased()
-        case .duration:
-            ConsoleFormatter.duration(for: self)
-        case .host:
-            host
-        case .statusCode:
-            statusCode != 0 ? statusCode.description : nil
-        case .taskType:
-            NetworkLogger.TaskType(rawValue: taskType)?.urlSessionTaskClassName
-        case .taskDescription:
-            taskDescription
-        case .requestHeaderField(let key):
-            (currentRequest?.headers ?? [:])[key]
-        case .responseHeaderField(let key):
-            (response?.headers ?? [:])[key]
+    private func makeFont(size: Int, weight: Font.Weight? = nil, design: Font.Design? = nil) -> Font {
+        if #available(iOS 16, tvOS 16, *) {
+            return Font.system(size: CGFloat(design == .monospaced ? size - 1 : size) * fontMultiplier, weight: weight, design: design)
+        } else {
+            return Font.system(size: CGFloat(design == .monospaced ? size - 1 : size) * fontMultiplier)
         }
     }
-
-    private func byteCount(for size: Int64) -> String {
-        guard size > 0 else { return "0 KB" }
-        return ByteCountFormatter.string(fromByteCount: size)
-    }
 }
+
+#if canImport(RiftSupport)
+import RiftSupport
 
 private extension View {
     @ViewBuilder
     func higlighted(_ isHighlighted: Bool) -> some View {
         if isHighlighted {
-            self.modifier(Components.makeHighlightModifier())
+            self.highlighted()
         } else {
             self
         }
     }
 }
+#else
+private extension View {
+    func higlighted(_ isHighlighted: Bool) -> some View {
+        self
+    }
+}
+#endif
 
 #if DEBUG
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleTaskCell_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleTaskCell(task: LoggerStore.preview.entity(for: .login))

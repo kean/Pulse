@@ -212,14 +212,19 @@ private struct TextViewSearchContextKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    var textViewSearchContext: TextViewSearchContext? {
+    package var textViewSearchContext: TextViewSearchContext? {
         get { self[TextViewSearchContextKey.self] }
         set { self[TextViewSearchContextKey.self] = newValue }
     }
 }
 
-struct TextViewSearchContext {
-    let searchTerm: ConsoleSearchTerm
-    let matchIndex: Int
+package struct TextViewSearchContext {
+    package let searchTerm: ConsoleSearchTerm
+    package let matchIndex: Int
+
+    package init(searchTerm: ConsoleSearchTerm, matchIndex: Int) {
+        self.searchTerm = searchTerm
+        self.matchIndex = matchIndex
+    }
 }
 

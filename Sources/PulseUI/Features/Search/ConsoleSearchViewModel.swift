@@ -7,7 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
-protocol ConsoleEntitiesSource {
+package protocol ConsoleEntitiesSource {
     var events: PassthroughSubject<ConsoleUpdateEvent, Never> { get }
     var entities: [NSManagedObject] { get }
 }
@@ -18,7 +18,7 @@ final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
     @Published var options: StringSearchOptions = .default
     @Published var scopes: Set<ConsoleSearchScope> = []
@@ -306,7 +306,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchResultViewModel: Identifiable {
     var id: ConsoleSearchResultKey { ConsoleSearchResultKey(id: entity.objectID) }
     let entity: NSManagedObject
@@ -331,12 +331,12 @@ struct ConsoleSearchParameters: Equatable, Hashable {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchSuggestionsViewModel {
     let searches: [ConsoleSearchSuggestion]
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchSuggestion: Identifiable {
     let id = UUID()
     let text: AttributedString

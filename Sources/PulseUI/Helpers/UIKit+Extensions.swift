@@ -19,7 +19,7 @@ extension UIView {
 }
 
 extension UIApplication {
-    static var keyWindow: UIWindow? {
+    package static var keyWindow: UIWindow? {
         shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
             .flatMap { $0.windows }

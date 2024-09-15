@@ -10,7 +10,7 @@ import Combine
 
 #if os(iOS) || os(macOS) || os(visionOS)
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 16, macOS 13, visionOS 1, *)
 struct SessionListView: View {
     @Binding var selection: Set<UUID>
     @Binding var sharedSessions: SelectedSessionsIDs?
@@ -141,9 +141,13 @@ struct SessionListView: View {
     }
 }
 
-struct SelectedSessionsIDs: Hashable, Identifiable {
-    var id: SelectedSessionsIDs { self }
-    let ids: Set<UUID>
+package struct SelectedSessionsIDs: Hashable, Identifiable {
+    package var id: SelectedSessionsIDs { self }
+    package let ids: Set<UUID>
+
+    package init(ids: Set<UUID>) {
+        self.ids = ids
+    }
 }
 
 private let sectionTitleFormatter: DateFormatter = {
@@ -157,7 +161,7 @@ private let sectionTitleFormatter: DateFormatter = {
 #endif
 
 @available(macOS 13, *)
-struct ConsoleSessionCell: View {
+package struct ConsoleSessionCell: View {
     let session: LoggerSessionEntity
     var isCompact = true
 
@@ -166,7 +170,12 @@ struct ConsoleSessionCell: View {
     @Environment(\.editMode) private var editMode
 #endif
 
-    var body: some View {
+    package init(session: LoggerSessionEntity, isCompact: Bool = true) {
+        self.session = session
+        self.isCompact = isCompact
+    }
+
+    package var body: some View {
         HStack(alignment: .lastTextBaseline) {
             Text(session.formattedDate(isCompact: isCompact))
                 .fontWeight(store.session.id == session.id ? .medium : .regular)

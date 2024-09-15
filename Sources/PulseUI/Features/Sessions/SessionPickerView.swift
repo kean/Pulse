@@ -10,7 +10,7 @@ import Combine
 
 #if os(iOS) || os(macOS) || os(visionOS)
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 16, macOS 13, visionOS 1, *)
 struct SessionPickerView: View {
     @Binding var selection: Set<UUID>
 

@@ -6,11 +6,11 @@ import Foundation
 import CoreData
 import CommonCrypto
 
-var Files: FileManager { FileManager.default }
+package var Files: FileManager { FileManager.default }
 
 extension FileManager {
     @discardableResult
-    func createDirectoryIfNeeded(at url: URL) -> Bool {
+    package func createDirectoryIfNeeded(at url: URL) -> Bool {
         guard !fileExists(atPath: url.path) else { return false }
         try? createDirectory(at: url, withIntermediateDirectories: true, attributes: [:])
         return true
@@ -18,22 +18,22 @@ extension FileManager {
 }
 
 extension URL {
-    func appending(filename: String) -> URL {
+    package func appending(filename: String) -> URL {
         appendingPathComponent(filename, isDirectory: false)
     }
 
-    func appending(directory: String) -> URL {
+    package func appending(directory: String) -> URL {
         appendingPathComponent(directory, isDirectory: true)
     }
 
-    static var temp: URL {
+    package static var temp: URL {
         let url = Files.temporaryDirectory
             .appending(directory: "com.github.kean.logger")
         Files.createDirectoryIfNeeded(at: url)
         return url
     }
 
-    static var logs: URL {
+    package static var logs: URL {
 #if os(tvOS)
         let searchPath = FileManager.SearchPathDirectory.cachesDirectory
 #else
@@ -58,7 +58,7 @@ extension Data {
     /// print("http://test.com".data(using: .utf8)!.sha1)
     /// // prints "c6b6cafcb77f54d43cd1bd5361522a5e0c074b65"
     /// ```
-    var sha1: Data {
+    package var sha1: Data {
         Data(withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> [UInt8] in
             var hash = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
             CC_SHA1(bytes.baseAddress, CC_LONG(count), &hash)
@@ -66,7 +66,7 @@ extension Data {
         })
     }
 
-    var hexString: String {
+    package var hexString: String {
         map { String(format: "%02x", $0) }.joined()
     }
 }
@@ -114,10 +114,14 @@ extension URL {
     }
 }
 
-struct LoggerBlogDataStore {
-    let getDecompressedData: (LoggerBlobHandleEntity) -> Data?
+package struct LoggerBlogDataStore {
+    package let getDecompressedData: (LoggerBlobHandleEntity) -> Data?
 
-    init(_ store: LoggerStore) {
+    package init(_ getDecompressedData: @escaping (LoggerBlobHandleEntity) -> Data?) {
+        self.getDecompressedData = getDecompressedData
+    }
+
+    package init(_ store: LoggerStore) {
         self.getDecompressedData = { [weak store] in
             store?.getDecompressedData(for: $0)
         }
@@ -128,7 +132,7 @@ struct LoggerBlogDataStore {
     }
 
     /// The key for `NSManagedObjectContext` `userInfo`.
-    static let loggerStoreKey = "com.github.kean.pulse.associated-logger-store"
+    package static let loggerStoreKey = "com.github.kean.pulse.associated-logger-store"
 }
 
 struct TemporaryDirectory {
@@ -145,11 +149,11 @@ struct TemporaryDirectory {
 }
 
 extension Data {
-    func compressed() throws -> Data {
+    package func compressed() throws -> Data {
         try (self as NSData).compressed(using: .lzfse) as Data
     }
 
-    func decompressed() throws -> Data {
+    package func decompressed() throws -> Data {
         try (self as NSData).decompressed(using: .lzfse) as Data
     }
 }

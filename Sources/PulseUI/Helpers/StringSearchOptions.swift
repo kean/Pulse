@@ -4,31 +4,37 @@
 
 import Foundation
 
-struct StringSearchOptions: Equatable, Hashable, Codable {
-    var kind: Kind = .text
-    var caseSensitivity: CaseSensitivity = .ignoringCase
-    var rule: MatchingRule = .contains
+package struct StringSearchOptions: Equatable, Hashable, Codable {
+    package var kind: Kind
+    package var caseSensitivity: CaseSensitivity
+    package var rule: MatchingRule
 
-    static let `default` = StringSearchOptions()
+    package static let `default` = StringSearchOptions()
 
-    enum Kind: String, Hashable, Codable, CaseIterable {
+    package init(kind: Kind = .text, caseSensitivity: CaseSensitivity = .ignoringCase, rule: MatchingRule = .contains) {
+        self.kind = kind
+        self.caseSensitivity = caseSensitivity
+        self.rule = rule
+    }
+
+    package enum Kind: String, Hashable, Codable, CaseIterable {
         case text = "Text"
         case wildcard = "Wildcard"
         case regex = "Regular Expression"
     }
 
-    enum CaseSensitivity: String, Hashable, Codable, CaseIterable {
+    package enum CaseSensitivity: String, Hashable, Codable, CaseIterable {
         case ignoringCase = "Ignoring Case"
         case matchingCase = "Matching Case"
     }
 
-    enum MatchingRule: String, Equatable, Hashable, Codable, CaseIterable {
+    package enum MatchingRule: String, Equatable, Hashable, Codable, CaseIterable {
         case begins = "Begins With"
         case contains = "Contains"
         case ends = "Ends With"
     }
 
-    var title: String {
+    package var title: String {
         switch kind {
         case .text: return rule.rawValue
         case .wildcard: return "Contains"
@@ -36,7 +42,7 @@ struct StringSearchOptions: Equatable, Hashable, Codable {
         }
     }
 
-    func allEligibleMatchingRules() -> [MatchingRule]? {
+    package func allEligibleMatchingRules() -> [MatchingRule]? {
         switch kind {
         case .text, .wildcard: return MatchingRule.allCases
         case .regex: return nil
@@ -45,7 +51,7 @@ struct StringSearchOptions: Equatable, Hashable, Codable {
 }
 
 extension String.CompareOptions {
-    init(_ options: StringSearchOptions) {
+    package init(_ options: StringSearchOptions) {
         self.init()
         if options.kind == .regex || options.kind == .wildcard {
             insert(.regularExpression)
@@ -72,13 +78,13 @@ extension String.CompareOptions {
 
 extension String {
     /// Returns first range of substring.
-    func firstRange(of substring: String, options: String.CompareOptions = []) -> Range<String.Index>? {
+    package func firstRange(of substring: String, options: String.CompareOptions = []) -> Range<String.Index>? {
         range(of: substring, options: options, range: startIndex..<endIndex, locale: nil)
     }
 }
 
 extension String {
-    func ranges(of target: String, options: StringSearchOptions) -> [Range<String.Index>] {
+    package func ranges(of target: String, options: StringSearchOptions) -> [Range<String.Index>] {
         var startIndex = target.startIndex
         var ranges = [Range<String.Index>]()
         let target = options.kind == .wildcard ? makeRegexForWildcard(target, rule: options.rule) : target
@@ -93,7 +99,7 @@ extension String {
 }
 
 extension NSString {
-    func ranges(of substring: String, options: StringSearchOptions) -> [NSRange] {
+    package func ranges(of substring: String, options: StringSearchOptions) -> [NSRange] {
         var index = 0
         var ranges = [NSRange]()
         let substring = options.kind == .wildcard ? makeRegexForWildcard(substring, rule: options.rule) : substring

@@ -7,19 +7,21 @@ import CoreData
 import Pulse
 import Combine
 
-final class ConsoleRouter: ObservableObject {
+package final class ConsoleRouter: ObservableObject {
 #if os(macOS)
-    @Published var selection: ConsoleSelectedItem?
+    @Published package var selection: ConsoleSelectedItem?
 #endif
-    @Published var shareItems: ShareItems?
-    @Published var isShowingFilters = false
-    @Published var isShowingSettings = false
-    @Published var isShowingSessions = false
-    @Published var isShowingShareStore = false
+    @Published package var shareItems: ShareItems?
+    @Published package var isShowingFilters = false
+    @Published package var isShowingSettings = false
+    @Published package var isShowingSessions = false
+    @Published package var isShowingShareStore = false
+
+    package init() {}
 }
 
 #if os(macOS)
-enum ConsoleSelectedItem: Hashable {
+package enum ConsoleSelectedItem: Hashable {
     case entity(NSManagedObjectID)
     case occurrence(NSManagedObjectID, ConsoleSearchOccurrence)
 }
@@ -30,14 +32,14 @@ struct ConsoleRouterView: View {
     @EnvironmentObject var router: ConsoleRouter
 
     var body: some View {
-        if #available(iOS 15, macOS 13, *) {
+        if #available(iOS 16, macOS 13, *) {
             contents
         }
     }
 }
 
 #if os(iOS) || os(visionOS)
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 extension ConsoleRouterView {
     var contents: some View {
         Text("").invisible()
@@ -89,7 +91,7 @@ extension ConsoleRouterView {
     private var destinationShareStore: some View {
         NavigationView {
             ShareStoreView(onDismiss: { router.isShowingShareStore = false })
-        }.backport.presentationDetents([.medium, .large])
+        }.presentationDetents([.medium, .large])
     }
 }
 

@@ -5,11 +5,16 @@
 import SwiftUI
 import Pulse
 
-struct ConsoleSearchToggleCell: View {
-    let title: String
-    @Binding var isOn: Bool
+package struct ConsoleSearchToggleCell: View {
+    package let title: String
+    @Binding package var isOn: Bool
 
-    var body: some View {
+    package init(title: String, isOn: Binding<Bool>) {
+        self.title = title
+        self._isOn = isOn
+    }
+
+    package var body: some View {
 #if os(macOS)
         HStack {
             Toggle(title, isOn: $isOn)

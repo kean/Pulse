@@ -252,7 +252,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         return container
     }
 
-    func startSession(_ session: Session, info: Info.AppInfo) {
+    package func startSession(_ session: Session, info: Info.AppInfo) {
         backgroundContext.performAndWait {
             self.session = session
             saveEntity(for: session, info: info)
@@ -342,7 +342,7 @@ extension LoggerStore {
     }
 
     /// Handles event emitted by the external store.
-    func handleExternalEvent(_ event: Event) {
+    package func handleExternalEvent(_ event: Event) {
         perform { _ in self._handle(event) }
     }
 
@@ -710,7 +710,7 @@ extension LoggerStore {
 
     // MARK: - Performing Changes
 
-    func perform(_ changes: @escaping (NSManagedObjectContext) -> Void) {
+    package func perform(_ changes: @escaping (NSManagedObjectContext) -> Void) {
         if options.contains(.synchronous) {
             backgroundContext.performAndWait {
                 changes(backgroundContext)
@@ -1252,17 +1252,17 @@ extension LoggerStore {
 // MARK: - LoggerStore (Manifest)
 
 extension LoggerStore {
-    private struct Manifest: Codable {
-        var storeId: UUID
-        var version: Version
-        var lastSweepDate: Date?
+    package struct Manifest: Codable {
+        package var storeId: UUID
+        package var version: Version
+        package var lastSweepDate: Date?
 
-        init(storeId: UUID, version: Version) {
+        package init(storeId: UUID, version: Version) {
             self.storeId = storeId
             self.version = version
         }
 
-        init?(url: URL) {
+        package init?(url: URL) {
             guard let data = try? Data(contentsOf: url),
                   let manifest = try? JSONDecoder().decode(Manifest.self, from: data) else {
                 return nil
@@ -1273,14 +1273,14 @@ extension LoggerStore {
 }
 
 extension Version {
-    static let minimumSupportedVersion = Version(3, 1, 0)
-    static let currentStoreVersion = Version(3, 6, 0)
-    static let currentProtocolVersion = Version(4, 0, 0)
+    package static let minimumSupportedVersion = LoggerStore.Version(3, 1, 0)
+    package static let currentStoreVersion = LoggerStore.Version(3, 6, 0)
+    package static let currentProtocolVersion = LoggerStore.Version(4, 0, 0)
 }
 
 // MARK: - Constants
 
-let manifestFilename = "manifest.json"
-let databaseFilename = "logs.sqlite"
-let infoFilename = "info.json"
-let blobsDirectoryName = "blobs"
+package let manifestFilename = "manifest.json"
+package let databaseFilename = "logs.sqlite"
+package let infoFilename = "info.json"
+package let blobsDirectoryName = "blobs"

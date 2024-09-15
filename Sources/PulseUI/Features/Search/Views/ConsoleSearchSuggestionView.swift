@@ -9,7 +9,7 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchSuggestionView: View {
     let suggestion: ConsoleSearchSuggestion
     let action: () -> Void

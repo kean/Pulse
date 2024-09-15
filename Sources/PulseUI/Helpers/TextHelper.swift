@@ -6,13 +6,13 @@ import Foundation
 import SwiftUI
 
 /// Manages text attributes.
-final class TextHelper {
+package final class TextHelper {
     private var cachedAttributes: [AttributesKey: [NSAttributedString.Key: Any]] = [:]
     private var cachedFonts: [TextStyle: UXFont] = [:]
 
-    init() {}
+    package init() {}
 
-    func attributes(
+    package func attributes(
         role: TextRole,
         style: TextFontStyle = .proportional,
         weight: UXFont.Weight = .regular,
@@ -26,7 +26,7 @@ final class TextHelper {
         .font: scaled(font: UXFont.systemFont(ofSize: 10))
     ]
 
-    func attributes(style: TextStyle, color: UXColor?) -> [NSAttributedString.Key: Any] {
+    package func attributes(style: TextStyle, color: UXColor?) -> [NSAttributedString.Key: Any] {
         let key = AttributesKey(textStyle: style, color: color)
         if let attributes = cachedAttributes[key] {
             return attributes
@@ -36,7 +36,7 @@ final class TextHelper {
         return attributes
     }
 
-    func font(style: TextStyle) -> UXFont {
+    package func font(style: TextStyle) -> UXFont {
         if let font = cachedFonts[style] {
             return font
         }
@@ -120,14 +120,21 @@ final class TextHelper {
     }
 }
 
-struct TextStyle: Hashable {
-    var role: TextRole
-    var style: TextFontStyle = .proportional
-    var weight: UXFont.Weight = .regular
-    var width: TextWidth = .standard
+package struct TextStyle: Hashable {
+    package var role: TextRole
+    package var style: TextFontStyle
+    package var weight: UXFont.Weight
+    package var width: TextWidth
+
+    package init(role: TextRole, style: TextFontStyle = .proportional, weight: UXFont.Weight = .regular, width: TextWidth = .standard) {
+        self.role = role
+        self.style = style
+        self.weight = weight
+        self.width = width
+    }
 }
 
-enum TextRole {
+package enum TextRole {
     /// Large title.
     case title
     /// Section headline (small).
@@ -141,17 +148,17 @@ enum TextRole {
     /// Smaller body for console and other views where information has to be
     /// condensed.
     ///
-    /// Font size: iOS 15, macOS 12, tvOS 26, watchOS 14.
+    /// Font size: iOS 16, macOS 12, tvOS 26, watchOS 14.
     case body2
 }
 
-enum TextFontStyle {
+package enum TextFontStyle {
     case proportional
     case monospaced
     case monospacedDigital
 }
 
-enum TextWidth {
+package enum TextWidth {
     case condensed
     case standard
 }

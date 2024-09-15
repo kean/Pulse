@@ -9,17 +9,22 @@ import SwiftUI
 import WebKit
 import UIKit
 
-struct WebView: UIViewRepresentable {
-    let data: Data
-    let contentType: String
+package struct WebView: UIViewRepresentable {
+    package let data: Data
+    package let contentType: String
 
-    func makeUIView(context: Context) -> WKWebView {
+    package init(data: Data, contentType: String) {
+        self.data = data
+        self.contentType = contentType
+    }
+
+    package func makeUIView(context: Context) -> WKWebView {
         let webView = WKWebView(frame: .zero, configuration: .init())
         webView.load(data, mimeType: contentType, characterEncodingName: "UTF8", baseURL: FileManager.default.temporaryDirectory)
         return webView
     }
 
-    func updateUIView(_ webView: WKWebView, context: Context) {
+    package func updateUIView(_ webView: WKWebView, context: Context) {
         // Do nothing
     }
 }
@@ -30,17 +35,17 @@ struct WebView: UIViewRepresentable {
 import WebKit
 import AppKit
 
-struct WebView: NSViewRepresentable {
-    let data: Data
-    let contentType: String
+package struct WebView: NSViewRepresentable {
+    package let data: Data
+    package let contentType: String
 
-    func makeNSView(context: Context) -> WKWebView {
+    package func makeNSView(context: Context) -> WKWebView {
         let webView = WKWebView(frame: .zero, configuration: .init())
         webView.load(data, mimeType: contentType, characterEncodingName: "UTF8", baseURL: FileManager.default.temporaryDirectory)
         return webView
     }
 
-    func updateNSView(_ nsView: WKWebView, context: Context) {
+    package func updateNSView(_ nsView: WKWebView, context: Context) {
         // Do nothing
     }
 }

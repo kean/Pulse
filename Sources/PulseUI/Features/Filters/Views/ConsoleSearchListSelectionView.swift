@@ -5,27 +5,47 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 15, visionOS 1.0, *)
-struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable, Label: View>: View {
-    let title: String
-    let items: Data
-    let id: KeyPath<Data.Element, ID>
-    @Binding var selection: Set<ID>
-    let description: (Data.Element) -> String
-    @ViewBuilder let label: (Data.Element) -> Label
+@available(iOS 16, visionOS 1, *)
+package struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable, Label: View>: View {
+    package let title: String
+    package let items: Data
+    package let id: KeyPath<Data.Element, ID>
+    @Binding package var selection: Set<ID>
+    package let description: (Data.Element) -> String
+    @ViewBuilder package let label: (Data.Element) -> Label
 
 #if os(iOS) || os(macOS) || os(visionOS)
-    var limit = 6
+    package var limit = 6
 #else
-    var limit = 3
+    package var limit = 3
 #endif
+
+    package init(
+        title: String,
+        items: Data,
+        id: KeyPath<Data.Element, ID>,
+        selection: Binding<Set<ID>>,
+        description: @escaping (Data.Element) -> String,
+        @ViewBuilder label: @escaping (Data.Element) -> Label,
+        limit: Int? = nil
+    ) {
+        self.title = title
+        self.items = items
+        self.id = id
+        self._selection = selection
+        self.description = description
+        self.label = label
+        if let limit {
+            self.limit = limit
+        }
+    }
 
     @State private var searchText = ""
 
 #if os(macOS)
     @State private var isExpanded = false
 
-    var body: some View {
+    package var body: some View {
         if items.isEmpty {
             emptyView
         } else {
@@ -53,7 +73,7 @@ struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable
     @State private var isExpandedListPresented = false
     @State private var isSearching = false
 
-    var body: some View {
+    package var body: some View {
         if items.isEmpty {
             emptyView
         } else {
@@ -136,7 +156,7 @@ struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable
 }
 
 #if DEBUG
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchListSelectionView_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleSearchListSelectionViewDemo()
@@ -144,7 +164,7 @@ struct ConsoleSearchListSelectionView_Previews: PreviewProvider {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 private struct ConsoleSearchListSelectionViewDemo: View {
     @State private var selection: Set<String>  = []
 

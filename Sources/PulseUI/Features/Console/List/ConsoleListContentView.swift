@@ -9,7 +9,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleListContentView: View {
     @EnvironmentObject var viewModel: ConsoleListViewModel
 
@@ -63,13 +63,17 @@ struct ConsoleListContentView: View {
 }
 
 #if os(iOS) || os(visionOS)
-@available(iOS 15, visionOS 1.0, *)
-struct ConsoleStaticList: View {
-    let entities: [NSManagedObject]
+@available(iOS 16, visionOS 1, *)
+package struct ConsoleStaticList: View {
+    package let entities: [NSManagedObject]
 
-    var body: some View {
+    package init(entities: [NSManagedObject]) {
+        self.entities = entities
+    }
+
+    package var body: some View {
         List {
-            ForEach(entities, id: \.objectID, content: Components.makeConsoleEntityCell)
+            ForEach(entities, id: \.objectID, content: ConsoleEntityCell.init)
         }
         .listStyle(.plain)
 #if os(iOS) || os(visionOS)

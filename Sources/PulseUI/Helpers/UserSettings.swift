@@ -26,14 +26,12 @@ public final class UserSettings: ObservableObject {
     @AppStorage("com.github.kean.pulse.sharingOutput")
     public var sharingOutput: ShareStoreOutput = .store
 
-    /// HTTP headers to display in a Console. By default, empty.
+    // Deprecated in Pulse 5.1.
+    @available(*, deprecated, message: "Replaced with listDisplayOptions.header.fields and listDisplayOptions.footer.fields")
     public var displayHeaders: [String] {
-        get { decode(rawDisplayHeaders) ?? [] }
-        set { rawDisplayHeaders = encode(newValue) ?? "[]" }
+        get { [] }
+        set { }
     }
-
-    @AppStorage("com.github.kean.pulse.display.headers")
-    var rawDisplayHeaders: String = "[]"
 
     /// If `true`, the network inspector will show the current request by default.
     /// If `false`, show the original request.

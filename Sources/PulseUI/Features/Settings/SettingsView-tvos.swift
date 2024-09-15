@@ -21,8 +21,10 @@ public struct SettingsView: View {
                 RemoteLoggerSettingsView(viewModel: .shared)
             }
             Section {
-                NavigationLink(destination: StoreDetailsView(source: .store(store))) {
-                    Text("Store Info")
+                if #available(tvOS 16, *) {
+                    NavigationLink(destination: StoreDetailsView(source: .store(store))) {
+                        Text("Store Info")
+                    }
                 }
                 if !store.options.contains(.readonly) {
                     Button(role: .destructive, action: { store.removeAll() }) {

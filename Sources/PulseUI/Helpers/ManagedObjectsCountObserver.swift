@@ -4,12 +4,12 @@
 
 import CoreData
 
-final class ManagedObjectsCountObserver: NSObject, ObservableObject, NSFetchedResultsControllerDelegate {
-    let controller: NSFetchedResultsController<NSManagedObject>
+package final class ManagedObjectsCountObserver: NSObject, ObservableObject, NSFetchedResultsControllerDelegate {
+    package let controller: NSFetchedResultsController<NSManagedObject>
 
-    @Published private(set) var count = 0
+    @Published private(set) package var count = 0
 
-    init<T: NSManagedObject>(entity: T.Type, context: NSManagedObjectContext, sortDescriptior: NSSortDescriptor) {
+    package init<T: NSManagedObject>(entity: T.Type, context: NSManagedObjectContext, sortDescriptior: NSSortDescriptor) {
         let request = NSFetchRequest<NSManagedObject>(entityName: "\(T.self)")
         request.fetchBatchSize = 1
         request.sortDescriptors = [sortDescriptior]
@@ -22,17 +22,17 @@ final class ManagedObjectsCountObserver: NSObject, ObservableObject, NSFetchedRe
         self.refresh()
     }
 
-    func setPredicate(_ predicate: NSPredicate?) {
+    package func setPredicate(_ predicate: NSPredicate?) {
         controller.fetchRequest.predicate = predicate
         refresh()
     }
 
-    func refresh() {
+    package func refresh() {
         try? controller.performFetch()
         self.count = controller.fetchedObjects?.count ?? 0
     }
 
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    package func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         self.count = controller.fetchedObjects?.count ?? 0
     }
 }

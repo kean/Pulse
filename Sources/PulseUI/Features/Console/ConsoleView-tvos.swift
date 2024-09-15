@@ -61,8 +61,12 @@ private struct ConsoleMenuView: View {
         } header: { Text("Quick Filters") }
         if !(store.options.contains(.readonly)) {
             Section {
-                NavigationLink(destination: destinationStoreDetails) {
-                    Label("Store Info", systemImage: "info.circle")
+                if #available(iOS 16, tvOS 16, *) {
+                    NavigationLink {
+                        StoreDetailsView(source: .store(store)).padding()
+                    } label: {
+                        Label("Store Info", systemImage: "info.circle")
+                    }
                 }
                 Button(role: .destructive, action: {
                     environment.index.clear()
@@ -81,10 +85,6 @@ private struct ConsoleMenuView: View {
 
     private var destinationSettings: some View {
         SettingsView(store: store).padding()
-    }
-
-    private var destinationStoreDetails: some View {
-        StoreDetailsView(source: .store(store)).padding()
     }
 
     private var destinationFilters: some View {

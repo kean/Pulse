@@ -4,11 +4,16 @@ import SwiftUI
 
 import SwiftUI
 
-struct SectionHeaderView: View {
-    var systemImage: String?
-    let title: String
+package struct SectionHeaderView: View {
+    package var systemImage: String?
+    package let title: String
 
-    var body: some View {
+    package init(systemImage: String? = nil, title: String) {
+        self.systemImage = systemImage
+        self.title = title
+    }
+
+    package var body: some View {
         HStack {
             if let systemImage = systemImage {
                 Image(systemName: systemImage)

@@ -5,7 +5,7 @@
 import SwiftUI
 import Network
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct RemoteLoggerErrorView: View {
     let error: NWError
 
@@ -55,7 +55,7 @@ private struct RemoteLoggerPolicyDeniedView: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 private struct RemoteLoggerNoAuthView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -93,7 +93,7 @@ private let plistContents = """
 """
 
 #if DEBUG
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct Previews_RemoteLoggerNoAuthView_Previews: PreviewProvider {
     static var previews: some View {
         Form {

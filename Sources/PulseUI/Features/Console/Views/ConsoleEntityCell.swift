@@ -9,7 +9,7 @@ import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 15, visionOS 1, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleEntityCell: View {
     let entity: NSManagedObject
 
@@ -23,7 +23,7 @@ struct ConsoleEntityCell: View {
     }
 }
 
-@available(iOS 15, visionOS 1, *)
+@available(iOS 16, visionOS 1, *)
 private struct _ConsoleMessageCell: View {
     let message: LoggerMessageEntity
 
@@ -59,7 +59,7 @@ private struct _ConsoleMessageCell: View {
     }
 }
 
-@available(iOS 15, visionOS 1, *)
+@available(iOS 16, visionOS 1, *)
 private struct _ConsoleTaskCell: View {
     let task: NetworkTaskEntity
     @State private var shareItems: ShareItems?

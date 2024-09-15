@@ -9,13 +9,13 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 protocol ConsoleSearchOperationDelegate: AnyObject {
     func searchOperation(_ operation: ConsoleSearchOperation, didAddResults results: [ConsoleSearchResultViewModel])
     func searchOperationDidFinish(_ operation: ConsoleSearchOperation, hasMore: Bool)
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 final class ConsoleSearchOperation {
     private let parameters: ConsoleSearchParameters
     private var entities: [NSManagedObject]
@@ -188,30 +188,37 @@ final class ConsoleSearchOperation {
     }
 }
 
-struct ConsoleSearchMatch {
-    let line: String
+package struct ConsoleSearchMatch {
+    package let line: String
     /// Starts with `1.
-    let lineNumber: Int
-    let range: Range<String.Index>
-    let term: ConsoleSearchTerm
+    package let lineNumber: Int
+    package let range: Range<String.Index>
+    package let term: ConsoleSearchTerm
 
-    static let limit = 1000
+    package static let limit = 1000
+
+    package init(line: String, lineNumber: Int, range: Range<String.Index>, term: ConsoleSearchTerm) {
+        self.line = line
+        self.lineNumber = lineNumber
+        self.range = range
+        self.term = term
+    }
 }
 
-@available(iOS 15, visionOS 1.0, *)
-final class ConsoleSearchService {
+@available(iOS 16, visionOS 1, *)
+package final class ConsoleSearchService {
     private let cache = NSCache<NSManagedObjectID, CachedString>()
 
-    init() {
+    package init() {
         cache.totalCostLimit = 16_000_000
         cache.countLimit = 1000
     }
 
-    func clearCache() {
+    package func clearCache() {
         cache.removeAllObjects()
     }
 
-    func getBodyString(for blob: LoggerBlobHandleEntity) -> String? {
+    package func getBodyString(for blob: LoggerBlobHandleEntity) -> String? {
         if let string = cache.object(forKey: blob.objectID)?.value {
             return string
         }

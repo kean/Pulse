@@ -9,8 +9,8 @@ import CoreData
 import Pulse
 import Combine
 
-@available(iOS 15, visionOS 1, macOS 13, *)
-struct NetworkInspectorView: View {
+@available(iOS 16, visionOS 1, macOS 13, *)
+package struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
 
     @State private var shareItems: ShareItems?
@@ -18,7 +18,11 @@ struct NetworkInspectorView: View {
     @ObservedObject private var settings: UserSettings = .shared
     @Environment(\.store) private var store
 
-    var body: some View {
+    package init(task: NetworkTaskEntity) {
+        self.task = task
+    }
+
+    package var body: some View {
         List {
             contents
         }
@@ -27,7 +31,7 @@ struct NetworkInspectorView: View {
         .safeAreaInset(edge: .bottom) {
             OpenOnMacOverlay(entity: task)
         }
-        .inlineNavigationTitle(ConsoleViewDelegate.getShortTitle(for: task))
+        .inlineNavigationTitle(task.getShortTitle(options: settings.listDisplayOptions))
         .sheet(item: $shareItems, content: ShareView.init)
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
@@ -95,7 +99,7 @@ struct NetworkInspectorView: View {
 }
 
 #if DEBUG
-@available(iOS 15, visionOS 1, macOS 13, *)
+@available(iOS 16, visionOS 1, macOS 13, *)
 struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
         Group {

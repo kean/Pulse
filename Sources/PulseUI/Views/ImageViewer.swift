@@ -5,10 +5,14 @@
 import SwiftUI
 import Pulse
 
-struct ImageViewer: View {
-    let viewModel: ImagePreviewViewModel
+package struct ImageViewer: View {
+    package let viewModel: ImagePreviewViewModel
 
-    var body: some View {
+    package init(viewModel: ImagePreviewViewModel) {
+        self.viewModel = viewModel
+    }
+
+    package var body: some View {
         VStack(spacing: 16) {
             ImageThumbnailView(viewModel: viewModel)
 
@@ -22,10 +26,14 @@ struct ImageViewer: View {
     }
 }
 
-struct ImageThumbnailView: View {
+package struct ImageThumbnailView: View {
     let viewModel: ImagePreviewViewModel
 
-    var body: some View {
+    package init(viewModel: ImagePreviewViewModel) {
+        self.viewModel = viewModel
+    }
+
+    package var body: some View {
         Image(uxImage: viewModel.image)
             .resizable()
             .aspectRatio(contentMode: .fit)
@@ -34,12 +42,12 @@ struct ImageThumbnailView: View {
     }
 }
 
-struct ImagePreviewViewModel {
-    let image: UXImage
-    let info: KeyValueSectionViewModel
-    let context: FileViewerViewModelContext
+package struct ImagePreviewViewModel {
+    package let image: UXImage
+    package let info: KeyValueSectionViewModel
+    package let context: FileViewerViewModelContext
 
-    init(image: UXImage, data: Data, context: FileViewerViewModelContext) {
+    package init(image: UXImage, data: Data, context: FileViewerViewModelContext) {
         func intValue(for key: String) -> Int? {
             context.metadata?[key].flatMap { Int($0) }
         }

@@ -8,7 +8,7 @@ extension LoggerStore {
     /// Returns Core Data model used by the store.
     /// 
     /// - warning: Model has to be loaded only once.
-    nonisolated(unsafe) static let model: NSManagedObjectModel = {
+    nonisolated(unsafe) package static let model: NSManagedObjectModel = {
         typealias Entity = NSEntityDescription
         typealias Attribute = NSAttributeDescription
         typealias Relationship = NSRelationshipDescription

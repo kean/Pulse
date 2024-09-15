@@ -9,7 +9,7 @@ import Combine
 
 #if os(iOS) || os(visionOS)
 
-@available(iOS 15, visionOS 1.0, macOS 13, *)
+@available(iOS 16, visionOS 1, macOS 13, *)
 struct ConsoleSearchResultView: View {
     let viewModel: ConsoleSearchResultViewModel
     var limit: Int = 4
@@ -100,7 +100,7 @@ struct ConsoleSearchResultView: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchResultDetailsView: View {
     let viewModel: ConsoleSearchResultViewModel
 
@@ -114,9 +114,11 @@ struct ConsoleSearchResultDetailsView: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
-struct PlainListGroupSeparator: View {
-    var body: some View {
+@available(iOS 16, visionOS 1, *)
+package struct PlainListGroupSeparator: View {
+    package init() {}
+
+    package var body: some View {
         Rectangle().foregroundColor(.clear) // DIY separator
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowBackground(Color.separator.opacity(0.2))
@@ -129,12 +131,17 @@ struct PlainListGroupSeparator: View {
 
 #if os(iOS) || os(visionOS) || os(macOS)
 
-@available(iOS 15, macOS 13, visionOS 1, *)
-struct PlainListSectionHeader<Content: View>: View {
-    var title: String?
-    @ViewBuilder let content: () -> Content
+@available(iOS 16, macOS 13, visionOS 1, *)
+package struct PlainListSectionHeader<Content: View>: View {
+    package var title: String?
+    @ViewBuilder package let content: () -> Content
 
-    var body: some View {
+    package init(title: String? = nil, @ViewBuilder content: @escaping () -> Content) {
+        self.title = title
+        self.content = content
+    }
+
+    package var body: some View {
         contents
             .padding(.top, 8)
             .listRowBackground(Color.separator.opacity(0.2))
@@ -157,18 +164,22 @@ struct PlainListSectionHeader<Content: View>: View {
     }
 }
 
-@available(iOS 15, macOS 13, visionOS 1, *)
+@available(iOS 16, macOS 13, visionOS 1, *)
 extension PlainListSectionHeader where Content == Text {
     init(title: String) {
         self.init(title: title, content: { Text(title) })
     }
 }
 
-@available(iOS 15, visionOS 1, *)
-struct PlainListSeeAllView: View {
+@available(iOS 16, visionOS 1, *)
+package struct PlainListSeeAllView: View {
     let count: Int
 
-    var body: some View {
+    package init(count: Int) {
+        self.count = count
+    }
+
+    package var body: some View {
         (Text("Show All").foregroundColor(.accentColor) +
          Text("  (\(count))"))
         .font(.subheadline)
@@ -177,11 +188,15 @@ struct PlainListSeeAllView: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
-struct PlainListSectionHeaderSeparator: View {
+@available(iOS 16, visionOS 1, *)
+package struct PlainListSectionHeaderSeparator: View {
     let title: String
 
-    var body: some View {
+    package init(title: String) {
+        self.title = title
+    }
+
+    package var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
             Text(title)
                 .foregroundColor(.secondary)

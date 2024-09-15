@@ -9,20 +9,16 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleToolbarView: View {
     @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
-        if #available(iOS 16.0, *) {
-            ViewThatFits {
-                horizontal
-                vertical
-            }
-            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
-        } else {
+        ViewThatFits {
             horizontal
+            vertical
         }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
 
     private var horizontal: some View {
@@ -100,13 +96,20 @@ private struct ConsoleToolbarTitle: View {
     }
 }
 
-struct ConsoleModeButton: View {
-    let title: String
-    var details: String?
-    let isSelected: Bool
-    let action: () -> Void
+package struct ConsoleModeButton: View {
+    package let title: String
+    package var details: String?
+    package let isSelected: Bool
+    package let action: () -> Void
 
-    var body: some View {
+    package init(title: String, details: String? = nil, isSelected: Bool, action: @escaping () -> Void) {
+        self.title = title
+        self.details = details
+        self.isSelected = isSelected
+        self.action = action
+    }
+
+    package var body: some View {
         Button(action: action) {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(title)
@@ -131,7 +134,7 @@ struct ConsoleModeButton: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleListOptionsView: View {
     @EnvironmentObject private var filters: ConsoleFiltersViewModel
 

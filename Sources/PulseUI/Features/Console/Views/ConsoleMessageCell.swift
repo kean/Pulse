@@ -7,15 +7,19 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, visionOS 1, *)
-struct ConsoleMessageCell: View {
-    let message: LoggerMessageEntity
-    var isDisclosureNeeded = false
+package struct ConsoleMessageCell: View {
+    package let message: LoggerMessageEntity
+    package var isDisclosureNeeded = false
 
     @ScaledMetric(relativeTo: .body) private var fontMultiplier = 17.0
     @ObservedObject private var settings: UserSettings = .shared
 
-    var body: some View {
+    package init(message: LoggerMessageEntity, isDisclosureNeeded: Bool = false) {
+        self.message = message
+        self.isDisclosureNeeded = isDisclosureNeeded
+    }
+
+    package var body: some View {
         let contents = VStack(alignment: .leading, spacing: 4) {
             header.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             Text(message.text)
@@ -39,7 +43,9 @@ struct ConsoleMessageCell: View {
                 .foregroundColor(titleColor)
             Spacer()
 #if !os(watchOS)
-            Components.makePinView(for: message)
+#if canImport(RiftSupport)
+            PinView(message: message)
+#endif
             ConsoleTimestampView(date: message.createdAt)
                 .padding(.trailing, 3)
 #endif
@@ -94,7 +100,7 @@ struct ListDisclosureIndicator: View {
 }
 
 extension UXColor {
-    static func textColor(for level: LoggerStore.Level) -> UXColor {
+    package static func textColor(for level: LoggerStore.Level) -> UXColor {
         switch level {
         case .trace: return .secondaryLabel
         case .debug, .info: return .label
@@ -105,7 +111,7 @@ extension UXColor {
 }
 
 extension Color {
-    static func textColor(for level: LoggerStore.Level) -> Color {
+    package static func textColor(for level: LoggerStore.Level) -> Color {
         switch level {
         case .trace: return .secondary
         case .debug, .info: return .primary
@@ -116,7 +122,7 @@ extension Color {
 }
 
 #if DEBUG
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleMessageCell_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleMessageCell(message: try! LoggerStore.mock.messages()[0])

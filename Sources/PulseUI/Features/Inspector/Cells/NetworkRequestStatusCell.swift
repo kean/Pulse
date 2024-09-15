@@ -5,12 +5,16 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 15, visionOS 1.0, *)
-struct NetworkRequestStatusCell: View {
-    let viewModel: NetworkRequestStatusCellModel
+@available(iOS 16, visionOS 1, *)
+package struct NetworkRequestStatusCell: View {
+    package let viewModel: NetworkRequestStatusCellModel
+
+    package init(viewModel: NetworkRequestStatusCellModel) {
+        self.viewModel = viewModel
+    }
 
 #if os(watchOS)
-    var body: some View {
+    package var body: some View {
         HStack(spacing: spacing) {
             Text(viewModel.status.title)
                 .lineLimit(3)
@@ -23,7 +27,7 @@ struct NetworkRequestStatusCell: View {
     }
 
 #else
-    var body: some View {
+    package var body: some View {
         HStack(spacing: spacing) {
             viewModel.status.text
                 .lineLimit(1)
@@ -57,18 +61,18 @@ struct NetworkRequestStatusCell: View {
     }
 }
 
-struct NetworkRequestStatusCellModel {
-    let status: StatusLabelViewModel
-    let isMock: Bool
+package struct NetworkRequestStatusCellModel {
+    package let status: StatusLabelViewModel
+    package let isMock: Bool
     fileprivate let duration: DurationViewModel?
 
-    init(task: NetworkTaskEntity, store: LoggerStore?) {
+    package init(task: NetworkTaskEntity, store: LoggerStore?) {
         self.status = StatusLabelViewModel(task: task, store: store)
         self.duration = DurationViewModel(task: task)
         self.isMock = task.isMocked
     }
 
-    init(transaction: NetworkTransactionMetricsEntity) {
+    package init(transaction: NetworkTransactionMetricsEntity) {
         status = StatusLabelViewModel(transaction: transaction)
         duration = DurationViewModel(transaction: transaction)
         isMock = false
@@ -133,7 +137,7 @@ private let spacing: CGFloat? = nil
 #endif
 
 #if DEBUG
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct NetworkRequestStatusCell_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

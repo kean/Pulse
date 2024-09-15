@@ -9,7 +9,7 @@ import Pulse
 import AppKit
 #endif
 
-final class TextRendererJSON {
+package final class TextRendererJSON {
     // Input
     private let json: Any
     private var error: NetworkLogger.DecodingError?
@@ -27,14 +27,14 @@ final class TextRendererJSON {
     private var errorRange: NSRange?
     private var string = ""
 
-    init(json: Any, error: NetworkLogger.DecodingError? = nil, options: TextRenderer.Options = .init()) {
+    package init(json: Any, error: NetworkLogger.DecodingError? = nil, options: TextRenderer.Options = .init()) {
         self.options = options
         self.helper = TextHelper()
         self.json = json
         self.error = error
     }
 
-    func render() -> NSAttributedString {
+    package func render() -> NSAttributedString {
         render(json: json, isFree: true)
 
         let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: .monospaced, color: color(for: .key)))
@@ -210,8 +210,7 @@ final class TextRendererJSON {
 
     // MARK: Error
 
-    /// - note: Pulse Pro
-    static var makeErrorAttributes: ((Error) -> [NSAttributedString.Key: Any])?
+    package static var makeErrorAttributes: ((Error) -> [NSAttributedString.Key: Any])?
 
     func makeErrorAttributes() -> [NSAttributedString.Key: Any] {
         guard let error = error else {
@@ -239,26 +238,26 @@ final class TextRendererJSON {
     }
 }
 
-struct JSONColors {
-    static let punctuation = UXColor.dynamic(
+package struct JSONColors {
+    package static let punctuation = UXColor.dynamic(
         light: .init(red: 113.0/255.0, green: 128.0/255.0, blue: 141.0/255.0, alpha: 1.0),
         dark: .init(red: 113.0/255.0, green: 128.0/255.0, blue: 141.0/255.0, alpha: 1.0)
     )
-    static let key = UXColor.label
-    static let valueString = Palette.red
-    static let valueOther = UXColor.dynamic(
+    package static let key = UXColor.label
+    package static let valueString = Palette.red
+    package static let valueOther = UXColor.dynamic(
         light: .init(red: 28.0/255.0, green: 0.0/255.0, blue: 207.0/255.0, alpha: 1.0),
         dark: .init(red: 208.0/255.0, green: 191.0/255.0, blue: 105.0/255.0, alpha: 1.0)
     )
-    static let null = Palette.pink
+    package static let null = Palette.pink
 }
 
 extension NSAttributedString.Key {
-    static let decodingError = NSAttributedString.Key(rawValue: "com.github.kean.pulse.decoding-error-key")
-    static let node = NSAttributedString.Key(rawValue: "com.github.kean.pulse.json-container-node")
+    package static let decodingError = NSAttributedString.Key(rawValue: "com.github.kean.pulse.decoding-error-key")
+    package static let node = NSAttributedString.Key(rawValue: "com.github.kean.pulse.json-container-node")
 }
 
-enum JSONElement {
+package enum JSONElement {
     case punctuation
     case key
     case valueString
@@ -266,18 +265,18 @@ enum JSONElement {
     case null
 }
 
-final class JSONContainerNode {
-    enum Kind {
+package final class JSONContainerNode {
+    package enum Kind {
         case object
         case array
     }
 
-    let kind: Kind
-    let json: Any
-    var isExpanded = true
-    var expanded: NSAttributedString?
+    package let kind: Kind
+    package let json: Any
+    package var isExpanded = true
+    package var expanded: NSAttributedString?
 
-    init(kind: Kind, json: Any) {
+    package init(kind: Kind, json: Any) {
         self.kind = kind
         self.json = json
     }

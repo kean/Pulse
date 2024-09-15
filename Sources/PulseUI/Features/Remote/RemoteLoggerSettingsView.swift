@@ -8,7 +8,7 @@ import Combine
 import Pulse
 import Network
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct RemoteLoggerSettingsView: View {
     @ObservedObject private var logger: RemoteLogger = .shared
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
@@ -130,7 +130,7 @@ struct RemoteLoggerSettingsView: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct RemoteLoggerSettingsRouterView: View {
     @ObservedObject private var logger: RemoteLogger = .shared
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
@@ -164,7 +164,7 @@ struct RemoteLoggerSettingsRouterView: View {
 }
 
 #if DEBUG
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct RemoteLoggerSettingsView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)

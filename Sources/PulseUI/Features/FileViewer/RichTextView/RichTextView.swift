@@ -42,17 +42,11 @@ struct RichTextView: View {
 
     @ViewBuilder
     private var contents: some View {
-        if #available(iOS 15, *) {
-            ContentView(viewModel: viewModel)
-                .searchable(text: $viewModel.searchTerm)
-                .disableAutocorrection(true)
-        } else {
-            WrappedTextView(viewModel: viewModel)
-                .edgesIgnoringSafeArea(.bottom)
-        }
+        ContentView(viewModel: viewModel)
+            .searchable(text: $viewModel.searchTerm)
+            .disableAutocorrection(true)
     }
 
-    @available(iOS 15, visionOS 1.0, *)
     private struct ContentView: View {
         @ObservedObject var viewModel: RichTextViewModel
         @Environment(\.isSearching) private var isSearching

@@ -8,7 +8,7 @@ import Combine
 
 #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleFiltersView: View {
     @EnvironmentObject var environment: ConsoleEnvironment // important: reloads mode
     @EnvironmentObject var viewModel: ConsoleFiltersViewModel
@@ -50,7 +50,7 @@ struct ConsoleFiltersView: View {
 
 // MARK: - ConsoleFiltersView (Sections)
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 extension ConsoleFiltersView {
     var sessionsSection: some View {
         ConsoleSection(isDividerHidden: true, header: {
@@ -98,7 +98,7 @@ extension ConsoleFiltersView {
 #if DEBUG
 import CoreData
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleFiltersView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -118,7 +118,7 @@ struct ConsoleFiltersView_Previews: PreviewProvider {
     }
 }
 
-@available(iOS 15, macOS 13, visionOS 1.0, *)
+@available(iOS 16, macOS 13, visionOS 1, *)
 private func makePreview(isOnlyNetwork: Bool) -> some View {
     let store = LoggerStore.mock
     let entities: [NSManagedObject] = try! isOnlyNetwork ? store.tasks() : store.messages()

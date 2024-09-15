@@ -142,7 +142,7 @@ private func makeTimingRows(transaction: NetworkTransactionMetricsEntity, taskIn
 }
 
 extension URLSessionTaskMetrics.ResourceFetchType {
-    var title: String {
+    package var title: String {
         switch self {
         case .networkLoad: return "Network Load"
         case .localCache: return "Cache Lookup"

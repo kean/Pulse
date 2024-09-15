@@ -6,7 +6,6 @@
 
 import SwiftUI
 
-@available(iOS 15, visionOS 1.0, *)
 struct RichTextViewSearchToobar: View {
     @ObservedObject var viewModel: RichTextViewModel
 

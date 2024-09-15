@@ -7,12 +7,12 @@
 import SwiftUI
 import Combine
 
-struct SearchBar: View {
+package struct SearchBar: View {
     private let title: String
     private let imageName: String
     @Binding private var text: String
 
-    init(title: String,
+    package init(title: String,
          imageName: String = "magnifyingglass",
          text: Binding<String>) {
         self.title = title
@@ -20,7 +20,7 @@ struct SearchBar: View {
         self._text = text
     }
 
-    var body: some View {
+    package var body: some View {
         HStack(spacing: 6) {
             Image(systemName: imageName)
                 .foregroundColor(.secondary)

@@ -8,12 +8,12 @@ import Pulse
 import Combine
 import SwiftUI
 
-final class ManagedObjectsObserver<T: NSManagedObject>: NSObject, NSFetchedResultsControllerDelegate {
-    @Published private(set) var objects: [T] = []
+package final class ManagedObjectsObserver<T: NSManagedObject>: NSObject, NSFetchedResultsControllerDelegate {
+    @Published private(set) package var objects: [T] = []
 
     private let controller: NSFetchedResultsController<T>
 
-    init(request: NSFetchRequest<T>,
+    package init(request: NSFetchRequest<T>,
          context: NSManagedObjectContext,
          cacheName: String? = nil) {
         self.controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: cacheName)
@@ -25,13 +25,13 @@ final class ManagedObjectsObserver<T: NSManagedObject>: NSObject, NSFetchedResul
         controller.delegate = self
     }
 
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    package func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         objects = self.controller.fetchedObjects ?? []
     }
 }
 
 extension ManagedObjectsObserver where T == LoggerSessionEntity {
-    static func sessions(for context: NSManagedObjectContext) -> ManagedObjectsObserver {
+    package static func sessions(for context: NSManagedObjectContext) -> ManagedObjectsObserver {
         let request = NSFetchRequest<LoggerSessionEntity>(entityName: "\(LoggerSessionEntity.self)")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)]
 

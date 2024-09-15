@@ -9,7 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleListView: View {
     @EnvironmentObject var environment: ConsoleEnvironment
     @EnvironmentObject var filters: ConsoleFiltersViewModel
@@ -19,7 +19,7 @@ struct ConsoleListView: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 private struct _InternalConsoleListView: View {
     private let environment: ConsoleEnvironment
 
@@ -58,7 +58,7 @@ private struct _InternalConsoleListView: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 private struct _ConsoleListView: View {
     @Environment(\.isSearching) private var isSearching
     @Environment(\.store) private var store

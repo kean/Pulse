@@ -5,17 +5,26 @@
 import Pulse
 import Foundation
 
-struct FileViewerViewModelContext {
-    var contentType: NetworkLogger.ContentType?
-    var originalSize: Int64
-    var metadata: [String: String]?
-    var isResponse = true
-    var error: NetworkLogger.DecodingError?
-    var sourceURL: URL?
+package struct FileViewerViewModelContext {
+    package var contentType: NetworkLogger.ContentType?
+    package var originalSize: Int64
+    package var metadata: [String: String]?
+    package var isResponse = true
+    package var error: NetworkLogger.DecodingError?
+    package var sourceURL: URL?
+
+    package init(contentType: NetworkLogger.ContentType? = nil, originalSize: Int64, metadata: [String : String]? = nil, isResponse: Bool = true, error: NetworkLogger.DecodingError? = nil, sourceURL: URL? = nil) {
+        self.contentType = contentType
+        self.originalSize = originalSize
+        self.metadata = metadata
+        self.isResponse = isResponse
+        self.error = error
+        self.sourceURL = sourceURL
+    }
 }
 
 extension NetworkTaskEntity {
-    var requestFileViewerContext: FileViewerViewModelContext {
+    package var requestFileViewerContext: FileViewerViewModelContext {
         FileViewerViewModelContext(
             contentType: originalRequest?.contentType,
             originalSize: requestBodySize,
@@ -25,7 +34,7 @@ extension NetworkTaskEntity {
         )
     }
 
-    var responseFileViewerContext: FileViewerViewModelContext {
+    package var responseFileViewerContext: FileViewerViewModelContext {
         FileViewerViewModelContext(
             contentType: response?.contentType,
             originalSize: responseBodySize,
@@ -38,7 +47,7 @@ extension NetworkTaskEntity {
 
     /// - returns `nil` if the task is an unknown state. It may happen if the
     /// task is pending, but it's from the previous app run.
-    func state(in store: LoggerStore?) -> NetworkTaskEntity.State? {
+    package func state(in store: LoggerStore?) -> NetworkTaskEntity.State? {
         let state = self.state
         if state == .pending, let store, self.session != store.session.id {
             return nil

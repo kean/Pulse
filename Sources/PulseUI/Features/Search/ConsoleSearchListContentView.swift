@@ -9,7 +9,7 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, visionOS 1, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchListContentView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
@@ -43,7 +43,7 @@ struct ConsoleSearchListContentView: View {
     }
 }
 
-@available(iOS 15, visionOS 1, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchResultsListContentView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 

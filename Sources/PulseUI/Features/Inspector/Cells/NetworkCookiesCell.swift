@@ -7,7 +7,7 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct NetworkCookiesCell: View {
     let viewModel: NetworkCookiesCellViewModel
 
@@ -31,7 +31,7 @@ struct NetworkCookiesCell: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct NetworkCookiesCellViewModel {
     let title: String
     let details: String
@@ -57,7 +57,7 @@ private func getCookies(from headers: [String: String]?, url: URL?) -> [HTTPCook
     return HTTPCookie.cookies(withResponseHeaderFields: headers, for: url)
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 private func makeAttributedString(for cookies: [HTTPCookie]) -> NSAttributedString {
     guard !cookies.isEmpty else {
         return NSAttributedString(string: "Empty") // Should never happen
@@ -87,7 +87,7 @@ private func makeAttributedString(for cookies: [HTTPCookie]) -> NSAttributedStri
 }
 
 #if DEBUG
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct NetworkCookiesCell_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

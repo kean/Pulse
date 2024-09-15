@@ -9,17 +9,17 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, visionOS 1.0, *)
-final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
-    let id = ConsoleSearchOccurrenceId()
-    let scope: ConsoleSearchScope
-    let match: ConsoleSearchMatch
-    var line: Int { match.lineNumber }
-    var range: NSRange { NSRange(match.range, in: match.line) }
-    lazy var preview = ConsoleSearchOccurrence.makePreview(for: match, attributes: previewAttibutes)
-    let searchContext: TextViewSearchContext
+@available(iOS 16, visionOS 1, *)
+package final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
+    package let id = ConsoleSearchOccurrenceId()
+    package let scope: ConsoleSearchScope
+    package let match: ConsoleSearchMatch
+    package var line: Int { match.lineNumber }
+    package var range: NSRange { NSRange(match.range, in: match.line) }
+    package lazy var preview = ConsoleSearchOccurrence.makePreview(for: match, attributes: previewAttibutes)
+    package let searchContext: TextViewSearchContext
 
-    init(scope: ConsoleSearchScope,
+    package init(scope: ConsoleSearchScope,
          match: ConsoleSearchMatch,
          searchContext: TextViewSearchContext) {
         self.scope = scope
@@ -27,18 +27,18 @@ final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
         self.searchContext = searchContext
     }
 
-    static func == (lhs: ConsoleSearchOccurrence, rhs: ConsoleSearchOccurrence) -> Bool {
+    package static func == (lhs: ConsoleSearchOccurrence, rhs: ConsoleSearchOccurrence) -> Bool {
         lhs.id == rhs.id
     }
 
-    func hash(into hasher: inout Hasher) {
+    package func hash(into hasher: inout Hasher) {
         id.hash(into: &hasher)
     }
 }
 
 private let previewAttibutes = TextHelper().attributes(role: .body2, style: .monospaced)
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 extension ConsoleSearchOccurrence {
     static func makePreview(for match: ConsoleSearchMatch, attributes customAttributes: [NSAttributedString.Key: Any] = [:]) -> AttributedString {
 
@@ -84,8 +84,8 @@ private extension Substring {
     }
 }
 
-struct ConsoleSearchOccurrenceId: Hashable {
-    let id = UUID()
+package struct ConsoleSearchOccurrenceId: Hashable {
+    package let id = UUID()
 }
 
 #endif

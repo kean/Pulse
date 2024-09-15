@@ -33,9 +33,7 @@ public struct SettingsView: View {
                 }
             }
             Section {
-                if #available(watchOS 9, *) {
-                    Button("Share Store") { isShowingShareView = true }
-                }
+                Button("Share Store") { isShowingShareView = true }
             }
             Section {
                 NavigationLink(destination: StoreDetailsView(source: .store(store))) {
@@ -50,11 +48,9 @@ public struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .sheet(isPresented: $isShowingShareView) {
-            if #available(watchOS 9, *) {
-                NavigationView {
-                    ShareStoreView {
-                        isShowingShareView = false
-                    }
+            NavigationView {
+                ShareStoreView {
+                    isShowingShareView = false
                 }
             }
         }

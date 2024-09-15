@@ -7,14 +7,20 @@ import Pulse
 
 // MARK: - View
 
-struct NetworkInspectorTransferInfoView: View {
-    let viewModel: NetworkInspectorTransferInfoViewModel
+package struct NetworkInspectorTransferInfoView: View {
+    package let viewModel: NetworkInspectorTransferInfoViewModel
 
-    var isSentHidden = false
-    var isReceivedHidden = false
+    package var isSentHidden = false
+    package var isReceivedHidden = false
+
+    package init(viewModel: NetworkInspectorTransferInfoViewModel, isSentHidden: Bool = false, isReceivedHidden: Bool = false) {
+        self.viewModel = viewModel
+        self.isSentHidden = isSentHidden
+        self.isReceivedHidden = isReceivedHidden
+    }
 
 #if os(watchOS)
-    var body: some View {
+    package var body: some View {
         HStack(alignment: .center) {
             if !isSentHidden {
                 bytesSent
@@ -26,7 +32,7 @@ struct NetworkInspectorTransferInfoView: View {
         .frame(maxWidth: .infinity)
     }
 #else
-    var body: some View {
+    package var body: some View {
         HStack {
             Spacer()
             bytesSent
@@ -131,16 +137,16 @@ private let mockModel = NetworkInspectorTransferInfoViewModel(
 
 // MARK: - ViewModel
 
-struct NetworkInspectorTransferInfoViewModel {
-    let totalBytesSent: String
-    let bodyBytesSent: String
-    let headersBytesSent: String
+package struct NetworkInspectorTransferInfoViewModel {
+    package let totalBytesSent: String
+    package let bodyBytesSent: String
+    package let headersBytesSent: String
 
-    let totalBytesReceived: String
-    let bodyBytesReceived: String
-    let headersBytesReceived: String
+    package let totalBytesReceived: String
+    package let bodyBytesReceived: String
+    package let headersBytesReceived: String
 
-    init(empty: Bool) {
+    package init(empty: Bool) {
         totalBytesSent = "–"
         bodyBytesSent = "–"
         headersBytesSent = "–"
@@ -149,11 +155,11 @@ struct NetworkInspectorTransferInfoViewModel {
         headersBytesReceived = "–"
     }
 
-    init(task: NetworkTaskEntity) {
+    package init(task: NetworkTaskEntity) {
         self.init(transferSize: task.totalTransferSize)
     }
 
-    init(transferSize: NetworkLogger.TransferSizeInfo) {
+    package init(transferSize: NetworkLogger.TransferSizeInfo) {
         totalBytesSent = formatBytes(transferSize.totalBytesSent)
         bodyBytesSent = formatBytes(transferSize.requestBodyBytesSent)
         headersBytesSent = formatBytes(transferSize.requestHeaderBytesSent)

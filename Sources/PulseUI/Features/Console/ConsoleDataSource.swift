@@ -183,7 +183,7 @@ private final class ConsoleFetchDelegate: NSObject, NSFetchedResultsControllerDe
     }
 }
 
-enum ConsoleUpdateEvent {
+package enum ConsoleUpdateEvent {
     /// Full refresh of data.
     case refresh
     /// Incremental update.

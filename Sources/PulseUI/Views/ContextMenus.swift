@@ -9,16 +9,21 @@ import Pulse
 import Combine
 import CoreData
 
-enum ContextMenu {
-    @available(iOS 15, visionOS 1.0, *)
-    struct MessageContextMenu: View {
-        let message: LoggerMessageEntity
+package enum ContextMenu {
+    @available(iOS 16, visionOS 1, *)
+    package struct MessageContextMenu: View {
+        package let message: LoggerMessageEntity
 
-        @Binding private(set) var shareItems: ShareItems?
+        @Binding private(set) package var shareItems: ShareItems?
 
         @EnvironmentObject private var filters: ConsoleFiltersViewModel
 
-        var body: some View {
+        package init(message: LoggerMessageEntity, shareItems: Binding<ShareItems?>) {
+            self.message = message
+            self._shareItems = shareItems
+        }
+
+        package var body: some View {
             Section {
                 Button(action: { shareItems = ShareService.share(message, as: .plainText) }) {
                     Label("Share", systemImage: "square.and.arrow.up")
@@ -55,17 +60,29 @@ enum ContextMenu {
         }
     }
 
-    struct NetworkTaskContextMenuItems: View {
+    package struct NetworkTaskContextMenuItems: View {
         let task: NetworkTaskEntity
 #if os(iOS) || os(visionOS)
         @Binding private(set) var sharedItems: ShareItems?
+
+        package init(task: NetworkTaskEntity, sharedItems: Binding<ShareItems?>, isDetailsView: Bool = false) {
+            self.task = task
+            self._sharedItems = sharedItems
+            self.isDetailsView = isDetailsView
+        }
 #else
         @Binding private(set) var sharedTask: NetworkTaskEntity?
+
+        package init(task: NetworkTaskEntity, sharedTask: Binding<NetworkTaskEntity?>, isDetailsView: Bool = false) {
+            self.task = task
+            self._sharedTask = sharedTask
+            self.isDetailsView = isDetailsView
+        }
 #endif
 
         var isDetailsView = false
 
-        var body: some View {
+        package var body: some View {
             Section {
 #if os(iOS) || os(visionOS)
                 ContextMenu.NetworkTaskShareMenu(task: task, shareItems: $sharedItems)
@@ -159,17 +176,21 @@ enum ContextMenu {
         }
     }
 
-    struct NetworkTaskCopyMenu: View {
+    package struct NetworkTaskCopyMenu: View {
         let task: NetworkTaskEntity
 
-        var body: some View {
+        package init(task: NetworkTaskEntity) {
+            self.task = task
+        }
+
+        package var body: some View {
             Menu(content: content) {
                 Label("Copy", systemImage: "doc.on.doc")
             }
         }
 
         @ViewBuilder
-        func content() -> some View {
+        package func content() -> some View {
             if let url = task.url {
                 Button(action: {
                     UXPasteboard.general.string = url
@@ -208,12 +229,17 @@ enum ContextMenu {
     }
 }
 
-struct StringSearchOptionsMenu: View {
+package struct StringSearchOptionsMenu: View {
     @Binding private(set) var options: StringSearchOptions
     var isKindNeeded = true
 
+    package init(options: Binding<StringSearchOptions>, isKindNeeded: Bool = true) {
+        self._options = options
+        self.isKindNeeded = isKindNeeded
+    }
+
 #if os(macOS)
-    var body: some View {
+    package var body: some View {
         Menu(content: { contents }, label: {
             Image(systemName: "ellipsis.circle")
         })
@@ -223,7 +249,7 @@ struct StringSearchOptionsMenu: View {
         .menuIndicator(.hidden)
     }
 #else
-    var body: some View {
+    package var body: some View {
         contents
     }
 #endif
@@ -251,7 +277,7 @@ struct StringSearchOptionsMenu: View {
 }
 
 #if os(iOS) || os(visionOS)
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct OpenOnMacOverlay: View {
     let entity: NSManagedObject
     @ObservedObject var logger: RemoteLogger = .shared
@@ -302,11 +328,16 @@ private func openOnMac(_ entity: NSManagedObject) {
 }
 #endif
 
-struct AttributedStringShareMenu: View {
+package struct AttributedStringShareMenu: View {
     @Binding var shareItems: ShareItems?
     let string: () -> NSAttributedString
 
-    var body: some View {
+    package init(shareItems: Binding<ShareItems?>, string: @escaping () -> NSAttributedString) {
+        self._shareItems = shareItems
+        self.string = string
+    }
+
+    package var body: some View {
         Button(action: { shareItems = ShareService.share(string(), as: .plainText) }) {
             Label("Share as Text", systemImage: "square.and.arrow.up")
         }

@@ -22,7 +22,6 @@ struct ConsoleTimestampView: View {
     }
 }
 
-@available(iOS 15, visionOS 1, *)
 struct MockBadgeView: View {
     var body: some View {
         Text("MOCK")
@@ -43,7 +42,7 @@ struct StatusIndicatorView: View {
 #if os(tvOS)
             .font(.system(size: 12))
 #else
-            .font(.system(size: 10))
+            .font(.system(size: 9))
 #endif
             .clipShape(RoundedRectangle(cornerRadius: 3))
     }

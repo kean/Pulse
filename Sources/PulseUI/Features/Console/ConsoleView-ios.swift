@@ -20,14 +20,14 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        if #available(iOS 15, *) {
+        if #available(iOS 16, *) {
             contents
         } else {
-            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires iOS 15 or later").padding()
+            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires iOS 16 or later").padding()
         }
     }
 
-    @available(iOS 15, visionOS 1.0, *)
+    @available(iOS 16, visionOS 1, *)
     private var contents: some View {
         ConsoleListView()
             .navigationTitle(environment.title)
@@ -53,7 +53,7 @@ public struct ConsoleView: View {
         return copy
     }
 
-    @available(iOS 15, visionOS 1.0, *)
+    @available(iOS 16, visionOS 1, *)
     @ViewBuilder private var trailingNavigationBarItems: some View {
         Button(action: { environment.router.isShowingShareStore = true }) {
             Image(systemName: "square.and.arrow.up")

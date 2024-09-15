@@ -9,7 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchContextMenu: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 

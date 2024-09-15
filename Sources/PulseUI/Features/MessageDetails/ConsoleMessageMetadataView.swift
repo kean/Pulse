@@ -5,24 +5,32 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 15, macOS 13, visionOS 1, *)
+@available(iOS 16, macOS 13, visionOS 1, *)
 struct ConsoleMessageMetadataView: View {
     let message: LoggerMessageEntity
 
+    init(message: LoggerMessageEntity) {
+        self.message = message
+    }
+
     var body: some View {
-        Components.makeRichTextView(string: string)
-#if !os(macOS)
+        RichTextView(viewModel: .init(string: string))
             .navigationTitle("Message Details")
-#endif
     }
 
     private var string: NSAttributedString {
         let renderer = TextRenderer()
+        let sections = KeyValueSectionViewModel.makeMetadata(for: message)
         renderer.render(sections)
         return renderer.make()
     }
+}
 
-    private var sections: [KeyValueSectionViewModel] {
+extension KeyValueSectionViewModel {
+    package static func makeMetadata(for message: LoggerMessageEntity) -> [KeyValueSectionViewModel] {
+        let metadataItems: [(String, String?)] = message.metadata
+            .sorted(by: { $0.key < $1.key })
+            .map { ($0.key, $0.value )}
         return [
             KeyValueSectionViewModel(title: "Summary", color: .textColor(for: message.logLevel), items: [
                 ("Date", DateFormatter.fullDateFormatter.string(from: message.createdAt)),
@@ -37,10 +45,6 @@ struct ConsoleMessageMetadataView: View {
             KeyValueSectionViewModel(title: "Metadata", color: .indigo, items: metadataItems)
         ]
     }
-
-    private var metadataItems: [(String, String?)] {
-        message.metadata.sorted(by: { $0.key < $1.key }).map { ($0.key, $0.value )}
-    }
 }
 
 private extension String {
@@ -50,7 +54,7 @@ private extension String {
 }
 
 #if DEBUG
-@available(iOS 15, macOS 13, visionOS 1, *)
+@available(iOS 16, macOS 13, visionOS 1, *)
 struct ConsoleMessageMetadataView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

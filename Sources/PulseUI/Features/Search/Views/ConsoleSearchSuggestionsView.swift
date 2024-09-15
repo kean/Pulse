@@ -9,7 +9,7 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchSuggestionsView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
@@ -50,7 +50,7 @@ struct ConsoleSearchSuggestionsView: View {
 }
 
 #if DEBUG
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct Previews_ConsoleSearchSuggestionsView_Previews: PreviewProvider {
     static let environment = ConsoleEnvironment(store: .mock)
 

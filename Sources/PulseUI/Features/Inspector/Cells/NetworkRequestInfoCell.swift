@@ -25,12 +25,12 @@ struct NetworkRequestInfoCell: View {
     }
 }
 
-final class NetworkRequestInfoCellViewModel {
-    let httpMethod: String
-    let url: String
-    let render: () -> NSAttributedString
+package final class NetworkRequestInfoCellViewModel {
+    package let httpMethod: String
+    package let url: String
+    package let render: () -> NSAttributedString
 
-    init(task: NetworkTaskEntity, store: LoggerStore) {
+    package init(task: NetworkTaskEntity, store: LoggerStore) {
         self.httpMethod = task.httpMethod ?? "GET"
         self.url = task.url ?? "–"
         self.render = {
@@ -40,7 +40,7 @@ final class NetworkRequestInfoCellViewModel {
         }
     }
 
-    init(transaction: NetworkTransactionMetricsEntity) {
+    package init(transaction: NetworkTransactionMetricsEntity) {
         self.httpMethod = transaction.request.httpMethod ?? "GET"
         self.url = transaction.request.url ?? "–"
         self.render = { TextRenderer(options: .sharing).make { $0.render(transaction) } }

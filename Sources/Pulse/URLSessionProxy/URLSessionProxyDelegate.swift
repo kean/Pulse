@@ -6,7 +6,7 @@ import Foundation
 
 /// Automates URLSession request tracking.
 ///
-/// - important: On iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, it automatically
+/// - important: On iOS 16, tvOS 16, macOS 13, watchOS 9.0, it automatically
 /// tracks new task creation using the `urlSession(_:didCreateTask:)` delegate
 /// method which allows the logger to start tracking network requests right
 /// after their creation. On earlier versions, you can (optionally) call
@@ -33,7 +33,7 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
             #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didFinishDownloadingTo:)),
             #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:))
         ]
-        if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
+        if #available(iOS 16, tvOS 16, macOS 13, watchOS 9, *) {
             interceptedSelectors.insert(#selector(URLSessionTaskDelegate.urlSession(_:didCreateTask:)))
         }
         self.interceptedSelectors = interceptedSelectors
@@ -46,7 +46,7 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
     public func urlSession(_ session: Foundation.URLSession, didCreateTask task: URLSessionTask) {
         createdTask.value = task
         logger.logTaskCreated(task)
-        if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
+        if #available(iOS 16, tvOS 16, macOS 13, watchOS 9, *) {
             taskDelegate?.urlSession?(session, didCreateTask: task)
         }
     }

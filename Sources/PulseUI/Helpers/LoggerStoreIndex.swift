@@ -8,16 +8,16 @@ import Combine
 import Pulse
 
 /// Keeps track of hosts, paths, etc.
-final class LoggerStoreIndex: ObservableObject {
-    @Published private(set) var labels: Set<String> = []
-    @Published private(set) var files: Set<String> = []
-    @Published private(set) var hosts: Set<String> = []
-    @Published private(set) var paths: Set<String> = []
+package final class LoggerStoreIndex: ObservableObject {
+    @Published private(set) package var labels: Set<String> = []
+    @Published private(set) package var files: Set<String> = []
+    @Published private(set) package var hosts: Set<String> = []
+    @Published private(set) package var paths: Set<String> = []
 
     private let context: NSManagedObjectContext
     private var cancellable: AnyCancellable?
 
-    convenience init(store: LoggerStore) {
+    convenience package init(store: LoggerStore) {
         self.init(context: store.backgroundContext)
 
         store.backgroundContext.perform {
@@ -28,7 +28,7 @@ final class LoggerStoreIndex: ObservableObject {
         }
     }
 
-    init(context: NSManagedObjectContext) {
+    package init(context: NSManagedObjectContext) {
         self.context = context
         context.perform {
             self.prepopulate()

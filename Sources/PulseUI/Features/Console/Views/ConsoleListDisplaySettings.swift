@@ -18,18 +18,27 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
 
     /// Specifies what is displayed in the network task cell header.
     public struct HeaderSettings: Hashable, Codable {
-        public var fontSize: Int = defaultHeaderFooterFontSize
+        public var fontSize: Int
 
         /// The line limit for messages in the console. By default, `1`.
-        public var lineLimit: Int = 1
+        public var lineLimit: Int
 
-    #if os(macOS) || os(tvOS)
-        /// Fields to display below the main text label.
-        public var fields: [TaskField] = [.responseSize, .duration, .host]
-    #else
-        /// Fields to display below the main text label.
-        public var fields: [TaskField] = [.responseSize, .duration]
-    #endif
+        /// Additinoal fields to display below the in the header.
+        public var fields: [TaskField]
+
+        public init(fontSize: Int? = nil, lineLimit: Int = 1, fields: [TaskField]? = nil) {
+            self.fontSize = fontSize ?? ConsoleListDisplaySettings.defaultHeaderFooterFontSize
+            self.lineLimit = lineLimit
+            if let fields {
+                self.fields = fields
+            } else {
+#if os(macOS) || os(tvOS)
+                self.fields = [.responseSize, .duration, .host]
+#else
+                self.fields = [.responseSize, .duration]
+#endif
+            }
+        }
     }
 
     /// Specifies how the main content of the is displaying, including the
@@ -37,29 +46,61 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
     public struct ContentSettings: Hashable, Codable {
 
         /// If task description is available, show it instead of the `URL`.
-        public var showTaskDescription = false
+        public var showTaskDescription: Bool
 
         /// Show HTTP method when available.
-        public var showMethod = true
+        public var showMethod: Bool
 
         /// Defines what components to display in the list. By default, shows
         /// only path.
-        public var components: Set<URLComponent> = [.path]
+        public var components: Set<URLComponent>
 
         /// The default value is different based on the platform but typically
         /// matches the "body" font size.
-        public var fontSize: Int = defaultContentFontSize
+        public var fontSize: Int
 
         /// The line limit for messages in the console. By default, `3`.
-        public var lineLimit: Int = 3
+        public var lineLimit: Int
+
+        /// If enabled, use monospaced font to display the content.
+        public var isMonospaced = false
+
+        public init(
+            showTaskDescription: Bool = false,
+            showMethod: Bool = true,
+            components: Set<URLComponent> = [.path],
+            fontSize: Int? = nil,
+            lineLimit: Int = 3
+        ) {
+            self.showTaskDescription = showTaskDescription
+            self.showMethod = showMethod
+            self.components = components
+            self.fontSize = fontSize ?? ConsoleListDisplaySettings.defaultContentFontSize
+            self.lineLimit = lineLimit
+        }
     }
 
     public struct FooterSettings: Sendable, Hashable, Codable {
         /// By default, matches the "footnote" style.
-        public var fontSize: Int = defaultHeaderFooterFontSize
+        public var fontSize: Int
 
         /// The line limit for messages in the console. By default, `1`.
-        public var lineLimit: Int = 1
+        public var lineLimit: Int
+
+        /// Fields to display horizonally below the main text label with a separator.
+        public var fields: [TaskField]
+
+        /// Additional fields to display below the main list.
+        public var additionalFields: [TaskField] = []
+
+        /// If enabled, use monospaced font to display the content.
+        public var isMonospaced = false
+
+        public init(fontSize: Int? = nil, lineLimit: Int = 1) {
+            self.fontSize = fontSize ?? ConsoleListDisplaySettings.defaultHeaderFooterFontSize
+            self.lineLimit = lineLimit
+            self.fields = [.host]
+        }
     }
 
     public enum URLComponent: String, CaseIterable, Codable {
@@ -83,16 +124,18 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
     public init() {}
 }
 
+extension ConsoleListDisplaySettings {
 #if os(watchOS)
-let defaultContentFontSize = 17
-let defaultHeaderFooterFontSize = 14
+    package static let defaultContentFontSize = 16
+    package static let defaultHeaderFooterFontSize = 14
 #elseif os(macOS)
-let defaultContentFontSize = 13
-let defaultHeaderFooterFontSize = 11
+    package static let defaultContentFontSize = 13
+    package static let defaultHeaderFooterFontSize = 11
 #elseif os(iOS) || os(visionOS)
-let defaultContentFontSize = 17
-let defaultHeaderFooterFontSize = 13
+    package static let defaultContentFontSize = 16
+    package static let defaultHeaderFooterFontSize = 13
 #elseif os(tvOS)
-let defaultContentFontSize = 27
-let defaultHeaderFooterFontSize = 21
+    package static let defaultContentFontSize = 27
+    package static let defaultHeaderFooterFontSize = 21
 #endif
+}

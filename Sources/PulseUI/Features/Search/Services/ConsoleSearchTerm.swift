@@ -4,9 +4,14 @@
 
 import Foundation
 
-struct ConsoleSearchTerm: Identifiable, Hashable, Codable {
-    var id: ConsoleSearchTerm { self }
+package struct ConsoleSearchTerm: Identifiable, Hashable, Codable {
+    package var id: ConsoleSearchTerm { self }
 
-    var text: String
-    var options: StringSearchOptions
+    package var text: String
+    package var options: StringSearchOptions
+
+    package init(text: String, options: StringSearchOptions) {
+        self.text = text
+        self.options = options
+    }
 }

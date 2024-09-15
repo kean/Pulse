@@ -5,12 +5,12 @@
 import SwiftUI
 import Pulse
 
-struct NetworkDetailsView: View {
+package struct NetworkDetailsView: View {
     private var title: String
     private let viewModel: NetworkDetailsViewModel?
     @State private var isShowingShareSheet = false
 
-    init(title: String, viewModel: @escaping () -> KeyValueSectionViewModel?) {
+    package init(title: String, viewModel: @escaping () -> KeyValueSectionViewModel?) {
         self.title = title
         self.viewModel = NetworkDetailsViewModel {
             viewModel().map { viewModel in
@@ -19,12 +19,12 @@ struct NetworkDetailsView: View {
         }
     }
 
-    init(title: String, text: @escaping () -> NSAttributedString?) {
+    package init(title: String, text: @escaping () -> NSAttributedString?) {
         self.title = title
         self.viewModel = NetworkDetailsViewModel(text)
     }
 
-    var body: some View {
+    package var body: some View {
         contents.inlineNavigationTitle(title)
     }
 

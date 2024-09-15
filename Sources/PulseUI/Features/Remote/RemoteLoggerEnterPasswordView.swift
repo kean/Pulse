@@ -7,7 +7,7 @@ import Network
 import Pulse
 import Combine
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct RemoteLoggerEnterPasswordView: View {
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
     @ObservedObject var logger: RemoteLogger = .shared

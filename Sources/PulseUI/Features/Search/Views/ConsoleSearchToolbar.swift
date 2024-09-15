@@ -9,7 +9,7 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchToolbar: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
@@ -40,7 +40,7 @@ struct ConsoleSearchToolbar: View {
     }
 }
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct ConsoleSearchScopesPicker: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 

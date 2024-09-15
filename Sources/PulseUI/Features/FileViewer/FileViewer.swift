@@ -90,8 +90,8 @@ private struct PreviewContainer<Content: View>: View {
 
 #if DEBUG
 
-enum MockJSON {
-    static let allPossibleValues = """
+package enum MockJSON {
+    package static let allPossibleValues = """
     {
       "actors": [
         {

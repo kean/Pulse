@@ -10,7 +10,7 @@ import Combine
 
 #if os(iOS) || os(visionOS)
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct SessionsView: View {
     @State private var selection: Set<UUID> = []
     @State private var sharedSessions: SelectedSessionsIDs?
@@ -49,7 +49,7 @@ struct SessionsView: View {
             .sheet(item: $sharedSessions) { sessions in
                 NavigationView {
                     ShareStoreView(sessions: sessions.ids, onDismiss: { sharedSessions = nil })
-                }.backport.presentationDetents([.medium, .large])
+                }.presentationDetents([.medium, .large])
             }
     }
 
@@ -106,7 +106,7 @@ struct SessionsView: View {
 }
 
 #if DEBUG
-@available(iOS 15.0, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct Previews_SessionsView_Previews: PreviewProvider {
     static let environment = ConsoleEnvironment(store: .mock)
 

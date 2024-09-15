@@ -13,16 +13,16 @@ import SwiftUI
 // A set of typealias and APIs to make AppKit and UIKit more
 // compatible with each other
 
-struct Palette {
+package struct Palette {
 #if os(watchOS)
-    static var red: UXColor { Palette.darkRed }
-    static var pink: UXColor { Palette.darkPink }
+    package static var red: UXColor { Palette.darkRed }
+    package static var pink: UXColor { Palette.darkPink }
 #else
-    static var red: UXColor {
+    package static var red: UXColor {
         UXColor.dynamic(light: Palette.lightRed, dark: Palette.darkRed)
     }
 
-    static var pink: UXColor {
+    package static var pink: UXColor {
         UXColor.dynamic(light: Palette.lightPink, dark: Palette.darkPink)
     }
 #endif
@@ -35,25 +35,25 @@ struct Palette {
 }
 
 #if os(macOS)
-typealias UXColor = NSColor
-typealias UXFont = NSFont
-typealias UXTextView = NSTextView
-typealias UXImage = NSImage
-typealias UXPasteboard = NSPasteboard
+package typealias UXColor = NSColor
+package typealias UXFont = NSFont
+package typealias UXTextView = NSTextView
+package typealias UXImage = NSImage
+package typealias UXPasteboard = NSPasteboard
 
 extension NSColor {
-    static var separator: NSColor { separatorColor }
-    static var label: NSColor { labelColor }
-    static var systemBackground: NSColor { windowBackgroundColor }
-    static var secondaryLabel: NSColor { secondaryLabelColor }
-    static var secondarySystemFill: NSColor { controlBackgroundColor }
+    package static var separator: NSColor { separatorColor }
+    package static var label: NSColor { labelColor }
+    package static var systemBackground: NSColor { windowBackgroundColor }
+    package static var secondaryLabel: NSColor { secondaryLabelColor }
+    package static var secondarySystemFill: NSColor { controlBackgroundColor }
     static var systemGray4: NSColor { systemGray.withAlphaComponent(0.7) }
     static var systemGray3: NSColor { systemGray.withAlphaComponent(0.8) }
     static var systemGray2: NSColor { systemGray.withAlphaComponent(0.9) }
 }
 
 extension NSColor {
-    static func dynamic(light: NSColor, dark: NSColor) -> NSColor {
+    package static func dynamic(light: NSColor, dark: NSColor) -> NSColor {
         NSColor(name: nil) {
             switch $0.name {
             case .darkAqua, .vibrantDark, .accessibilityHighContrastDarkAqua, .accessibilityHighContrastVibrantDark:
@@ -66,12 +66,12 @@ extension NSColor {
 }
 
 #else
-typealias UXColor = UIColor
-typealias UXFont = UIFont
-typealias UXImage = UIImage
+package typealias UXColor = UIColor
+package typealias UXFont = UIFont
+package typealias UXImage = UIImage
 
 extension UIColor {
-    static func dynamic(light: UIColor, dark: UIColor) -> UIColor {
+    package static func dynamic(light: UIColor, dark: UIColor) -> UIColor {
 #if !os(watchOS)
         UIColor {
             switch $0.userInterfaceStyle {
@@ -90,10 +90,10 @@ extension UIColor {
 #endif
 
 #if os(tvOS)
-typealias UXTextView = UITextView
+package typealias UXTextView = UITextView
 #elseif os(iOS) || os(visionOS)
-typealias UXTextView = UITextView
-typealias UXPasteboard = UIPasteboard
+package typealias UXTextView = UITextView
+package typealias UXPasteboard = UIPasteboard
 #endif
 
 #if os(tvOS)
@@ -102,7 +102,6 @@ extension UIColor {
     static var systemGray2: UIColor { systemGray.withAlphaComponent(0.9) }
     static var systemGray3: UIColor { systemGray.withAlphaComponent(0.8) }
     static var systemGray4: UIColor { systemGray.withAlphaComponent(0.7) }
-    static var controlBackgroundColor: UIColor { .clear }
 }
 #endif
 
@@ -119,7 +118,7 @@ extension UXColor {
 
 #if os(iOS) || os(visionOS)
 extension UITextView {
-    var isAutomaticLinkDetectionEnabled: Bool {
+    package var isAutomaticLinkDetectionEnabled: Bool {
         get { dataDetectorTypes.contains(.link) }
         set {
             if newValue {
@@ -149,12 +148,12 @@ func runHapticFeedback(_ type: VisionHapticFeedabackTypePlaceholder = .success) 
 
 #if os(macOS)
 extension NSTextView {
-    var attributedText: NSAttributedString? {
+    package var attributedText: NSAttributedString? {
         get { nil }
         set { textStorage?.setAttributedString(newValue ?? NSAttributedString()) }
     }
 
-    var text: String {
+    package var text: String {
         get { string }
         set { string = newValue }
     }
@@ -171,11 +170,11 @@ func runHapticFeedback(_ type: NSHapticFeedabackTypePlaceholder = .success) {
 
 extension Image {
 #if os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
-    init(uxImage: UXImage) {
+    package init(uxImage: UXImage) {
         self.init(uiImage: uxImage)
     }
 #elseif os(macOS)
-    init(uxImage: UXImage) {
+    package init(uxImage: UXImage) {
         self.init(nsImage: uxImage)
     }
 #endif
@@ -183,7 +182,7 @@ extension Image {
 
 #if os(macOS)
 extension NSPasteboard {
-    var string: String? {
+    package var string: String? {
         get { string(forType: .string) ?? "" }
         set {
             guard let newValue = newValue else { return }
@@ -194,7 +193,7 @@ extension NSPasteboard {
 }
 
 extension NSImage {
-    var cgImage: CGImage? {
+    package var cgImage: CGImage? {
         cgImage(forProposedRect: nil, context: nil, hints: nil)
     }
 }

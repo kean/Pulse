@@ -7,12 +7,16 @@ import Pulse
 
 #if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
 
-@available(iOS 15, macOS 13, visionOS 1, *)
-struct ConsoleMessageDetailsView: View {
-    let message: LoggerMessageEntity
+@available(iOS 16, macOS 13, visionOS 1, *)
+package struct ConsoleMessageDetailsView: View {
+    package let message: LoggerMessageEntity
+
+    package init(message: LoggerMessageEntity) {
+        self.message = message
+    }
 
 #if os(iOS) || os(visionOS)
-    var body: some View {
+    package var body: some View {
         contents
             .inlineNavigationTitle("")
             .toolbar {
@@ -29,7 +33,7 @@ struct ConsoleMessageDetailsView: View {
         }
     }
 #elseif os(watchOS)
-    var body: some View {
+    package var body: some View {
         ScrollView {
             VStack(spacing: 8) {
                 NavigationLink(destination: ConsoleMessageMetadataView(message: message)) {
@@ -40,7 +44,7 @@ struct ConsoleMessageDetailsView: View {
         }
     }
 #elseif os(tvOS)
-    var body: some View {
+    package var body: some View {
         contents
     }
 #endif
@@ -57,7 +61,7 @@ struct ConsoleMessageDetailsView: View {
 }
 
 #if DEBUG
-@available(iOS 15, macOS 13, visionOS 1, *)
+@available(iOS 16, macOS 13, visionOS 1, *)
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
@@ -71,7 +75,7 @@ struct ConsoleMessageDetailsView_Previews: PreviewProvider {
 
 #if DEBUG
 
-func makeMockMessage() -> LoggerMessageEntity {
+package func makeMockMessage() -> LoggerMessageEntity {
     let entity = LoggerMessageEntity(context: LoggerStore.mock.viewContext)
     entity.text = "test"
     entity.createdAt = Date()

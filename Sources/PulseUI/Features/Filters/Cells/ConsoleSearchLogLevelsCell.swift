@@ -5,8 +5,12 @@
 import SwiftUI
 import Pulse
 
-struct ConsoleSearchLogLevelsCell: View {
-    @Binding var selection: Set<LoggerStore.Level>
+package struct ConsoleSearchLogLevelsCell: View {
+    @Binding package  var selection: Set<LoggerStore.Level>
+
+    package init(selection: Binding<Set<LoggerStore.Level>>) {
+        self._selection = selection
+    }
 
     var isAllSelected: Bool {
         selection.count == LoggerStore.Level.allCases.count
@@ -33,7 +37,7 @@ struct ConsoleSearchLogLevelsCell: View {
     }
 
 #if os(macOS)
-    var body: some View {
+    package var body: some View {
         VStack(alignment: .leading, spacing: -16) {
             HStack {
                 Spacer()
@@ -57,7 +61,7 @@ struct ConsoleSearchLogLevelsCell: View {
         }
     }
 #else
-    var body: some View {
+    package var body: some View {
         Section {
             ForEach(LoggerStore.Level.allCases, id: \.self) { level in
                 HStack {

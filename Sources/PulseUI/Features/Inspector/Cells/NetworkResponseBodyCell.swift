@@ -7,7 +7,7 @@ import Pulse
 
 #if !os(macOS)
 
-@available(iOS 15, visionOS 1.0, *)
+@available(iOS 16, visionOS 1, *)
 struct NetworkResponseBodyCell: View {
     let viewModel: NetworkResponseBodyCellViewModel
 

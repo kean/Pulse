@@ -4,10 +4,10 @@
 
 import SwiftUI
 
-struct PlaceholderView: View {
-    var imageName: String?
-    let title: String
-    var subtitle: String?
+package struct PlaceholderView: View {
+    package var imageName: String?
+    package let title: String
+    package var subtitle: String?
 
 #if os(tvOS)
     private let iconSize: CGFloat = 150
@@ -23,7 +23,13 @@ struct PlaceholderView: View {
     private let maxWidth: CGFloat = 280
 #endif
 
-    var body: some View {
+    package init(imageName: String? = nil, title: String, subtitle: String? = nil) {
+        self.imageName = imageName
+        self.title = title
+        self.subtitle = subtitle
+    }
+
+    package var body: some View {
         VStack {
             imageName.map(Image.init(systemName:))
                 .font(.system(size: iconSize, weight: .light))

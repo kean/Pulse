@@ -18,7 +18,7 @@ struct NetworkInspectorView: View {
 
     var body: some View {
         contents
-            .inlineNavigationTitle(ConsoleViewDelegate.getShortTitle(for: task))
+            .inlineNavigationTitle(task.getShortTitle(options: settings.listDisplayOptions))
     }
 
     var contents: some View {

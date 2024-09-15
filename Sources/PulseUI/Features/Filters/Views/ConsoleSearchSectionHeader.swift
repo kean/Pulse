@@ -4,6 +4,8 @@
 
 import SwiftUI
 
+#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
+
 struct ConsoleSectionHeader: View {
     let icon: String
     let title: String
@@ -22,28 +24,6 @@ struct ConsoleSectionHeader: View {
         self.isDefault = filter.wrappedValue == `default` ?? Filter()
     }
 
-#if os(macOS)
-    var body: some View {
-        HStack {
-            HStack(spacing: 4) {
-                Image(systemName: icon)
-                    .foregroundColor(.secondary)
-                Text(title)
-                    .lineLimit(1)
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-            }
-            Spacer()
-            if !isDefault {
-                Button(action: reset) {
-                    Image(systemName: "arrow.uturn.left")
-                }
-                .foregroundColor(.secondary)
-                .disabled(isDefault)
-            }
-        }.buttonStyle(.plain)
-    }
-#elseif os(iOS) || os(visionOS)
     var body: some View {
         HStack {
             Text(title)
@@ -62,9 +42,6 @@ struct ConsoleSectionHeader: View {
             }
         }
     }
-#else
-    var body: some View {
-        Text(title)
-    }
-#endif
 }
+
+#endif

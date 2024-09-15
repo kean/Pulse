@@ -7,29 +7,29 @@ import SwiftUI
 #if os(iOS) || os(visionOS)
 import UIKit
 
-struct ShareView: UIViewControllerRepresentable {
+package struct ShareView: UIViewControllerRepresentable {
     var activityItems: [Any]
     var applicationActivities: [UIActivity]?
     private let cleanup: () -> Void
     private var completion: (() -> Void)?
 
-    init(activityItems: [Any]) {
+    package init(activityItems: [Any]) {
         self.activityItems = activityItems
         self.cleanup = {}
     }
 
-    init(_ items: ShareItems) {
+    package init(_ items: ShareItems) {
         self.activityItems = items.items
         self.cleanup = items.cleanup
     }
 
-    func onCompletion(_ completion: @escaping () -> Void) -> Self {
+    package func onCompletion(_ completion: @escaping () -> Void) -> Self {
         var copy = self
         copy.completion = completion
         return copy
     }
 
-    func makeUIViewController(context: UIViewControllerRepresentableContext<ShareView>) -> UIActivityViewController {
+    package func makeUIViewController(context: UIViewControllerRepresentableContext<ShareView>) -> UIActivityViewController {
         let controller = UIActivityViewController(activityItems: activityItems, applicationActivities: applicationActivities)
         controller.completionWithItemsHandler = { _, _, _, _ in
             cleanup()
@@ -38,7 +38,7 @@ struct ShareView: UIViewControllerRepresentable {
         return controller
     }
 
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ShareView>) {
+    package func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ShareView>) {
     }
 }
 #endif
@@ -47,24 +47,24 @@ struct ShareView: UIViewControllerRepresentable {
 import AppKit
 import Pulse
 
-struct ShareView: View {
-    let items: ShareItems
+package struct ShareView: View {
+    package let items: ShareItems
 
     private var cleanup: (() -> Void)?
     private var completion: (() -> Void)?
 
-    init(_ items: ShareItems) {
+    package init(_ items: ShareItems) {
         self.items = items
         self.cleanup = items.cleanup
     }
 
-    func onCompletion(_ completion: @escaping () -> Void) -> Self {
+    package func onCompletion(_ completion: @escaping () -> Void) -> Self {
         var copy = self
         copy.completion = completion
         return copy
     }
 
-    var body: some View {
+    package var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             let services = NSSharingService.sharingServices(forItems: items.items)
             ForEach(services, id: \.title) { service in
@@ -103,7 +103,7 @@ struct ShareView: View {
 #endif
 
 #if os(macOS)
-struct ShareNetworkTaskView: View {
+package struct ShareNetworkTaskView: View {
     @ObservedObject var task: NetworkTaskEntity
 
     @AppStorage("com-github-kean-selected-task-sharing-option") private var output: Output = .plainText
@@ -111,7 +111,11 @@ struct ShareNetworkTaskView: View {
     @State private var items: ShareItems?
     @Environment(\.store) private var store
 
-    var body: some View {
+    package init(task: NetworkTaskEntity) {
+        self.task = task
+    }
+
+    package var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 8) {
                 NetworkRequestStatusCell(viewModel: .init(task: task, store: store))

@@ -9,12 +9,17 @@ import CoreData
 import Pulse
 import Combine
 
-struct DateRangePicker: View {
-    let title: String
-    @Binding var date: Date?
+package struct DateRangePicker: View {
+    package let title: String
+    @Binding package var date: Date?
+
+    package init(title: String, date: Binding<Date?>) {
+        self.title = title
+        self._date = date
+    }
 
 #if os(macOS)
-    var body: some View {
+    package var body: some View {
         HStack {
             Text(title + " Date")
             Spacer()
@@ -22,7 +27,7 @@ struct DateRangePicker: View {
         }.frame(height: 24)
     }
 #else
-    var body: some View {
+    package var body: some View {
 #if os(iOS) || os(visionOS)
         if #available(iOS 16, *) {
             ViewThatFits {

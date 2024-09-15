@@ -9,15 +9,15 @@ import CoreData
 #if DEBUG || STANDALONE_PULSE_APP
 
 extension LoggerStore {
-    static let mock: LoggerStore = {
+    package static let mock: LoggerStore = {
         let store = makeMockStore()
         _syncPopulateStore(store)
         return store
     }()
 
-    static let preview = makeMockStore()
+    package static let preview = makeMockStore()
 
-    func populate() {
+    package func populate() {
         _syncPopulateStore(self)
     }
 }
@@ -396,7 +396,7 @@ private func getHeadersEstimatedSize(_ headers: [String: String]?) -> Int64 {
 }
 
 extension LoggerStore {
-    func entity(for task: MockTask) -> NetworkTaskEntity {
+    package func entity(for task: MockTask) -> NetworkTaskEntity {
         var configuration = NetworkLogger.Configuration()
         configuration.isWaitingForDecoding = true
         _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self, configuration: configuration))
