@@ -2,6 +2,10 @@
 
 Learn how to configure Pulse to best suit your app needs.
 
+## Console
+
+Pulse is highly customizable and you can tweak it to best match your style and your backend. To learn more, see [PulseUI: Overview](https://kean-docs.github.io/pulseui/documentation/pulseui/).
+
 ## Logger
 
 ### Configure Store

@@ -4,6 +4,8 @@ A set of components that you can integrate into your app to view the logs.
 
 ## Overview
 
+### SwiftUI
+
 The easiest way to integrate PulseUI is by using ``ConsoleView``.
 
 ```swift
@@ -24,7 +26,7 @@ NavigationLink(destination: ConsoleView()) {
 
 > tip: If you use Pulse to log only network requests, and not text messages, use `ConsoleView(mode: .network)` to show a view specialized to only display network requests.
 
-## UIKit
+### UIKit
 
 To present the console from `UIKit`, use `UIHostingController`:
 
@@ -45,7 +47,13 @@ nav.navigationBar.prefersLargeTitles = true
 present(nav, animated: true)
 ```
 
-## Custom Views
+## Customization
+
+### Settings
+
+Pulse is highly customizable and provides a massive number of settings in ``UserSettings``, including the options for customizing the look of the cells in the list, and more.
+
+### Custom Views
 
 PulseUI gives you complete access to the underlying data and its model. You can easily create custom views into your log data by using affordances provided by SwiftUI:
 
