@@ -140,9 +140,12 @@ extension NetworkTaskEntity {
         guard let url else {
             return nil
         }
-        let displayed = options.content.components
-        if displayed.count == ConsoleListDisplaySettings.URLComponent.allCases.count {
-            return url
+        return NetworkTaskEntity.formattedURL(url, components:  options.content.components)
+    }
+
+    static func formattedURL(_ url: String, components displayed: Set<ConsoleListDisplaySettings.URLComponent>) -> String? {
+        guard !displayed.isEmpty else {
+            return nil
         }
         guard var components = URLComponents(string: url) else {
             return nil

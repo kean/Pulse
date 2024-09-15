@@ -102,7 +102,7 @@ struct ConsoleTaskCell: View {
 
     private var content: some View {
         var method: Text? {
-            guard let method = task.httpMethod else {
+            guard settings.listDisplayOptions.content.showMethod, let method = task.httpMethod else {
                 return nil
             }
             return Text(method.appending(" "))

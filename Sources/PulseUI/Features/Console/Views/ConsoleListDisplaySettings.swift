@@ -39,6 +39,9 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
         /// If task description is available, show it instead of the `URL`.
         public var showTaskDescription = false
 
+        /// Show HTTP method when available.
+        public var showMethod = true
+
         /// Defines what components to display in the list. By default, shows
         /// only path.
         public var components: Set<URLComponent> = [.path]
@@ -59,13 +62,11 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
         public var lineLimit: Int = 1
     }
 
-    public enum URLComponent: String, Identifiable, CaseIterable, Codable {
+    public enum URLComponent: String, CaseIterable, Codable {
         case scheme, user, password, host, port, path, query, fragment
-
-        public var id: URLComponent { self }
     }
 
-    public enum TaskField: Sendable, Codable, Hashable, Identifiable {
+    public enum TaskField: Sendable, Codable, Hashable {
         case method
         case requestSize
         case responseSize
@@ -75,10 +76,8 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
         case statusCode
         case taskType
         case taskDescription
-        case requestHeaderField(key: String)
-        case responseHeaderField(key: String)
-
-        public var id: TaskField { self }
+        case requestHeaderField(String)
+        case responseHeaderField(String)
     }
 
     public init() {}
