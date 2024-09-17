@@ -190,8 +190,20 @@ private extension Data {
 private func _redactingSensitiveFields(_ value: Any, _ fields: Set<String>) -> Any {
     switch value {
     case var object as [String: Any]:
-        for key in object.keys.filter(fields.contains) {
-            object[key] = "<private>"
+        for key in object.keys {
+            if fields.contains(key) {
+                // Redact any value (including objects and arrays) matching the key
+                object[key] = "<private>"
+            } else if let value = object[key] as? [String: Any] {
+                // Recessively process values that are objects
+                object[key] = _redactingSensitiveFields(value, fields)
+            } else if var value = object[key] as? [Any] {
+                // Recessively process values that are arrays
+                value = value.map({ _redactingSensitiveFields($0, fields) })
+                object[key] = value
+            } else {
+                // All other key/values are left untouched.
+            }
         }
         return object
     case let array as [Any]:
