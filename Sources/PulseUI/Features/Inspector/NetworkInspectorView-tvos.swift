@@ -26,6 +26,7 @@ struct NetworkInspectorView: View {
             Form { lhs }.frame(width: 740)
             Form { rhs }
         }
+        .disableScrollClip()
     }
 
     @ViewBuilder

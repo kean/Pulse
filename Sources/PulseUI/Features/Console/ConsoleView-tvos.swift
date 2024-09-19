@@ -37,6 +37,7 @@ public struct ConsoleView: View {
             .onAppear { listViewModel.isViewVisible = true }
             .onDisappear { listViewModel.isViewVisible = false }
         }
+        .disableScrollClip()
         .injecting(environment)
         .environmentObject(listViewModel)
     }
@@ -89,6 +90,17 @@ private struct ConsoleMenuView: View {
 
     private var destinationFilters: some View {
         ConsoleFiltersView().padding()
+    }
+}
+
+extension View {
+    @available(tvOS, obsoleted: 17.0, renamed: "scrollClipDisabled")
+    @ViewBuilder func disableScrollClip() -> some View {
+        if #available(tvOS 17.0, *) {
+            scrollClipDisabled()
+        } else {
+            self
+        }
     }
 }
 
