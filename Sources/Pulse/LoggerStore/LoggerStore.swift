@@ -1122,7 +1122,7 @@ extension LoggerStore {
     }
 
     private func reduceBlobStoreSize() throws {
-        var currentSize = try getBlobsSize()
+        var currentSize = try getBlobsSize(in: backgroundContext)
 
         guard currentSize > configuration.blobSizeLimit else {
             return // All good, no need to remove anything
@@ -1147,7 +1147,7 @@ extension LoggerStore {
         }
     }
 
-    private func getBlobsSize(isDecompressed: Bool = false) throws -> Int64 {
+    private func getBlobsSize(in context: NSManagedObjectContext, isDecompressed: Bool = false) throws -> Int64 {
         let request = LoggerBlobHandleEntity.fetchRequest()
 
         let description = NSExpressionDescription()
@@ -1162,7 +1162,7 @@ extension LoggerStore {
         request.propertiesToFetch = [description]
         request.resultType = .dictionaryResultType
 
-        let result = try backgroundContext.fetch(request) as? [[String: Any]]
+        let result = try context.fetch(request) as? [[String: Any]]
         return (result?.first?[description.name] as? Int64) ?? 0
     }
 }
@@ -1196,8 +1196,8 @@ extension LoggerStore {
             taskCount: taskCount,
             blobCount: blobCount,
             totalStoreSize: try storeURL.directoryTotalSize(),
-            blobsSize: try getBlobsSize(),
-            blobsDecompressedSize: try getBlobsSize(isDecompressed: true),
+            blobsSize: try getBlobsSize(in: context),
+            blobsDecompressedSize: try getBlobsSize(in: context, isDecompressed: true),
             appInfo: .current,
             deviceInfo: deviceInfo
         )
