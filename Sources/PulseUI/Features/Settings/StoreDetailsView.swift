@@ -13,7 +13,7 @@ struct StoreDetailsView: View {
 
     var body: some View {
         StoreDetailsContentsView(viewModel: viewModel)
-            .onAppear { viewModel.load(from: source) }
+            .task { await viewModel.load(from: source) }
 #if os(tvOS)
             .padding()
 #else
@@ -97,18 +97,16 @@ enum StoreDetailsViewSource {
 
 // MARK: - ViewModel
 
-final class StoreDetailsViewModel: ObservableObject {
+@MainActor final class StoreDetailsViewModel: ObservableObject {
     @Published private(set) var storeSizeLimit: Int64?
     @Published private(set) var sections: [KeyValueSectionViewModel] = []
     @Published private(set) var info: LoggerStore.Info?
     @Published private(set) var errorMessage: String?
 
-    func load(from source: StoreDetailsViewSource) {
+    func load(from source: StoreDetailsViewSource) async {
         switch source {
         case .store(let store):
-            Task {
-                await loadInfo(for: store)
-            }
+            await loadInfo(for: store)
         case .info(let value):
             display(value)
         }
