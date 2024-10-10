@@ -33,7 +33,7 @@ The best way to start using Pulse is with the [**Getting Started**](https://kean
 
 | Pulse      | Swift      | Xcode       | Platforms                                        |
 |------------|------------|-------------|--------------------------------------------------|
-| Pulse 5.0  | Swift 5.10 | Xcode 15.3  | iOS 15, tvOS 15, watchOS 8, macOS 12, visionOS 1 |
+| Pulse 5.0  | Swift 5.10 | Xcode 15.4  | iOS 15, tvOS 15, watchOS 8, macOS 12, visionOS 1 |
 | Pulse 4.0  | Swift 5.7  | Xcode 14.1  | iOS 14, tvOS 15, watchOS 8, macOS 12             |
 
 ## License

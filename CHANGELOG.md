@@ -1,5 +1,29 @@
 # Pulse 5.x
 
+## Pulse 5.1.1
+
+*Sep 19, 2024*
+
+- Implement deep JSON redaction by @briancordanyoung in https://github.com/kean/Pulse/pull/292
+- Fix a CoreData multithreading issue in `LoggerStore.info()` by @ejensen in https://github.com/kean/Pulse/pull/293
+- Fix `ConsoleView` focus state clipping on tvOS by @ejensen in https://github.com/kean/Pulse/pull/295
+- Revert the removal of the `NetworkLogger`’s convenience initializer by @ejensen in https://github.com/kean/Pulse/pull/294
+
+## Pulse 5.1
+
+*Sep 16, 2024*
+
+- Introduce an enhanced design for console cells with improved information hierarchy. It has multiple tweaks, but the main change is how the URLs are formatted. By default, the console will now show only the path with a host as a secondary field below it.
+- Add new convenience APIs for accessing messages and tasks stored in the logger: `LoggerStore/message(sortDescriptors:predicate:)` and `LoggerStore/tasks(sortDescriptors:predicate:)`. Deprecate `allTasks` and `allMessages`.
+- Fix an issue with thumbnails for image responses being too aggressively compressed and add `LoggerStore.ThumbnailOptions` to make it customizable
+- Update image response viewer to show thumbnails at a 2x resolution
+- Display thumbnail resolution in the response viewer
+- Fix an issue with app icons send too blurry to the Pulse Pro app
+- Improve support for `.inMemory` store option, which is now guaranteed to not write anything on disk, including the store manifest. It also no longer requires the `.create` option like the regular store and the `storeURL` parameter can point to anything, including `/dev/null`.
+- Deprecate `UserSettings.displayHeaders` (user new `ConsoleListDisplaySettings` instead)
+- Fix xcprivacy warnings when used with SwiftPM, thanks to @alphatroya
+- Performance optimizations
+
 ## Pulse 5.0
 
 *Sep 4, 2024*

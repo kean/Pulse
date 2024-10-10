@@ -766,9 +766,10 @@ extension LoggerStore {
     /// - parameter predicate: By default, `nil`.
     public func messages(
         sortDescriptors: [SortDescriptor<LoggerMessageEntity>] = [SortDescriptor(\.createdAt, order: .forward)],
-        predicate: NSPredicate? = nil
+        predicate: NSPredicate? = nil,
+        context: NSManagedObjectContext? = nil
     ) throws -> [LoggerMessageEntity] {
-        try viewContext.fetch(LoggerMessageEntity.self) {
+        try (context ?? viewContext).fetch(LoggerMessageEntity.self) {
             $0.sortDescriptors = sortDescriptors.map(NSSortDescriptor.init)
             $0.predicate = predicate
         }
@@ -781,9 +782,10 @@ extension LoggerStore {
     /// - parameter predicate: By default, `nil`.
     public func tasks(
         sortDescriptors: [SortDescriptor<NetworkTaskEntity>] = [SortDescriptor(\.createdAt, order: .forward)],
-        predicate: NSPredicate? = nil
+        predicate: NSPredicate? = nil,
+        context: NSManagedObjectContext? = nil
     ) throws -> [NetworkTaskEntity] {
-        try viewContext.fetch(NetworkTaskEntity.self) {
+        try (context ?? viewContext).fetch(NetworkTaskEntity.self) {
             $0.sortDescriptors = sortDescriptors.map(NSSortDescriptor.init)
             $0.predicate = predicate
         }
