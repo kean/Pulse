@@ -60,6 +60,7 @@ package final class TextRendererJSON {
             case .key: return UXColor.label
             case .valueString: return UXColor.label
             case .valueOther: return UXColor.label
+            case .boolean: return UXColor.label
             case .null: return UXColor.label
             }
         } else {
@@ -68,6 +69,7 @@ package final class TextRendererJSON {
             case .key: return JSONColors.key
             case .valueString: return JSONColors.valueString
             case .valueOther: return JSONColors.valueOther
+            case .boolean: return JSONColors.null
             case .null: return JSONColors.null
             }
         }
@@ -160,9 +162,9 @@ package final class TextRendererJSON {
 
     private func renderNumber(_ number: NSNumber) {
         if number === kCFBooleanTrue {
-            append("true", .valueOther)
+            append("true", .boolean)
         } else if number === kCFBooleanFalse {
-            append("false", .valueOther)
+            append("false", .boolean)
         } else {
             append("\(number)", .valueOther)
         }
@@ -262,6 +264,7 @@ package enum JSONElement {
     case key
     case valueString
     case valueOther
+    case boolean
     case null
 }
 

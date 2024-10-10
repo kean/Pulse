@@ -57,9 +57,9 @@ package struct ConsoleTaskCell: View {
             info.higlighted(highlightedArea == .header)
 
             Spacer()
-#if canImport(RiftSupport)
-            PinView(task: task)
-#endif
+            if task.isPinned {
+                BookmarkIconView()
+            }
             ConsoleTimestampView(date: task.createdAt)
                 .padding(.trailing, 3)
         }

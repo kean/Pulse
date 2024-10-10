@@ -25,13 +25,11 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            Section {
+            Section("Store") {
                 // TODO: load this info async
-//                if #available(macOS 13, *), let info = try? store.info() {
-//                    LoggerStoreSizeChart(info: info, sizeLimit: store.configuration.sizeLimit)
-//                }
-            } header: {
-                PlainListSectionHeaderSeparator(title: "Store")
+                //                if #available(macOS 13, *), let info = try? store.info() {
+                //                    LoggerStoreSizeChart(info: info, sizeLimit: store.configuration.sizeLimit)
+                //                }
             }
 
             Section {

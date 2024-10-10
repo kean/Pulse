@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
+#if !os(macOS)
+
 import SwiftUI
 import Pulse
 
@@ -14,7 +16,7 @@ package struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: 
     package let description: (Data.Element) -> String
     @ViewBuilder package let label: (Data.Element) -> Label
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
     package var limit = 6
 #else
     package var limit = 3
@@ -42,34 +44,6 @@ package struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: 
 
     @State private var searchText = ""
 
-#if os(macOS)
-    @State private var isExpanded = false
-
-    package var body: some View {
-        if items.isEmpty {
-            emptyView
-        } else {
-            let filtered = self.filteredItems
-            HStack {
-                SearchBar(title: "Search", text: $searchText)
-                Spacer()
-                buttonToggleAll
-            }
-            ForEach(isExpanded ? filtered : Array(filtered.prefix(limit)), id: id, content: makeRow)
-            if filtered.count > limit {
-                HStack {
-                    if !isExpanded {
-                        Button(action: { isExpanded = true }) {
-                            Text("Show All ") + Text("(\(items.count))").foregroundColor(.secondary)
-                        }
-                    } else {
-                        Button("Show Less") { isExpanded = false }
-                    }
-                }
-            }
-        }
-    }
-#else
     @State private var isExpandedListPresented = false
     @State private var isSearching = false
 
@@ -116,7 +90,6 @@ package struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: 
         .disableAutocorrection(true)
 #endif
     }
-#endif
 
     // MARK: - Shared
 
@@ -136,10 +109,6 @@ package struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: 
                 selection.remove(item[keyPath: id])
             }
         }), label: { label(item).lineLimit(1) })
-#if os(macOS)
-        .help(description(item))
-        .frame(maxWidth: .infinity, alignment: .leading)
-#endif
     }
 
     private var filteredItems: [Data.Element] {
@@ -181,4 +150,6 @@ private struct ConsoleSearchListSelectionViewDemo: View {
         }.listStyle(.plain)
     }
 }
+#endif
+
 #endif

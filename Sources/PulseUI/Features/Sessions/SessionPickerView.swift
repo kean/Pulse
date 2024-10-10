@@ -8,7 +8,7 @@ import SwiftUI
 import CoreData
 import Combine
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
 
 @available(iOS 16, macOS 13, visionOS 1, *)
 struct SessionPickerView: View {
@@ -16,10 +16,8 @@ struct SessionPickerView: View {
 
     var body: some View {
         SessionListView(selection: $selection, sharedSessions: .constant(nil))
-#if os(iOS) || os(visionOS)
             .environment(\.editMode, .constant(.active))
             .inlineNavigationTitle("Sessions")
-#endif
     }
 }
 

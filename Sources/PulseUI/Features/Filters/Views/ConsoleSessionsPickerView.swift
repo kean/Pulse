@@ -15,7 +15,11 @@ package struct ConsoleSessionsPickerView: View {
 
 #if os(iOS) || os(visionOS) || os(macOS)
     package static var makeSessionPicker: (_ selection: Binding<Set<UUID>>) -> AnyView = {
+#if os(macOS)
+        AnyView(EmptyView()) // Has to be injected
+#else
         AnyView(SessionPickerView(selection: $0))
+#endif
     }
 #endif
 

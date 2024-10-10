@@ -238,24 +238,7 @@ package struct StringSearchOptionsMenu: View {
         self.isKindNeeded = isKindNeeded
     }
 
-#if os(macOS)
     package var body: some View {
-        Menu(content: { contents }, label: {
-            Image(systemName: "ellipsis.circle")
-        })
-        .opacity(0.5)
-        .pickerStyle(.inline)
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
-    }
-#else
-    package var body: some View {
-        contents
-    }
-#endif
-
-    @ViewBuilder
-    private var contents: some View {
         Picker("Kind", selection: $options.kind) {
             ForEach(StringSearchOptions.Kind.allCases, id: \.self) {
                 Text($0.rawValue).tag($0)

@@ -6,6 +6,8 @@ import SwiftUI
 import Pulse
 import Combine
 
+#if !os(macOS)
+
 @available(iOS 16, visionOS 1, *)
 struct ConsoleDomainsSelectionView: View {
     @ObservedObject var viewModel: ConsoleFiltersViewModel
@@ -23,8 +25,8 @@ struct ConsoleDomainsSelectionView: View {
     }
 }
 
-private extension ConsoleFiltersViewModel {
-    func bindingForHosts(index: LoggerStoreIndex) -> Binding<Set<String>> {
+extension ConsoleFiltersViewModel {
+    package func bindingForHosts(index: LoggerStoreIndex) -> Binding<Set<String>> {
         Binding(get: {
             if let focused = self.criteria.network.host.focused {
                 return [focused]
@@ -43,3 +45,5 @@ private extension ConsoleFiltersViewModel {
         })
     }
 }
+
+#endif

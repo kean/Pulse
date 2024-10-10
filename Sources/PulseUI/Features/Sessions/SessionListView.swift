@@ -8,7 +8,7 @@ import SwiftUI
 import CoreData
 import Combine
 
-#if os(iOS) || os(macOS) || os(visionOS)
+#if os(iOS) || os(visionOS)
 
 @available(iOS 16, macOS 13, visionOS 1, *)
 struct SessionListView: View {
@@ -21,9 +21,7 @@ struct SessionListView: View {
     @State private var filterTerm = ""
     @State private var groupedSessions: [(Date, [LoggerSessionEntity])] = []
 
-#if os(iOS) || os(visionOS)
     @Environment(\.editMode) private var editMode
-#endif
     @Environment(\.store) private var store
 
     var body: some View {
@@ -42,30 +40,6 @@ struct SessionListView: View {
 
     @ViewBuilder
     private var content: some View {
-#if os(macOS)
-        VStack(spacing: 0) {
-            list
-
-            Divider()
-            SearchBar(title: "Filter", imageName: "line.3.horizontal.decrease.circle", text: $filterTerm)
-                .help("Show sessions with matching name")
-                .padding(8)
-        }
-#else
-        list
-#endif
-    }
-
-    private func refreshGroups() {
-        let calendar = Calendar.current
-        let groups = Dictionary(grouping: sessions) {
-            let components = calendar.dateComponents([.day, .year, .month], from: $0.createdAt)
-            return calendar.date(from: components) ?? $0.createdAt
-        }
-        self.groupedSessions = Array(groups.sorted(by: { $0.key > $1.key }))
-    }
-
-    private var list: some View {
         List(selection: $selection) {
             if !filterTerm.isEmpty {
                 ForEach(getFilteredSessions(), id: \.id, content: makeCell)
@@ -77,26 +51,26 @@ struct SessionListView: View {
                 }
             }
         }
-#if os(iOS) || os(visionOS)
         .listStyle(.plain)
         .searchable(text: $filterTerm)
-#else
-        .listStyle(.sidebar)
-#endif
+    }
+
+    private func refreshGroups() {
+        let calendar = Calendar.current
+        let groups = Dictionary(grouping: sessions) {
+            let components = calendar.dateComponents([.day, .year, .month], from: $0.createdAt)
+            return calendar.date(from: components) ?? $0.createdAt
+        }
+        self.groupedSessions = Array(groups.sorted(by: { $0.key > $1.key }))
     }
 
     private func makeHeader(for startDate: Date, sessions: [LoggerSessionEntity]) -> some View {
         HStack {
-#if os(macOS)
-            PlainListSectionHeaderSeparator(title: sectionTitleFormatter.string(from: startDate) + " (\(sessions.count))")
-#else
             (Text(sectionTitleFormatter.string(from: startDate)) +
              Text(" (\(sessions.count))").foregroundColor(.secondary.opacity(0.5)))
             .font(.headline)
             .padding(.vertical, 6)
-#endif
 
-#if os(iOS) || os(visionOS)
             if editMode?.wrappedValue.isEditing ?? false {
                 Spacer()
 
@@ -110,7 +84,6 @@ struct SessionListView: View {
                     }
                 }.font(.subheadline)
             }
-#endif
         }
     }
 
@@ -141,15 +114,6 @@ struct SessionListView: View {
     }
 }
 
-package struct SelectedSessionsIDs: Hashable, Identifiable {
-    package var id: SelectedSessionsIDs { self }
-    package let ids: Set<UUID>
-
-    package init(ids: Set<UUID>) {
-        self.ids = ids
-    }
-}
-
 private let sectionTitleFormatter: DateFormatter = {
     let formatter = DateFormatter()
     formatter.dateStyle = .long
@@ -159,6 +123,15 @@ private let sectionTitleFormatter: DateFormatter = {
 }()
 
 #endif
+
+package struct SelectedSessionsIDs: Hashable, Identifiable {
+    package var id: SelectedSessionsIDs { self }
+    package let ids: Set<UUID>
+
+    package init(ids: Set<UUID>) {
+        self.ids = ids
+    }
+}
 
 @available(macOS 13, *)
 package struct ConsoleSessionCell: View {

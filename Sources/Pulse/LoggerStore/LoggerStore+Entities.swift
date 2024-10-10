@@ -30,6 +30,7 @@ public final class LoggerMessageEntity: NSManagedObject {
 public final class NetworkTaskEntity: NSManagedObject {
     // Primary
     @NSManaged public var createdAt: Date
+    @NSManaged public var isPinned: Bool
     @NSManaged public var session: UUID
     @NSManaged public var taskId: UUID
 

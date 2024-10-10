@@ -808,6 +808,12 @@ extension LoggerStore {
         }
     }
 
+    package func clearSessions(withIDs sessionIDs: Set<UUID>) {
+        perform { _ in
+            try? self._removeMessagesForSessions(withIDs: sessionIDs, isInverted: false)
+        }
+    }
+
     private func _removeSessions(withIDs sessionIDs: Set<UUID>, isInverted: Bool = false) throws {
         try deleteEntities(for: {
             let request = LoggerSessionEntity.fetchRequest()
@@ -816,6 +822,10 @@ extension LoggerStore {
             return request
         }())
 
+        try _removeMessagesForSessions(withIDs: sessionIDs, isInverted: isInverted)
+    }
+
+    private func _removeMessagesForSessions(withIDs sessionIDs: Set<UUID>, isInverted: Bool) throws {
         var predicate = NSPredicate(format: "session IN %@", sessionIDs)
         predicate = isInverted ? NSCompoundPredicate(notPredicateWithSubpredicate: predicate) : predicate
         try removeMessages(with: predicate)
@@ -825,7 +835,9 @@ extension LoggerStore {
 
     /// Removes all of the previously recorded messages.
     public func removeAll() {
-        perform { _ in self._removeAll() }
+        perform { _ in
+            self._removeAll()
+        }
     }
 
     private func _removeAll() {

@@ -58,3 +58,12 @@ struct StatusIndicatorView: View {
         }
     }
 }
+
+struct BookmarkIconView: View {
+    var body: some View {
+        Image(systemName: "bookmark.fill")
+            .font(.footnote)
+            .foregroundColor(.pink)
+            .frame(width: 8, height: 8)
+    }
+}

@@ -114,6 +114,10 @@ struct ConsoleSearchResultDetailsView: View {
     }
 }
 
+#endif
+
+#if os(iOS) || os(visionOS) || os(macOS)
+
 @available(iOS 16, visionOS 1, *)
 package struct PlainListGroupSeparator: View {
     package init() {}
@@ -126,10 +130,6 @@ package struct PlainListGroupSeparator: View {
             .frame(height: 12)
     }
 }
-
-#endif
-
-#if os(iOS) || os(visionOS) || os(macOS)
 
 @available(iOS 16, macOS 13, visionOS 1, *)
 package struct PlainListSectionHeader<Content: View>: View {
@@ -168,41 +168,6 @@ package struct PlainListSectionHeader<Content: View>: View {
 extension PlainListSectionHeader where Content == Text {
     init(title: String) {
         self.init(title: title, content: { Text(title) })
-    }
-}
-
-@available(iOS 16, visionOS 1, *)
-package struct PlainListSeeAllView: View {
-    let count: Int
-
-    package init(count: Int) {
-        self.count = count
-    }
-
-    package var body: some View {
-        (Text("Show All").foregroundColor(.accentColor) +
-         Text("  (\(count))"))
-        .font(.subheadline)
-        .foregroundColor(.secondary)
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-}
-
-@available(iOS 16, visionOS 1, *)
-package struct PlainListSectionHeaderSeparator: View {
-    let title: String
-
-    package init(title: String) {
-        self.title = title
-    }
-
-    package var body: some View {
-        HStack(alignment: .bottom, spacing: 0) {
-            Text(title)
-                .foregroundColor(.secondary)
-                .font(.subheadline.weight(.medium))
-            Spacer()
-        }
     }
 }
 

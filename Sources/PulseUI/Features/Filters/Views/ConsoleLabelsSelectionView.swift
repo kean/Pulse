@@ -6,6 +6,8 @@ import SwiftUI
 import Pulse
 import Combine
 
+#if !os(macOS)
+
 @available(iOS 16, visionOS 1, *)
 struct ConsoleLabelsSelectionView: View {
     @ObservedObject var viewModel: ConsoleFiltersViewModel
@@ -23,8 +25,10 @@ struct ConsoleLabelsSelectionView: View {
     }
 }
 
-private extension ConsoleFiltersViewModel {
-    func bindingForSelectedLabels(index: LoggerStoreIndex) -> Binding<Set<String>> {
+#endif
+
+extension ConsoleFiltersViewModel {
+    package func bindingForSelectedLabels(index: LoggerStoreIndex) -> Binding<Set<String>> {
         Binding(get: {
             if let focused = self.criteria.messages.labels.focused {
                 return [focused]

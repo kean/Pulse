@@ -84,12 +84,13 @@ extension String {
 }
 
 extension String {
-    package func ranges(of target: String, options: StringSearchOptions) -> [Range<String.Index>] {
+    package func ranges(of target: String, options: StringSearchOptions, limit: Int = Int.max) -> [Range<String.Index>] {
         var startIndex = target.startIndex
         var ranges = [Range<String.Index>]()
         let target = options.kind == .wildcard ? makeRegexForWildcard(target, rule: options.rule) : target
         let options = String.CompareOptions(options)
-        while startIndex < endIndex,
+        while ranges.count < limit,
+                startIndex < endIndex,
               let range = range(of: target, options: options, range: startIndex..<endIndex, locale: nil) {
             ranges.append(range)
             startIndex = range.upperBound

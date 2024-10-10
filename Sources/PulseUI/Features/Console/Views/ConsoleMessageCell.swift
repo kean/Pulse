@@ -43,9 +43,9 @@ package struct ConsoleMessageCell: View {
                 .foregroundColor(titleColor)
             Spacer()
 #if !os(watchOS)
-#if canImport(RiftSupport)
-            PinView(message: message)
-#endif
+            if message.isPinned {
+                BookmarkIconView()
+            }
             ConsoleTimestampView(date: message.createdAt)
                 .padding(.trailing, 3)
 #endif

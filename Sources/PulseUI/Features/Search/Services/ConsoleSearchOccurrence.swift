@@ -9,6 +9,10 @@ import Pulse
 import CoreData
 import Combine
 
+#if os(macOS)
+import AppKit
+#endif
+
 @available(iOS 16, visionOS 1, *)
 package final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
     package let id = ConsoleSearchOccurrenceId()
@@ -40,9 +44,33 @@ private let previewAttibutes = TextHelper().attributes(role: .body2, style: .mon
 
 @available(iOS 16, visionOS 1, *)
 extension ConsoleSearchOccurrence {
-    static func makePreview(for match: ConsoleSearchMatch, attributes customAttributes: [NSAttributedString.Key: Any] = [:]) -> AttributedString {
+    package static func makePreview(for match: ConsoleSearchMatch, attributes customAttributes: [NSAttributedString.Key: Any] = [:]) -> AttributedString {
+        let segments = makePreviewSegments(for: match)
 
-        let prefixStartIndex = match.line.index(match.range.lowerBound, offsetBy: -50, limitedBy: match.line.startIndex) ?? match.line.startIndex
+        var attributes = AttributeContainer(customAttributes)
+#if os(macOS)
+        attributes.foregroundColor = .secondary
+        attributes.font = .callout
+#endif
+
+        var middle = AttributedString(segments[1], attributes: attributes)
+#if os(macOS)
+        middle.foregroundColor = .primary
+        middle.font = Font.callout.weight(.semibold)
+#else
+        middle.foregroundColor = .orange
+#endif
+        return AttributedString(segments[0], attributes: attributes) + middle + AttributedString(segments[2], attributes: attributes)
+    }
+
+    package static func makePreviewSegments(for match: ConsoleSearchMatch) -> [Substring] {
+        let prefixOffset: Int
+#if os(macOS)
+        prefixOffset = -20
+#else
+        prefixOffset = -50
+#endif
+        let prefixStartIndex = match.line.index(match.range.lowerBound, offsetBy: prefixOffset, limitedBy: match.line.startIndex) ?? match.line.startIndex
         let prefixRange = prefixStartIndex..<match.range.lowerBound
 
         let suffixUpperBound = match.line.index(match.range.upperBound, offsetBy: 200, limitedBy: match.line.endIndex) ?? match.line.endIndex
@@ -62,11 +90,7 @@ extension ConsoleSearchOccurrence {
         if isEllipsisNeeded {
             prefix.insert("…", at: prefix.startIndex)
         }
-
-        let attributes = AttributeContainer(customAttributes)
-        var middle = AttributedString(match.line[match.range], attributes: attributes)
-        middle.foregroundColor = .orange
-        return AttributedString(prefix, attributes: attributes) + middle + AttributedString(suffix, attributes: attributes)
+        return [prefix, match.line[match.range], suffix]
     }
 }
 
