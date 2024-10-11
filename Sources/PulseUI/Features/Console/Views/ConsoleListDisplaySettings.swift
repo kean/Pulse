@@ -87,7 +87,7 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
         /// The line limit for messages in the console. By default, `1`.
         public var lineLimit: Int
 
-        /// Fields to display horizonally below the main text label with a separator.
+        /// Fields to display horizontally below the main text label with a separator.
         public var fields: [TaskField]
 
         /// Additional fields to display below the main list.
