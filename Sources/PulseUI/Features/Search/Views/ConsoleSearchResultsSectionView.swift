@@ -12,7 +12,6 @@ import Combine
 @available(iOS 16, visionOS 1, macOS 13, *)
 struct ConsoleSearchResultView: View {
     let viewModel: ConsoleSearchResultViewModel
-    var limit: Int = 4
     var isSeparatorNeeded = false
 
     @ScaledMetric(relativeTo: .body) private var fontMultiplier = 1.0
@@ -21,20 +20,9 @@ struct ConsoleSearchResultView: View {
 
     var body: some View {
         ConsoleEntityCell(entity: viewModel.entity)
-        let occurrences = Array(viewModel.occurrences).filter { $0.scope.isDisplayedInResults }
-        ForEach(occurrences.prefix(limit)) { item in
-            NavigationLink(destination: ConsoleSearchResultView.makeDestination(for: item, entity: viewModel.entity).injecting(environment)) {
+        ForEach(makeMatches(from: viewModel.occurrences)) { item in
+            NavigationLink(destination: ConsoleSearchResultView.makeDestination(for: item.occurrence, entity: viewModel.entity).injecting(environment)) {
                 makeCell(for: item)
-            }
-        }
-        if occurrences.count > limit {
-            let total = occurrences.count > ConsoleSearchMatch.limit ? "\(ConsoleSearchMatch.limit)+" : "\(occurrences.count)"
-            NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel).injecting(environment)) {
-                Text("Total Results: ")
-                    .font(.callout) +
-                Text(total)
-                    .font(.callout)
-                    .foregroundColor(.secondary)
             }
         }
         if isSeparatorNeeded {
@@ -43,20 +31,15 @@ struct ConsoleSearchResultView: View {
     }
 
     @ViewBuilder
-    private func makeCell(for occurrence: ConsoleSearchOccurrence) -> some View {
-        let contents = VStack(alignment: .leading, spacing: 4) {
-            Text(occurrence.preview)
-                .font(contentFont)
-                .lineLimit(3)
-            Text(occurrence.scope.title + " (\(occurrence.line):\(occurrence.range.lowerBound + 1))")
+    private func makeCell(for item: ConsoleSearchResultsItem) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(item.title)
                 .font(detailsFont)
                 .foregroundColor(.secondary)
-        }
-        if #unavailable(iOS 16) {
-            contents.padding(.vertical, 4)
-        } else {
-            contents
-        }
+            Text(item.occurrence.preview)
+                .font(contentFont)
+                .lineLimit(3)
+        }.padding(.vertical, 4)
     }
 
     @ViewBuilder
@@ -101,16 +84,48 @@ struct ConsoleSearchResultView: View {
 }
 
 @available(iOS 16, visionOS 1, *)
-struct ConsoleSearchResultDetailsView: View {
-    let viewModel: ConsoleSearchResultViewModel
+private func makeMatches(from occurrences: [ConsoleSearchOccurrence]) -> [ConsoleSearchResultsItem] {
+    var items: [ConsoleSearchResultsItem] = []
+    var index = 0
+    while index < occurrences.endIndex {
+        let occurrence = occurrences[index]
 
-    var body: some View {
-        List {
-            ConsoleSearchResultView(viewModel: viewModel, limit: Int.max)
+        if !occurrence.scope.isDisplayedInResults {
+            index += 1
+            continue // Skip
         }
-        .listStyle(.plain)
-        .environment(\.defaultMinListRowHeight, 0)
-        .inlineNavigationTitle("Search Results")
+
+        // Count all occurences in this scope and skip to the end
+        var counter = 1 // Already found one
+        while (index+1) < occurrences.endIndex && occurrences[index+1].scope == occurrence.scope  {
+            counter += 1
+            index += 1 // Consume next
+        }
+
+        let item = ConsoleSearchResultsItem(totalCount: counter, occurrence: occurrence)
+        items.append(item)
+        index += 1
+    }
+    return items
+}
+
+@available(iOS 16, visionOS 1, *)
+struct ConsoleSearchResultsItem: Identifiable {
+    var id: ConsoleSearchOccurrence { occurrence }
+    let totalCount: Int
+    let occurrence: ConsoleSearchOccurrence
+
+    var title: String {
+        let suffix: String
+        if totalCount == 1 {
+            suffix = ""
+        } else if totalCount < ConsoleSearchMatch.limit {
+            suffix = " (\(totalCount) matches)"
+        } else {
+            // we know there is 6, showin
+            suffix = " (\(ConsoleSearchMatch.limit-1)+ matches)"
+        }
+        return "\(occurrence.scope.title)\(suffix)"
     }
 }
 

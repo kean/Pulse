@@ -7,6 +7,7 @@
 - Fix an issue with `isAutomaticConnectionEnabled` not starting the browser the first time it's enabled
 - Fix crash when exporting HAR file by @rounak in https://github.com/kean/Pulse/pull/299
 - Fix concurrency issue in `StoreDetailsViewModel` by @ejensen in https://github.com/kean/Pulse/pull/302
+- Update the deep search. It will now show all search scopes found and only one match per scope. You can tap on a match to see the scope with a prepopulated search query to see the remaining items.
 
 ## Pulse 5.1.1
 
