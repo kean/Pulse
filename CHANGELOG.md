@@ -2,7 +2,11 @@
 
 ## Pulse 5.1.2
 
+*Oct 10, 2024*
+
 - Fix an issue with `isAutomaticConnectionEnabled` not starting the browser the first time it's enabled
+- Fix crash when exporting HAR file by @rounak in https://github.com/kean/Pulse/pull/299
+- Fix concurrency issue in `StoreDetailsViewModel` by @ejensen in https://github.com/kean/Pulse/pull/302
 
 ## Pulse 5.1.1
 
