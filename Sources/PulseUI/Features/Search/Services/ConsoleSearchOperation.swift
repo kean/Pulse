@@ -135,11 +135,21 @@ final class ConsoleSearchOperation {
                 if let string = task.requestBody.flatMap(service.getBodyString) {
                     occurrences += ConsoleSearchOperation.search(string, term, scope)
                 }
-            case .originalRequestHeaders, .currentRequestHeaders, .responseHeaders:
-                break // Reserved
+            case .originalRequestHeaders:
+                if let headers = task.originalRequest?.httpHeaders {
+                    occurrences += ConsoleSearchOperation.search(headers, term, scope)
+                }
+            case .currentRequestHeaders:
+                if let headers = task.currentRequest?.httpHeaders {
+                    occurrences += ConsoleSearchOperation.search(headers, term, scope)
+                }
             case .responseBody:
                 if let string = task.responseBody.flatMap(service.getBodyString) {
                     occurrences += ConsoleSearchOperation.search(string, term, scope)
+                }
+            case .responseHeaders:
+                if let headers = task.response?.httpHeaders {
+                    occurrences += ConsoleSearchOperation.search(headers, term, scope)
                 }
             case .message, .metadata:
                 break // Applies only to LoggerMessageEntity
