@@ -26,7 +26,7 @@ private final class AppViewModel: ObservableObject {
         // This code registers the store with the `RemoteLogger` (important!)
         LoggerStore.shared = .demo
 
-        RemoteLogger.shared.isAutomaticConnectionEnabled = true
+        // RemoteLogger.shared.isAutomaticConnectionEnabled = true
 
         // NetworkLogger.enableProxy()
 

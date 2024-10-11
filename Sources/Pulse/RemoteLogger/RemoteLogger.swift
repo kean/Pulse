@@ -111,7 +111,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     /// requires Bluetooth, it will trigger a prompt on the first app run.
     public var isAutomaticConnectionEnabled = false {
         didSet {
-            isEnabled = true
+            guard isAutomaticConnectionEnabled else { return }
+            enable()
         }
     }
 

@@ -1,5 +1,9 @@
 # Pulse 5.x
 
+## Pulse 5.1.2
+
+- Fix an issue with `isAutomaticConnectionEnabled` not starting the browser the first time it's enabled
+
 ## Pulse 5.1.1
 
 *Sep 19, 2024*
