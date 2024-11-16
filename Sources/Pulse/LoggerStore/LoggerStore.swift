@@ -210,11 +210,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
 
         if !isArchive && !options.contains(.readonly) {
             try save(manifest)
-            if isAutomaticSweepNeeded {
-                DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
-                    self?.sweep()
-                }
-            }
+            sweepIfNeeded()
         }
     }
 
@@ -1079,6 +1075,13 @@ extension LoggerStore {
 // MARK: - LoggerStore (Sweep)
 
 extension LoggerStore {
+    public func sweepIfNeeded() {
+        guard isAutomaticSweepNeeded else { return }
+        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
+            self?.sweep()
+        }
+    }
+
     var isAutomaticSweepNeeded: Bool {
         guard options.contains(.sweep) && !isArchive else { return false }
         guard let lastSweepDate = manifest.lastSweepDate else {
