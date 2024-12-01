@@ -5,8 +5,7 @@
 import SwiftUI
 import Pulse
 
-#if os(watchOS) || os(tvOS) || os(macOS)
-
+#if os(watchOS) || os(macOS)
 struct RichTextView: View {
     let viewModel: RichTextViewModel
 
