@@ -5,66 +5,54 @@
 //  Created by seunghwan Lee on 12/1/24.
 //
 
+#if os(tvOS)
+import UIKit
 import SwiftUI
 import Pulse
  
-#if os(tvOS)
-extension NSAttributedString {
-    func components(separatedBy string: String) -> [NSAttributedString] {
-        var pos = 0
-        return self.string.components(separatedBy: string).map {
-            let range = NSRange(location: pos, length: $0.count)
-            pos += range.length + string.count
-            return self.attributedSubstring(from: range)
+struct ScrollableTextView: UIViewRepresentable {
+    var text: String?
+    var attributedText: NSAttributedString?
+    
+    init(text: String? = nil, attributedText: AttributedString? = nil) {
+        self.text = text
+        if let attributedText {
+            self.attributedText = NSAttributedString(attributedText)
+        }
+    }
+
+    func makeUIView(context: UIViewRepresentableContext<ScrollableTextView>) -> UITextView {
+        let textView = UITextView()
+        textView.isScrollEnabled = true
+        textView.isUserInteractionEnabled = true
+        textView.panGestureRecognizer.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirect.rawValue)]
+        textView.bounces = true
+        textView.contentInsetAdjustmentBehavior = .never
+        textView.insetsLayoutMarginsFromSafeArea = false
+        textView.showsVerticalScrollIndicator = true
+        textView.showsHorizontalScrollIndicator = false
+        textView.indicatorStyle = .white
+        return textView
+    }
+
+    func updateUIView(_ uiView: UITextView, context: UIViewRepresentableContext<ScrollableTextView>) {
+        if let attributedText {
+            uiView.attributedText = attributedText
+        } else if let text {
+            uiView.text = text
         }
     }
 }
 
 struct RichTextView: View {
     let viewModel: RichTextViewModel
-    @FocusState private var focusedIndex: Int?
-
+    
     var body: some View {
-        ScrollView(.vertical) {
-            LazyVStack {
-                if let attributedStrings = viewModel.attributedStrings {
-                    ForEach(attributedStrings.indices, id: \.self) { index in
-                        Text(attributedStrings[index])
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .focusable()
-                            .focused($focusedIndex, equals: index)
-                            .background(focusedIndex == index && index != 0 ? Color.secondary : Color.clear)
-                    }
-                } else {
-                    let strings = viewModel.strings
-                    ForEach(strings.indices, id: \.self) { index in
-                        Text(strings[index])
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .focusable()
-                            .focused($focusedIndex, equals: index)
-                            .background(focusedIndex == index && index != 0 ? Color.secondary : Color.clear)
-                    }
-                }
-            }
+        if let attributedText = viewModel.attributedString {
+            ScrollableTextView(attributedText: attributedText)
+        } else {
+            ScrollableTextView(text: viewModel.text)
         }
-    }
-}
-
-final class RichTextViewModel: ObservableObject {
-    let strings: [String]
-    let attributedStrings: [AttributedString]?
-
-    var isLinkDetectionEnabled = true
-    var isEmpty: Bool { strings.isEmpty }
-
-    init(string: String) {
-        self.strings = string.components(separatedBy: "\n")
-        self.attributedStrings = nil
-    }
-
-    init(string: NSAttributedString, contentType: NetworkLogger.ContentType? = nil) {
-        self.strings = string.string.components(separatedBy: "\n")
-        self.attributedStrings = string.components(separatedBy: "\n").compactMap { try? AttributedString($0, including: \.uiKit) }
     }
 }
 #endif

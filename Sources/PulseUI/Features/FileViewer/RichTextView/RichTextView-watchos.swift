@@ -26,6 +26,7 @@ struct RichTextView: View {
 #endif
     }
 }
+#endif
 
 final class RichTextViewModel: ObservableObject {
     let text: String
@@ -48,5 +49,3 @@ final class RichTextViewModel: ObservableObject {
         self.text = string.string
     }
 }
-
-#endif
