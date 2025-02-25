@@ -23,7 +23,7 @@ public final class NetworkLogger: @unchecked Sendable {
     private var sensitiveDataFields: Set<String> = []
 
     private var isFilteringNeeded = false
-    private let lock = NSLock()
+    private let lock = NSRecursiveLock()
 
     /// A shared network logger.
     ///

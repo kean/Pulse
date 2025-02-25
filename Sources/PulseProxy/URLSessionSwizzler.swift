@@ -29,7 +29,7 @@ final class URLSessionSwizzler {
         self._logger = logger
     }
 
-    static let lock = NSLock()
+    static let lock = NSRecursiveLock()
     static var isEnabled = false
 
     static func enable(logger: NetworkLogger?) {

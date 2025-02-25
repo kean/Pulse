@@ -11,7 +11,7 @@ final class NetworkDebugger: @unchecked Sendable {
     private var numberOfHandledRequests: [UUID: Int] = [:]
     private var mockedTaskIDs: Set<Int> = []
 
-    private let lock = NSLock()
+    private let lock = NSRecursiveLock()
 
     static let shared = NetworkDebugger()
 
