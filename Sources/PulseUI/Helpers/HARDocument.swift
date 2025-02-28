@@ -85,15 +85,7 @@ extension HARDocument {
             cache = .init()
             connection = "\(entity.orderedTransactions.first?.remotePort ?? .zero)"
             pageref = pageId
-            request = .init(
-                cookies: [],
-                headers: entity.originalRequest?.headers.compactMap { ["name": $0.key, "value": $0.value] } ?? [],
-                httpVersion: "HTTP/2",
-                method: entity.httpMethod,
-                queryString: [],
-                url: entity.url
-            )
-
+            request = .init(entity)
             response = .init(entity)
 
             serverIPAddress = entity.orderedTransactions.first?.remoteAddress ?? ""
@@ -170,6 +162,21 @@ extension HARDocument.Entry {
         let method: String?
         let queryString: [[String: String]]
         let url: String?
+        let postData: Content?
+       
+        init(_ entity: NetworkTaskEntity?) {
+            
+            bodySize = Int(entity?.requestBody?.size ?? -1);
+            cookies = []
+            headers = entity?.originalRequest?.headers.compactMap { ["name": $0.key, "value": $0.value] } ?? [];
+            httpVersion = "HTTP/2";
+            method = entity?.httpMethod;
+            queryString = [];
+            url = entity?.url;
+            postData = .init(entity?.requestBody);
+            
+        }
+        
     }
 
     struct Response: Encodable {
