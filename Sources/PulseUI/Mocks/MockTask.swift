@@ -164,7 +164,8 @@ extension MockTask {
 private let mockLoginOriginalRequest = URLRequest(
     url: "https://github.com/login?scopes=profile,repos",
     method: "POST",
-    headers: ["Cache-Control": "no-cache"]
+    headers: ["Cache-Control": "no-cache"],
+    body: "{\"login\":\"example\",\"password\":\"example2\"}"
 )
 
 private let mockLoginCurrentRequest = mockLoginOriginalRequest.adding(headers: [
@@ -498,10 +499,12 @@ package let mockPDF = Data(base64Encoded: "JVBERi0xLjMNCiXi48/TDQoNCjEgMCBvYmoNC
 // MARK: Helpers
 
 private extension URLRequest {
-    init(url: String, method: String = "GET", headers: [String: String] = [:]) {
+    init(url: String, method: String = "GET", headers: [String: String] = [:],
+         body:String?=nil) {
         self.init(url: URL(string: url)!)
         self.httpMethod = method
         self.allHTTPHeaderFields = headers
+        self.httpBody=body?.data(using: .utf8)
     }
 
     func adding(headers: [String: String]) -> Self {
