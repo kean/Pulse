@@ -500,11 +500,11 @@ package let mockPDF = Data(base64Encoded: "JVBERi0xLjMNCiXi48/TDQoNCjEgMCBvYmoNC
 
 private extension URLRequest {
     init(url: String, method: String = "GET", headers: [String: String] = [:],
-         body:String?=nil) {
+         body: String? = nil) {
         self.init(url: URL(string: url)!)
         self.httpMethod = method
         self.allHTTPHeaderFields = headers
-        self.httpBody=body?.data(using: .utf8)
+        self.httpBody = body?.data(using: .utf8)
     }
 
     func adding(headers: [String: String]) -> Self {
