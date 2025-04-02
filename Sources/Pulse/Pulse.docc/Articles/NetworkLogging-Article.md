@@ -84,10 +84,10 @@ struct NetworkLoggerEventMonitor: EventMonitor {
 }
 ```
 
-Alternatively, if you don't have access to `URLSessionTask`, you can store the request/response directly in ``LoggerStore``:
+Alternatively, if you don't have access to `URLSessionTask`, you can store the request/response directly using ``RequestsLogger``:
 
 ```swift
-LoggerStore.shared.storeRequest(urlRequest, response: urlResponse, ...)
+RequestsLogger.shared.storeRequest(urlRequest, response: urlResponse, ...)
 ```
 
 ## Configure Logging
@@ -113,36 +113,44 @@ logger.logTask(task, didFinishDecodingWithError: decodingError)
 
 ``NetworkLogger`` captures data safely in a local database, and it never leaves your device. Logs are never written to the system's logging system. But, of course, logs are meant to be viewed and shared, which is why PulseUI provides sharing options. In case the logs do leave your device, it's best to redact any sensitive information. 
 
-``NetworkLogger/Configuration`` has a set of convenience APIs for managing what information is included or excluded from the logs.
+It's possible to manage that information using ``Redacted`` component. The same type is used in ``NetworkLogger.Configuration`` and ``RequestsLogger.Configuration``. So you can either use different ones or the same one in both.
 
 ```swift
-var configuration = NetworkLogger.Configuration()
+var redacted = Redacted()
 
 // Includes only requests with the given domain.
-configuration.includedHosts = ["*.example.com"]
+redacted.includedHosts = ["*.example.com"]
 
 // Exclude some subdomains.
-configuration.excludedHosts = ["logging.example.com"]
+redacted.excludedHosts = ["logging.example.com"]
 
 // Exclude specific URLs.
-configuration.excludedURLs = ["*/log/event"]
+redacted.excludedURLs = ["*/log/event"]
 
 // Replaces values for the given HTTP headers with "<private>"
-configuration.sensitiveHeaders = ["Authorization", "Access-Token"]
+redacted.sensitiveHeaders = ["Authorization", "Access-Token"]
 
 // Redacts sensitive query items.
-configuration.sensitiveQueryItems = ["password"]
+redacted.sensitiveQueryItems = ["password"]
 
 // Replaces values for the given response and request JSON fields with "<private>"
-configuration.sensitiveDataFields = ["password"]
-
-let logger = NetworkLogger(configuration: configuration)
+redacted.sensitiveDataFields = ["password"]
 ```
 
 You can then replace the default decoder with your custom instance:
 
 ```swift
-NetworkLogger.shared = logger
+NetworkLogger.shared = NetworkLogger {
+    $0.redacted = redacted
+}
+```
+
+And do the same with ``RequestsLogger``
+
+```swift
+RequestsLogger.shared = RequestsLogger {
+    $0.redacted = redacted
+}
 ```
 
 > Tip: "Include" and "exclude" patterns support basic wildcards (`*`), but you can also turn them into full-featured regex patterns using ``NetworkLogger/Configuration/isRegexEnabled``. 

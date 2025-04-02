@@ -12,7 +12,6 @@
 ### Storing Logs
 
 - ``storeMessage(createdAt:label:level:message:metadata:file:function:line:)``
-- ``storeRequest(_:response:error:data:metrics:label:taskDescription:)``
 
 ### Accessing Logs
 
