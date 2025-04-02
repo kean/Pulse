@@ -13,16 +13,8 @@ public final class NetworkLogger: @unchecked Sendable {
     private var store: LoggerStore { _store ?? .shared }
     private let _store: LoggerStore?
 
-    private var includedHosts: [Regex] = []
-    private var includedURLs: [Regex] = []
-    private var excludedHosts: [Regex] = []
-    private var excludedURLs: [Regex] = []
+    private let patterns: Redacted.Patterns
 
-    private var sensitiveHeaders: [Regex] = []
-    private var sensitiveQueryItems: Set<String> = []
-    private var sensitiveDataFields: Set<String> = []
-
-    private var isFilteringNeeded = false
     private let lock = NSLock()
 
     /// A shared network logger.
@@ -53,49 +45,7 @@ public final class NetworkLogger: @unchecked Sendable {
         /// If the request itself fails, the task completes immediately.
         public var isWaitingForDecoding = false
 
-        /// Store logs only for the included hosts.
-        ///
-        /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
-        /// when ``isRegexEnabled`` option is enabled.
-        public var includedHosts: Set<String> = []
-
-        /// Store logs only for the included URLs.
-        ///
-        /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
-        /// when ``isRegexEnabled`` option is enabled.
-        public var includedURLs: Set<String> = []
-
-        /// Exclude the given hosts from the logs.
-        ///
-        /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
-        /// when ``isRegexEnabled`` option is enabled.
-        public var excludedHosts: Set<String> = []
-
-        /// Exclude the given URLs from the logs.
-        ///
-        /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
-        /// when ``isRegexEnabled`` option is enabled.
-        public var excludedURLs: Set<String> = []
-
-        /// Redact the given HTTP headers from the logged requests and responses.
-        ///
-        /// - note: Supports wildcards, e.g. `X-*`, and full regex
-        /// when ``isRegexEnabled`` option is enabled.
-        public var sensitiveHeaders: Set<String> = []
-
-        /// Redact the given query items from the URLs.
-        ///
-        /// - note: Supports only plain strings. Case-sensitive.
-        public var sensitiveQueryItems: Set<String> = []
-
-        /// Redact the given JSON fields from the logged requests and responses bodies.
-        ///
-        /// - note: Supports only plain strings. Case-sensitive.
-        public var sensitiveDataFields: Set<String> = []
-
-        /// If enabled, processes `include` and `exclude` patterns using regex.
-        /// By default, patterns support only basic wildcard syntax: `*.example.com`.
-        public var isRegexEnabled = false
+        public var redacted = Redacted()
 
         /// Gets called when the logger receives an event. You can use it to
         /// modify the event before it is stored in order, for example, filter
@@ -115,7 +65,7 @@ public final class NetworkLogger: @unchecked Sendable {
     public init(store: LoggerStore? = nil, configuration: Configuration = .init()) {
         self._store = store
         self.configuration = configuration
-        self.processPatterns()
+        self.patterns = configuration.redacted.patterns()
     }
 
     /// Initializes and configures the network logger.
@@ -123,36 +73,6 @@ public final class NetworkLogger: @unchecked Sendable {
         var configuration = Configuration()
         configure(&configuration)
         self.init(store: store, configuration: configuration)
-    }
-
-    // MARK: Patterns
-
-    private func processPatterns() {
-        func process(_ pattern: String) -> Regex? {
-            process(pattern, options: [])
-        }
-
-        func process(_ pattern: String, options: [Regex.Options]) -> Regex? {
-            do {
-                let pattern = configuration.isRegexEnabled ? pattern : expandingWildcards(pattern)
-                return try Regex(pattern)
-            } catch {
-                debugPrint("Failed to parse pattern: \(pattern) \(error)")
-                return nil
-            }
-        }
-
-        self.includedHosts = configuration.includedHosts.compactMap(process)
-        self.includedURLs = configuration.includedURLs.compactMap(process)
-        self.excludedHosts = configuration.excludedHosts.compactMap(process)
-        self.excludedURLs = configuration.excludedURLs.compactMap(process)
-        self.sensitiveHeaders = configuration.sensitiveHeaders.compactMap {
-            process($0, options: [.caseInsensitive])
-        }
-        self.sensitiveQueryItems = configuration.sensitiveQueryItems
-        self.sensitiveDataFields = configuration.sensitiveDataFields
-
-        self.isFilteringNeeded = !includedHosts.isEmpty || !excludedHosts.isEmpty || !includedURLs.isEmpty || !excludedURLs.isEmpty
     }
 
     // MARK: Logging
@@ -255,45 +175,13 @@ public final class NetworkLogger: @unchecked Sendable {
     }
 
     private func send(_ event: LoggerStore.Event) {
-        guard !isFilteringNeeded || filter(event) else {
+        guard !patterns.isFilteringNeeded || patterns.filter(event) else {
             return
         }
-        guard let event = configuration.willHandleEvent(preprocess(event)) else {
+        guard let event = configuration.willHandleEvent(patterns.preprocess(event)) else {
             return
         }
         store.handle(event)
-    }
-
-    /// Check if the events can be stored (included and not excluded).
-    private func filter(_ event: LoggerStore.Event) -> Bool {
-        guard let url = event.url else {
-            return false // Should never happen
-        }
-        var host = url.host ?? ""
-        if url.scheme == nil, let url = URL(string: "https://" + url.absoluteString) {
-            host = url.host ?? "" // URL(string: "example.com")?.host with not scheme returns host: ""
-        }
-        let absoluteString = url.absoluteString
-        if !includedHosts.isEmpty || !includedURLs.isEmpty {
-            guard includedHosts.contains(where: { $0.isMatch(host) }) ||
-                    includedURLs.contains(where: { $0.isMatch(absoluteString) }) else {
-                return false
-            }
-        }
-        if !excludedHosts.isEmpty && excludedHosts.contains(where: { $0.isMatch(host) }) {
-            return false
-        }
-        if !excludedURLs.isEmpty && excludedURLs.contains(where: { $0.isMatch(absoluteString) }) {
-            return false
-        }
-        return true
-    }
-
-    private func preprocess(_ event: LoggerStore.Event) -> LoggerStore.Event {
-        event
-            .redactingSensitiveHeaders(sensitiveHeaders)
-            .redactingSensitiveQueryItems(sensitiveQueryItems)
-            .redactingSensitiveResponseDataFields(sensitiveDataFields)
     }
 
     // MARK: - Private

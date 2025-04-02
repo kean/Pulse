@@ -57,6 +57,8 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     private var requestsCache: [NetworkLogger.Request: NetworkRequestEntity] = [:]
     private var responsesCache: [NetworkLogger.Response: NetworkResponseEntity] = [:]
 
+    private let patterns: Redacted.Patterns
+
     /// For testing purposes.
     var makeCurrentDate: () -> Date = { Date() }
 
@@ -132,6 +134,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
 
         self.options = options
         self.configuration = configuration
+        self.patterns = configuration.redacted.patterns()
 
         if options.contains(.inMemory) {
             // Do nothing
@@ -240,7 +243,11 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         self.backgroundContext = container.newBackgroundContext()
         self.manifest = .init(storeId: UUID(), version: .currentStoreVersion)
         self.options = []
-        self.configuration = .init()
+
+        let configuration = Configuration()
+
+        self.configuration = configuration
+        self.patterns = configuration.redacted.patterns()
     }
 
     private static func makeContainer(databaseURL: URL, options: Options) -> NSPersistentContainer {
@@ -314,7 +321,7 @@ extension LoggerStore {
         label: String? = nil,
         taskDescription: String? = nil
     ) {
-        handle(.networkTaskCompleted(.init(
+        let event: Event = .networkTaskCompleted(.init(
             taskId: UUID(),
             taskType: .dataTask,
             createdAt: makeCurrentDate(),
@@ -327,7 +334,13 @@ extension LoggerStore {
             metrics: metrics.map(NetworkLogger.Metrics.init),
             label: label,
             taskDescription: taskDescription
-        )))
+        ))
+
+        guard !patterns.isFilteringNeeded || patterns.filter(event) else {
+            return
+        }
+
+        handle(patterns.preprocess(event))
     }
 
     /// Handles event created by the current store and dispatches it to observers.

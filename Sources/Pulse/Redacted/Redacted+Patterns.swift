@@ -1,8 +1,58 @@
-// The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+//  File.swift
+//  Pulse
+//
+//  Created by Taras Nikulin on 02/04/2025.
+//
 
 import Foundation
+
+extension Redacted {
+    struct Patterns {
+        var includedHosts: [Regex] = []
+        var includedURLs: [Regex] = []
+        var excludedHosts: [Regex] = []
+        var excludedURLs: [Regex] = []
+
+        var sensitiveHeaders: [Regex] = []
+        var sensitiveQueryItems: Set<String> = []
+        var sensitiveDataFields: Set<String> = []
+
+        var isFilteringNeeded = false
+
+        /// Check if the events can be stored (included and not excluded).
+        func filter(_ event: LoggerStore.Event) -> Bool {
+            guard let url = event.url else {
+                return false // Should never happen
+            }
+            var host = url.host ?? ""
+            if url.scheme == nil, let url = URL(string: "https://" + url.absoluteString) {
+                host = url.host ?? "" // URL(string: "example.com")?.host with not scheme returns host: ""
+            }
+            let absoluteString = url.absoluteString
+            if !includedHosts.isEmpty || !includedURLs.isEmpty {
+                guard includedHosts.contains(where: { $0.isMatch(host) }) ||
+                        includedURLs.contains(where: { $0.isMatch(absoluteString) }) else {
+                    return false
+                }
+            }
+            if !excludedHosts.isEmpty && excludedHosts.contains(where: { $0.isMatch(host) }) {
+                return false
+            }
+            if !excludedURLs.isEmpty && excludedURLs.contains(where: { $0.isMatch(absoluteString) }) {
+                return false
+            }
+            return true
+        }
+
+        func preprocess(_ event: LoggerStore.Event) -> LoggerStore.Event {
+            event
+                .redactingSensitiveHeaders(sensitiveHeaders)
+                .redactingSensitiveQueryItems(sensitiveQueryItems)
+                .redactingSensitiveResponseDataFields(sensitiveDataFields)
+        }
+    }
+}
 
 // MARK: - Redacting Sensitive Headers
 
