@@ -1,3 +1,7 @@
+// The MIT License (MIT)
+//
+// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+
 import Foundation
 
 public struct Redacted: Sendable {

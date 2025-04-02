@@ -1,9 +1,6 @@
+// The MIT License (MIT)
 //
-//  File.swift
-//  Pulse
-//
-//  Created by Taras Nikulin on 02/04/2025.
-//
+// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 
