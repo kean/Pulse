@@ -6,16 +6,36 @@ import Foundation
 
 extension Redacted {
     struct Patterns {
-        var includedHosts: [Regex] = []
-        var includedURLs: [Regex] = []
-        var excludedHosts: [Regex] = []
-        var excludedURLs: [Regex] = []
+        let includedHosts: [Regex]
+        let includedURLs: [Regex]
+        let excludedHosts: [Regex]
+        let excludedURLs: [Regex]
 
-        var sensitiveHeaders: [Regex] = []
-        var sensitiveQueryItems: Set<String> = []
-        var sensitiveDataFields: Set<String> = []
+        let sensitiveHeaders: [Regex]
+        let sensitiveQueryItems: Set<String>
+        let sensitiveDataFields: Set<String>
 
-        var isFilteringNeeded = false
+        let isFilteringNeeded: Bool
+
+        init(
+            includedHosts: [Regex] = [],
+            includedURLs: [Regex] = [],
+            excludedHosts: [Regex] = [],
+            excludedURLs: [Regex] = [],
+            sensitiveHeaders: [Regex] = [],
+            sensitiveQueryItems: Set<String> = [],
+            sensitiveDataFields: Set<String> = [],
+            isFilteringNeeded: Bool = false
+        ) {
+            self.includedHosts = includedHosts
+            self.includedURLs = includedURLs
+            self.excludedHosts = excludedHosts
+            self.excludedURLs = excludedURLs
+            self.sensitiveHeaders = sensitiveHeaders
+            self.sensitiveQueryItems = sensitiveQueryItems
+            self.sensitiveDataFields = sensitiveDataFields
+            self.isFilteringNeeded = isFilteringNeeded
+        }
 
         /// Check if the events can be stored (included and not excluded).
         func filter(_ event: LoggerStore.Event) -> Bool {
