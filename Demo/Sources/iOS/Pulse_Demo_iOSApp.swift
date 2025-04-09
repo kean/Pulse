@@ -25,6 +25,13 @@ private final class AppViewModel: ObservableObject {
     init() {
         // This code registers the store with the `RemoteLogger` (important!)
         LoggerStore.shared = .demo
+        
+        /*
+            //Disable: options -> 1. "Settings", "Get Pulse Pro", "Report Issue"
+        UserDefaults.standard.set(true, forKey: "pulse-disable-support-prompts")
+        UserDefaults.standard.set(true, forKey: "pulse-disable-report-issue-prompts")
+        UserDefaults.standard.set(true, forKey: "pulse-disable-settings-prompts")
+         */
 
         // RemoteLogger.shared.isAutomaticConnectionEnabled = true
 
