@@ -88,6 +88,7 @@ extension URLRequest {
         var bodyStreamData = Data()
         while bodyStream.hasBytesAvailable {
             let readData = bodyStream.read(buffer, maxLength: bufferSize)
+            guard readData != 1 else { return nil } // read failed
             bodyStreamData.append(buffer, count: readData)
         }
         return bodyStreamData
