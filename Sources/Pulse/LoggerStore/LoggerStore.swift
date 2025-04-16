@@ -301,35 +301,6 @@ extension LoggerStore {
         )))
     }
 
-    /// Stores the network request.
-    ///
-    /// - note: If you want to store incremental updates to the task, use
-    /// `NetworkLogger` instead.
-    public func storeRequest(
-        _ request: URLRequest,
-        response: URLResponse?,
-        error: Swift.Error?,
-        data: Data?,
-        metrics: URLSessionTaskMetrics? = nil,
-        label: String? = nil,
-        taskDescription: String? = nil
-    ) {
-        handle(.networkTaskCompleted(.init(
-            taskId: UUID(),
-            taskType: .dataTask,
-            createdAt: makeCurrentDate(),
-            originalRequest: NetworkLogger.Request(request),
-            currentRequest: NetworkLogger.Request(request),
-            response: response.map(NetworkLogger.Response.init),
-            error: error.map(NetworkLogger.ResponseError.init),
-            requestBody: request.httpBody ?? request.httpBodyStreamData(),
-            responseBody: data,
-            metrics: metrics.map(NetworkLogger.Metrics.init),
-            label: label,
-            taskDescription: taskDescription
-        )))
-    }
-
     /// Handles event created by the current store and dispatches it to observers.
     func handle(_ event: Event) {
         guard let event = configuration.willHandleEvent(event) else {
