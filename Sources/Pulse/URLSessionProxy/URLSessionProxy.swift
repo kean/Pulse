@@ -28,7 +28,7 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
         logger: NetworkLogger? = nil,
         options: Options = .init()
     ) {
-        self.init(configuration: configuration, delegate: nil, delegateQueue: nil, options: options)
+        self.init(configuration: configuration, delegate: nil, delegateQueue: nil, logger: logger, options: options)
     }
 
     /// - parameter logger: A custom logger to use instead of ``NetworkLogger/shared``.
