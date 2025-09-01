@@ -168,7 +168,9 @@ public final class NetworkLogger: @unchecked Sendable {
         let context = context(for: task)
         lock.unlock()
 
+#if !os(tvOS) && !os(watchOS)
         guard !task.isKind(of: AVAssetDownloadTask.self) else { return }
+#endif
         guard let originalRequest = task.originalRequest else { return }
         send(.networkTaskCreated(LoggerStore.Event.NetworkTaskCreated(
             taskId: context.taskId,
