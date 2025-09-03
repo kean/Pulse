@@ -3,8 +3,12 @@
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-
-public protocol URLSessionProtocol: Sendable {
+#if swift(>=6.0)
+public typealias SendableIfSwift6 = Sendable
+#else
+public protocol SendableIfSwift6 {}
+#endif
+public protocol URLSessionProtocol: SendableIfSwift6 {
     // MARK: - Core
 
     func dataTask(with request: URLRequest) -> URLSessionDataTask
