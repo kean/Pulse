@@ -4,6 +4,73 @@
 
 import Foundation
 
+extension Redacted {
+    struct Patterns {
+        let includedHosts: [Regex]
+        let includedURLs: [Regex]
+        let excludedHosts: [Regex]
+        let excludedURLs: [Regex]
+
+        let sensitiveHeaders: [Regex]
+        let sensitiveQueryItems: Set<String>
+        let sensitiveDataFields: Set<String>
+
+        let isFilteringNeeded: Bool
+
+        init(
+            includedHosts: [Regex] = [],
+            includedURLs: [Regex] = [],
+            excludedHosts: [Regex] = [],
+            excludedURLs: [Regex] = [],
+            sensitiveHeaders: [Regex] = [],
+            sensitiveQueryItems: Set<String> = [],
+            sensitiveDataFields: Set<String> = [],
+            isFilteringNeeded: Bool = false
+        ) {
+            self.includedHosts = includedHosts
+            self.includedURLs = includedURLs
+            self.excludedHosts = excludedHosts
+            self.excludedURLs = excludedURLs
+            self.sensitiveHeaders = sensitiveHeaders
+            self.sensitiveQueryItems = sensitiveQueryItems
+            self.sensitiveDataFields = sensitiveDataFields
+            self.isFilteringNeeded = isFilteringNeeded
+        }
+
+        /// Check if the events can be stored (included and not excluded).
+        func filter(_ event: LoggerStore.Event) -> Bool {
+            guard let url = event.url else {
+                return false // Should never happen
+            }
+            var host = url.host ?? ""
+            if url.scheme == nil, let url = URL(string: "https://" + url.absoluteString) {
+                host = url.host ?? "" // URL(string: "example.com")?.host with not scheme returns host: ""
+            }
+            let absoluteString = url.absoluteString
+            if !includedHosts.isEmpty || !includedURLs.isEmpty {
+                guard includedHosts.contains(where: { $0.isMatch(host) }) ||
+                        includedURLs.contains(where: { $0.isMatch(absoluteString) }) else {
+                    return false
+                }
+            }
+            if !excludedHosts.isEmpty && excludedHosts.contains(where: { $0.isMatch(host) }) {
+                return false
+            }
+            if !excludedURLs.isEmpty && excludedURLs.contains(where: { $0.isMatch(absoluteString) }) {
+                return false
+            }
+            return true
+        }
+
+        func preprocess(_ event: LoggerStore.Event) -> LoggerStore.Event {
+            event
+                .redactingSensitiveHeaders(sensitiveHeaders)
+                .redactingSensitiveQueryItems(sensitiveQueryItems)
+                .redactingSensitiveResponseDataFields(sensitiveDataFields)
+        }
+    }
+}
+
 // MARK: - Redacting Sensitive Headers
 
 extension LoggerStore.Event {
