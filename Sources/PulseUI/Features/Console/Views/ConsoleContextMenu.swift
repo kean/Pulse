@@ -24,15 +24,16 @@ struct ConsoleContextMenu: View {
             Section {
                 ConsoleSortByMenu()
             }
-            if !UserDefaults.standard.bool(forKey: "pulse-disable-settings-menu") {
-                Section {
+            Section {
+                if !UserDefaults.standard.bool(forKey: "pulse-disable-settings-prompts") {
                     Button(action: { router.isShowingSettings = true }) {
                         Label("Settings", systemImage: "gear")
                     }
-                    if !environment.store.options.contains(.readonly) {
-                        Button(role: .destructive, action: environment.removeAllLogs) {
-                            Label("Remove Logs", systemImage: "trash")
-                        }
+                }
+                
+                if !environment.store.options.contains(.readonly) {
+                    Button(role: .destructive, action: environment.removeAllLogs) {
+                        Label("Remove Logs", systemImage: "trash")
                     }
                 }
             }
@@ -41,6 +42,8 @@ struct ConsoleContextMenu: View {
                     Button(action: buttonGetPulseProTapped) {
                         Label("Get Pulse Pro", systemImage: "link")
                     }
+                }
+                if !UserDefaults.standard.bool(forKey: "pulse-disable-report-issue-prompts") {
                     Button(action: buttonSendFeedbackTapped) {
                         Label("Report Issue", systemImage: "envelope")
                     }
