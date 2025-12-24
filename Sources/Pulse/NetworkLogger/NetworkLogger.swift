@@ -104,6 +104,16 @@ public final class NetworkLogger: @unchecked Sendable {
         /// is ignored completely.
         public var willHandleEvent: @Sendable (LoggerStore.Event) -> LoggerStore.Event? = { $0 }
 
+        // MARK: - WebSocket Configuration
+
+        /// If enabled, logs WebSocket frames (sent and received messages).
+        /// Defaults to `true`.
+        public var isWebSocketLoggingEnabled = true
+
+        /// Maximum size for WebSocket frame payloads. Larger frames will be truncated.
+        /// Defaults to 256 KB.
+        public var webSocketFrameSizeLimit: Int = 256_000
+
         /// Initializes the default configuration.
         public init() {}
     }
@@ -258,6 +268,132 @@ public final class NetworkLogger: @unchecked Sendable {
         )))
     }
 
+    // MARK: - WebSocket Logging
+
+    /// Logs when a WebSocket connection is opened.
+    public func logWebSocketOpened(_ task: URLSessionWebSocketTask, protocol: String?) {
+        guard configuration.isWebSocketLoggingEnabled else { return }
+
+        lock.lock()
+        let context = self.context(for: task)
+        lock.unlock()
+
+        send(.webSocketTaskOpened(.init(
+            taskId: context.taskId,
+            createdAt: Date(),
+            protocol: `protocol`
+        )))
+    }
+
+    /// Logs when a WebSocket connection is closed.
+    public func logWebSocketClosed(_ task: URLSessionWebSocketTask, closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
+        guard configuration.isWebSocketLoggingEnabled else { return }
+
+        lock.lock()
+        let context = self.context(for: task)
+        lock.unlock()
+
+        send(.webSocketTaskClosed(.init(
+            taskId: context.taskId,
+            createdAt: Date(),
+            closeCode: closeCode.rawValue,
+            reason: reason
+        )))
+    }
+
+    /// Logs a WebSocket frame that was sent.
+    public func logWebSocketFrameSent(_ task: URLSessionWebSocketTask, message: URLSessionWebSocketTask.Message) {
+        guard configuration.isWebSocketLoggingEnabled else { return }
+
+        lock.lock()
+        let context = self.context(for: task)
+        lock.unlock()
+
+        let frame = makeWebSocketFrame(taskId: context.taskId, message: message)
+        send(.webSocketFrameSent(frame))
+    }
+
+    /// Logs a WebSocket frame that was received.
+    public func logWebSocketFrameReceived(_ task: URLSessionWebSocketTask, message: URLSessionWebSocketTask.Message) {
+        guard configuration.isWebSocketLoggingEnabled else { return }
+
+        lock.lock()
+        let context = self.context(for: task)
+        lock.unlock()
+
+        let frame = makeWebSocketFrame(taskId: context.taskId, message: message)
+        send(.webSocketFrameReceived(frame))
+    }
+
+    /// Logs a ping sent on the WebSocket.
+    public func logWebSocketPingSent(_ task: URLSessionWebSocketTask) {
+        guard configuration.isWebSocketLoggingEnabled else { return }
+
+        lock.lock()
+        let context = self.context(for: task)
+        lock.unlock()
+
+        send(.webSocketFrameSent(.init(
+            taskId: context.taskId,
+            createdAt: Date(),
+            frameType: .ping,
+            data: nil,
+            isTruncated: false
+        )))
+    }
+
+    /// Logs a pong received on the WebSocket.
+    public func logWebSocketPongReceived(_ task: URLSessionWebSocketTask) {
+        guard configuration.isWebSocketLoggingEnabled else { return }
+
+        lock.lock()
+        let context = self.context(for: task)
+        lock.unlock()
+
+        send(.webSocketFrameReceived(.init(
+            taskId: context.taskId,
+            createdAt: Date(),
+            frameType: .pong,
+            data: nil,
+            isTruncated: false
+        )))
+    }
+
+    private func makeWebSocketFrame(taskId: UUID, message: URLSessionWebSocketTask.Message) -> LoggerStore.Event.WebSocketFrame {
+        let sizeLimit = configuration.webSocketFrameSizeLimit
+        switch message {
+        case .string(let text):
+            let data = Data(text.utf8)
+            let isTruncated = data.count > sizeLimit
+            let truncatedData = isTruncated ? data.prefix(sizeLimit) : data
+            return .init(
+                taskId: taskId,
+                createdAt: Date(),
+                frameType: .text,
+                data: Data(truncatedData),
+                isTruncated: isTruncated
+            )
+        case .data(let data):
+            let isTruncated = data.count > sizeLimit
+            let truncatedData = isTruncated ? data.prefix(sizeLimit) : data
+            return .init(
+                taskId: taskId,
+                createdAt: Date(),
+                frameType: .binary,
+                data: Data(truncatedData),
+                isTruncated: isTruncated
+            )
+        @unknown default:
+            return .init(
+                taskId: taskId,
+                createdAt: Date(),
+                frameType: .binary,
+                data: nil,
+                isTruncated: false
+            )
+        }
+    }
+
     private func send(_ event: LoggerStore.Event) {
         guard !isFilteringNeeded || filter(event) else {
             return
@@ -267,11 +403,27 @@ public final class NetworkLogger: @unchecked Sendable {
         }
         store.handle(event)
     }
+    
+    // MARK: - Public Event Logging
+    
+    /// Logs a raw event to the store. This is primarily used by third-party WebSocket
+    /// libraries (like Starscream) to log WebSocket events.
+    ///
+    /// - Parameter event: The event to log.
+    public func logEvent(_ event: LoggerStore.Event) {
+        send(event)
+    }
 
     /// Check if the events can be stored (included and not excluded).
     private func filter(_ event: LoggerStore.Event) -> Bool {
         guard let url = event.url else {
-            return false // Should never happen
+            // WebSocket frame events don't have a URL - they're tied to an already-filtered task
+            switch event {
+            case .webSocketTaskOpened, .webSocketTaskClosed, .webSocketFrameSent, .webSocketFrameReceived:
+                return true
+            default:
+                return false // Should never happen for other events
+            }
         }
         var host = url.host ?? ""
         if url.scheme == nil, let url = URL(string: "https://" + url.absoluteString) {

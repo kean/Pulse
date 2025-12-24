@@ -21,6 +21,7 @@ extension LoggerStore {
         let response = Entity(class: NetworkResponseEntity.self)
         let transaction = Entity(class: NetworkTransactionMetricsEntity.self)
         let blob = Entity(class: LoggerBlobHandleEntity.self)
+        let webSocketFrame = Entity(class: WebSocketFrameEntity.self)
 
         session.properties = [
             Attribute("id", .UUIDAttributeType),
@@ -75,7 +76,12 @@ extension LoggerStore {
             Relationship("message", .oneToOne(), entity: message),
             Relationship("requestBody", .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             Relationship("responseBody", .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
-            Relationship("progress", .oneToOne(isOptional: true), entity: progress)
+            Relationship("progress", .oneToOne(isOptional: true), entity: progress),
+            // WebSocket properties
+            Relationship("webSocketFrames", .oneToMany, entity: webSocketFrame),
+            Attribute("webSocketProtocol", .stringAttributeType) { $0.isOptional = true },
+            Attribute("webSocketCloseCode", .integer16AttributeType),
+            Attribute("webSocketCloseReason", .binaryDataAttributeType) { $0.isOptional = true }
         ]
 
         request.properties = [
@@ -148,8 +154,17 @@ extension LoggerStore {
             Attribute("isUncompressed", .booleanAttributeType)
         ]
 
+        webSocketFrame.properties = [
+            Attribute("createdAt", .dateAttributeType),
+            Relationship("task", .oneToOne(), entity: task),
+            Attribute("direction", .integer16AttributeType),
+            Attribute("frameType", .integer16AttributeType),
+            Attribute("payloadSize", .integer64AttributeType),
+            Relationship("payload", .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob)
+        ]
+
         let model = NSManagedObjectModel()
-        model.entities = [session, message, task, progress, blob, request, response, transaction]
+        model.entities = [session, message, task, progress, blob, request, response, transaction, webSocketFrame]
         return model
     }()
 }

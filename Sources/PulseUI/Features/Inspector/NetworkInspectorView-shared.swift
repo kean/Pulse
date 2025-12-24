@@ -31,6 +31,22 @@ extension NetworkInspectorView {
     }
 
     @ViewBuilder
+    static func makeWebSocketSection(task: NetworkTaskEntity) -> some View {
+        if task.isWebSocket {
+            NavigationLink(destination: WebSocketInspectorView(task: task)) {
+                HStack {
+                    Image(systemName: "arrow.up.arrow.down.circle")
+                        .foregroundColor(.blue)
+                    Text("WebSocket Frames")
+                    Spacer()
+                    Text("\(task.webSocketFrames.count)")
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
     static func makeHeaderView(task: NetworkTaskEntity, store: LoggerStore) -> some View {
         ZStack {
             NetworkInspectorTransferInfoView(viewModel: .init(empty: true))

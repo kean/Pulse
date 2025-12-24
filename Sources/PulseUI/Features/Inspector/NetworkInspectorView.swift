@@ -55,6 +55,11 @@ package struct NetworkInspectorView: View {
             Section {
                 NetworkInspectorView.makeResponseSection(task: task)
             }
+            if task.isWebSocket {
+                Section {
+                    NetworkInspectorView.makeWebSocketSection(task: task)
+                }
+            }
             Section {
                 NetworkMetricsCell(task: task)
                 NetworkCURLCell(task: task)

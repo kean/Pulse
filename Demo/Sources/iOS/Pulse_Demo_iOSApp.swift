@@ -13,8 +13,20 @@ struct PulseDemo_iOS: App {
 
     var body: some Scene {
         WindowGroup {
-            NavigationView {
-                ConsoleView(store: .demo)
+            TabView {
+                NavigationView {
+                    WebSocketDemoView()
+                }
+                .tabItem {
+                    Label("WebSocket", systemImage: "arrow.up.arrow.down.circle")
+                }
+                
+                NavigationView {
+                    ConsoleView(store: .shared)
+                }
+                .tabItem {
+                    Label("Console", systemImage: "list.bullet.rectangle")
+                }
             }
         }
     }
@@ -23,73 +35,7 @@ struct PulseDemo_iOS: App {
 @MainActor
 private final class AppViewModel: ObservableObject {
     init() {
-        // This code registers the store with the `RemoteLogger` (important!)
+        // Use shared store for demo
         LoggerStore.shared = .demo
-        
-        /*
-            //Disable: options -> 1. "Settings", "Get Pulse Pro", "Report Issue"
-        UserDefaults.standard.set(true, forKey: "pulse-disable-support-prompts")
-        UserDefaults.standard.set(true, forKey: "pulse-disable-report-issue-prompts")
-        UserDefaults.standard.set(true, forKey: "pulse-disable-settings-prompts")
-         */
-
-        // RemoteLogger.shared.isAutomaticConnectionEnabled = true
-
-        // NetworkLogger.enableProxy()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
-            sendRequest()
-        }
-    }
-}
-
-
-private func sendRequest() {
-     // testClosures()
-    // testSwiftConcurrency()
-}
-
-private func testClosures() {
-    let session = URLSessionProxy(configuration: .default)
-    let dataTask = session.dataTask(with: URLRequest(url: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!)) { data, _, _ in
-        NSLog("didFinish: \(data?.count ?? 0)")
-    }
-    dataTask.resume()
-
-    let downloadTask = session.downloadTask(with: URLRequest(url: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!)) { url, _, _ in
-        NSLog("didFinish: \(String(describing: url))")
-    }
-    downloadTask.resume()
-}
-
-private func testSwiftConcurrency() {
-    Task {
-        let demoDelegate = DemoSessionDelegate()
-        let session = URLSessionProxy(configuration: .default, delegate: demoDelegate, delegateQueue: nil)
-//        let session = URLSession(configuration: .default)
-
-        let (data, _) = try await session.data(from: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!)
-        NSLog("didFinish: \(data.count)")
-    }
-
-    Task {
-        let session = URLSessionProxy(configuration: .default)
-
-        let (url, _) = try await session.download(from: URL(string: "https://api.github.com/repos/octocat/Spoon-Knife/issues?per_page=2")!, delegate: nil)
-        NSLog("didFinish: \(url)")
-    }
-}
-
-private final class DemoSessionDelegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        NSLog("[\(dataTask.taskIdentifier)] didReceive: \(data.count)")
-    }
-
-    func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
-        NSLog("[\(task.taskIdentifier)] didFinishCollectingMetrics: \(metrics)")
-    }
-
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: (any Error)?) {
-        NSLog("[\(task.taskIdentifier)] didCompleteWithError: \(String(describing: error))")
     }
 }

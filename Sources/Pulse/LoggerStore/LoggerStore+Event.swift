@@ -11,6 +11,10 @@ extension LoggerStore {
         case networkTaskCreated(NetworkTaskCreated)
         case networkTaskProgressUpdated(NetworkTaskProgressUpdated)
         case networkTaskCompleted(NetworkTaskCompleted)
+        case webSocketTaskOpened(WebSocketTaskOpened)
+        case webSocketTaskClosed(WebSocketTaskClosed)
+        case webSocketFrameSent(WebSocketFrame)
+        case webSocketFrameReceived(WebSocketFrame)
 
         public struct MessageCreated: Codable, Sendable {
             public var createdAt: Date
@@ -138,6 +142,66 @@ extension LoggerStore {
             }
         }
 
+        // MARK: - WebSocket Events
+
+        public struct WebSocketTaskOpened: Codable, Sendable {
+            public var taskId: UUID
+            public var createdAt: Date
+            public var `protocol`: String?
+
+            public init(taskId: UUID, createdAt: Date, protocol: String?) {
+                self.taskId = taskId
+                self.createdAt = createdAt
+                self.protocol = `protocol`
+            }
+        }
+
+        public struct WebSocketTaskClosed: Codable, Sendable {
+            public var taskId: UUID
+            public var createdAt: Date
+            public var closeCode: Int
+            public var reason: Data?
+
+            public init(taskId: UUID, createdAt: Date, closeCode: Int, reason: Data?) {
+                self.taskId = taskId
+                self.createdAt = createdAt
+                self.closeCode = closeCode
+                self.reason = reason
+            }
+        }
+
+        public struct WebSocketFrame: Codable, Sendable {
+            public var taskId: UUID
+            public var createdAt: Date
+            public var frameType: FrameType
+            public var data: Data?
+            public var isTruncated: Bool
+
+            public init(taskId: UUID, createdAt: Date, frameType: FrameType, data: Data?, isTruncated: Bool = false) {
+                self.taskId = taskId
+                self.createdAt = createdAt
+                self.frameType = frameType
+                self.data = data
+                self.isTruncated = isTruncated
+            }
+
+            @frozen public enum FrameType: Int16, Codable, Sendable {
+                case text = 0
+                case binary = 1
+                case ping = 2
+                case pong = 3
+
+                public var description: String {
+                    switch self {
+                    case .text: return "Text"
+                    case .binary: return "Binary"
+                    case .ping: return "Ping"
+                    case .pong: return "Pong"
+                    }
+                }
+            }
+        }
+
         var url: URL? {
             switch self {
             case .messageStored:
@@ -148,6 +212,8 @@ extension LoggerStore {
                 return event.url
             case .networkTaskCompleted(let event):
                 return event.originalRequest.url
+            case .webSocketTaskOpened, .webSocketTaskClosed, .webSocketFrameSent, .webSocketFrameReceived:
+                return nil // WebSocket frames don't carry URL; the parent task does
             }
         }
     }

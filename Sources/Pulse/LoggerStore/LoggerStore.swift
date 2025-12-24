@@ -352,6 +352,10 @@ extension LoggerStore {
         case .networkTaskCreated(let event): process(event)
         case .networkTaskProgressUpdated(let event): process(event)
         case .networkTaskCompleted(let event): process(event)
+        case .webSocketTaskOpened(let event): process(event)
+        case .webSocketTaskClosed(let event): process(event)
+        case .webSocketFrameSent(let event): process(event, direction: .sent)
+        case .webSocketFrameReceived(let event): process(event, direction: .received)
         }
     }
 
@@ -492,6 +496,54 @@ extension LoggerStore {
         requestsCache = [:]
         responsesCache = [:]
         tasksCache[event.taskId] = nil
+    }
+
+    // MARK: - WebSocket Event Processing
+
+    private func process(_ event: Event.WebSocketTaskOpened) {
+        guard let task = findTask(forTaskId: event.taskId) else {
+            return // Task must exist before we can process WebSocket events
+        }
+        task.webSocketProtocol = event.protocol
+        // Update the task state to indicate the WebSocket is open/connected
+        task.requestState = NetworkTaskEntity.State.success.rawValue
+        task.startDate = event.createdAt
+    }
+
+    private func process(_ event: Event.WebSocketTaskClosed) {
+        guard let task = findTask(forTaskId: event.taskId) else {
+            return
+        }
+        task.webSocketCloseCode = Int16(event.closeCode)
+        task.webSocketCloseReason = event.reason
+        // Mark task as completed
+        task.duration = event.createdAt.timeIntervalSince(task.startDate ?? task.createdAt)
+
+        // Update associated message
+        if let message = task.message {
+            message.line = Int32(task.requestState)
+        }
+    }
+
+    private func process(_ event: Event.WebSocketFrame, direction: WebSocketFrameEntity.Direction) {
+        guard let task = findTask(forTaskId: event.taskId) else {
+            return
+        }
+
+        let frame = WebSocketFrameEntity(context: backgroundContext)
+        frame.createdAt = event.createdAt
+        frame.task = task
+        frame.direction = direction.rawValue
+        frame.frameType = event.frameType.rawValue
+        frame.payloadSize = Int64(event.data?.count ?? 0)
+
+        // Store payload if present
+        if let data = event.data, !data.isEmpty {
+            let contentType: NetworkLogger.ContentType? = event.frameType == .text ? "text/plain" : "application/octet-stream"
+            frame.payload = storeBlob(data, contentType: contentType)
+        }
+
+        task.webSocketFrames.insert(frame)
     }
 
     private func preprocessData(_ data: Data, contentType: NetworkLogger.ContentType?) -> Data {

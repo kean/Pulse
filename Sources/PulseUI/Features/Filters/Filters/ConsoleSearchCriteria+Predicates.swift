@@ -82,5 +82,10 @@ private func makePredicates(for criteria: ConsoleFilters.Network) -> [NSPredicat
         predicates.append(NSPredicate(format: "NOT url IN %@", Array(criteria.url.hidden)))
     }
 
+    // Task type filter
+    if criteria.taskTypes.types.count != NetworkLogger.TaskType.allCases.count {
+        predicates.append(NSPredicate(format: "taskType IN %@", Array(criteria.taskTypes.types.map { $0.rawValue })))
+    }
+
     return predicates
 }

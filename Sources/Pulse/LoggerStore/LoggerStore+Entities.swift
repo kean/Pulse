@@ -100,6 +100,17 @@ public final class NetworkTaskEntity: NSManagedObject {
     /// Associated (technical) message.
     @NSManaged public var message: LoggerMessageEntity?
 
+    // MARK: WebSocket
+
+    /// WebSocket frames associated with this task (only for WebSocket tasks).
+    @NSManaged public var webSocketFrames: Set<WebSocketFrameEntity>
+    /// The protocol negotiated during WebSocket handshake.
+    @NSManaged public var webSocketProtocol: String?
+    /// WebSocket close code (if closed).
+    @NSManaged public var webSocketCloseCode: Int16
+    /// WebSocket close reason (if closed).
+    @NSManaged public var webSocketCloseReason: Data?
+
     // MARK: Helpers
 
     public lazy var metadata = { rawMetadata.map(KeyValueEncoding.decodeKeyValuePairs) }()
@@ -142,6 +153,50 @@ public final class NetworkTaskEntity: NSManagedObject {
     public var decodingError: NetworkLogger.DecodingError? {
         error as? NetworkLogger.DecodingError
     }
+
+    public var orderedWebSocketFrames: [WebSocketFrameEntity] {
+        webSocketFrames.sorted { $0.createdAt < $1.createdAt }
+    }
+
+    public var isWebSocket: Bool {
+        type == .webSocketTask
+    }
+}
+
+/// Represents a WebSocket frame (sent or received).
+public final class WebSocketFrameEntity: NSManagedObject {
+    /// The timestamp when the frame was sent or received.
+    @NSManaged public var createdAt: Date
+    /// The task this frame belongs to.
+    @NSManaged public var task: NetworkTaskEntity
+    /// The direction of the frame: 0 = sent, 1 = received.
+    @NSManaged public var direction: Int16
+    /// The frame type: 0 = text, 1 = binary, 2 = ping, 3 = pong.
+    @NSManaged public var frameType: Int16
+    /// The payload size in bytes.
+    @NSManaged public var payloadSize: Int64
+    /// The payload data handle (for larger payloads).
+    @NSManaged public var payload: LoggerBlobHandleEntity?
+
+    /// Direction of the WebSocket frame.
+    @frozen public enum Direction: Int16 {
+        case sent = 0
+        case received = 1
+    }
+
+    /// Returns the direction as an enum.
+    public var frameDirection: Direction {
+        Direction(rawValue: direction) ?? .sent
+    }
+
+    /// Returns the frame type as an enum.
+    public var type: LoggerStore.Event.WebSocketFrame.FrameType {
+        LoggerStore.Event.WebSocketFrame.FrameType(rawValue: frameType) ?? .text
+    }
+}
+
+extension WebSocketFrameEntity: Identifiable {
+    public var id: NSManagedObjectID { objectID }
 }
 
 /// Indicates current download or upload progress.

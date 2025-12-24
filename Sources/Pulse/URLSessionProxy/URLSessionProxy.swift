@@ -108,6 +108,42 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
         session.webSocketTask(with: request)
     }
 
+    // MARK: - WebSocket Task Proxy
+
+    /// Creates a WebSocket task proxy that automatically logs sent and received frames.
+    ///
+    /// Use this instead of `webSocketTask(with:)` when you want automatic frame logging.
+    ///
+    /// - Parameter url: The WebSocket URL.
+    /// - Returns: A `WebSocketTaskProxy` that wraps the underlying task.
+    public func webSocketTaskProxy(with url: URL) -> WebSocketTaskProxy {
+        let task = session.webSocketTask(with: url)
+        logger.logTaskCreated(task)
+        return WebSocketTaskProxy(task: task, logger: logger)
+    }
+
+    /// Creates a WebSocket task proxy with subprotocols that automatically logs sent and received frames.
+    ///
+    /// - Parameters:
+    ///   - url: The WebSocket URL.
+    ///   - protocols: The subprotocols to request.
+    /// - Returns: A `WebSocketTaskProxy` that wraps the underlying task.
+    public func webSocketTaskProxy(with url: URL, protocols: [String]) -> WebSocketTaskProxy {
+        let task = session.webSocketTask(with: url, protocols: protocols)
+        logger.logTaskCreated(task)
+        return WebSocketTaskProxy(task: task, logger: logger)
+    }
+
+    /// Creates a WebSocket task proxy from a request that automatically logs sent and received frames.
+    ///
+    /// - Parameter request: The WebSocket request.
+    /// - Returns: A `WebSocketTaskProxy` that wraps the underlying task.
+    public func webSocketTaskProxy(with request: URLRequest) -> WebSocketTaskProxy {
+        let task = session.webSocketTask(with: request)
+        logger.logTaskCreated(task)
+        return WebSocketTaskProxy(task: task, logger: logger)
+    }
+
     // MARK: - URLSessionProtocol (Closures)
 
     public func dataTask(with request: URLRequest, completionHandler: @escaping @Sendable (Data?, URLResponse?, (any Error)?) -> Void) -> URLSessionDataTask {

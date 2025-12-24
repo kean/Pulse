@@ -19,6 +19,14 @@ Logger and network inspector for Apple platforms.
 - ``URLSessionProxyDelegate``
 - ``MockingURLProtocol``
 
+### WebSocket Support
+
+Pulse provides comprehensive WebSocket logging support for multiple frameworks:
+
+- **URLSession**: Use ``URLSessionProxy`` and ``WebSocketTaskProxy`` for automatic logging
+- **Starscream**: Import `PulseStarscream` and use `WebSocket.enablePulseLogging()`
+- **Apollo GraphQL**: Import `PulseApollo` and use `WebSocketTransport.enablePulseLogging()`
+
 ### Remote Logging
 
 - ``RemoteLogger``

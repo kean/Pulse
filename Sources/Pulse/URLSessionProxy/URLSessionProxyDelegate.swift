@@ -11,7 +11,7 @@ import Foundation
 /// method which allows the logger to start tracking network requests right
 /// after their creation. On earlier versions, you can (optionally) call
 /// ``NetworkLogger/logTaskCreated(_:)`` manually.
-public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate, URLSessionDownloadDelegate {
+public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate, URLSessionDownloadDelegate, URLSessionWebSocketDelegate {
     private let actualDelegate: URLSessionDelegate?
     private let taskDelegate: URLSessionTaskDelegate?
     private let interceptedSelectors: Set<Selector>
@@ -31,7 +31,10 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
             #selector(URLSessionTaskDelegate.urlSession(_:task:didFinishCollecting:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:)),
             #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didFinishDownloadingTo:)),
-            #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:))
+            #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:)),
+            // WebSocket delegate methods
+            #selector(URLSessionWebSocketDelegate.urlSession(_:webSocketTask:didOpenWithProtocol:)),
+            #selector(URLSessionWebSocketDelegate.urlSession(_:webSocketTask:didCloseWith:reason:))
         ]
         if #available(iOS 16, tvOS 16, macOS 13, watchOS 9, *) {
             interceptedSelectors.insert(#selector(URLSessionTaskDelegate.urlSession(_:didCreateTask:)))
@@ -84,6 +87,18 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
     public func urlSession(_ session: Foundation.URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         logger.logTask(downloadTask, didUpdateProgress: (completed: totalBytesWritten, total: totalBytesExpectedToWrite))
         (actualDelegate as? URLSessionDownloadDelegate)?.urlSession?(session, downloadTask: downloadTask, didWriteData: bytesWritten, totalBytesWritten: totalBytesWritten, totalBytesExpectedToWrite: totalBytesExpectedToWrite)
+    }
+
+    // MARK: URLSessionWebSocketDelegate
+
+    public func urlSession(_ session: Foundation.URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
+        logger.logWebSocketOpened(webSocketTask, protocol: `protocol`)
+        (actualDelegate as? URLSessionWebSocketDelegate)?.urlSession?(session, webSocketTask: webSocketTask, didOpenWithProtocol: `protocol`)
+    }
+
+    public func urlSession(_ session: Foundation.URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
+        logger.logWebSocketClosed(webSocketTask, closeCode: closeCode, reason: reason)
+        (actualDelegate as? URLSessionWebSocketDelegate)?.urlSession?(session, webSocketTask: webSocketTask, didCloseWith: closeCode, reason: reason)
     }
 
     // MARK: Proxy

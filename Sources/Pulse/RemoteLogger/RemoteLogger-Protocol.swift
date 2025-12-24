@@ -20,6 +20,9 @@ extension RemoteLogger {
         case storeEventNetworkTaskCreated = 8
         case storeEventNetworkTaskProgressUpdated = 9
         case storeEventNetworkTaskCompleted = 10
+        // WebSocket events
+        case storeEventWebSocketTaskOpened = 11
+        case storeEventWebSocketTaskClosed = 12
         // A custom message with the following format:
         //
         // path (String)
@@ -27,6 +30,9 @@ extension RemoteLogger {
         //
         // Moving forward, all non-control packets will be send using this format.
         case message = 13
+        // WebSocket frames (sent via message format, but using dedicated codes for efficiency)
+        case storeEventWebSocketFrameSent = 14
+        case storeEventWebSocketFrameReceived = 15
     }
 
     package struct PacketClientHello: Codable {

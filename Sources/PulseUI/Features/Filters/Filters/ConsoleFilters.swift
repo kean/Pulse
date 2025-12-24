@@ -24,6 +24,7 @@ struct ConsoleFilters: Hashable {
     struct Network: Hashable {
         var host = Host()
         var url = URL()
+        var taskTypes = TaskTypes()
     }
 }
 
@@ -67,5 +68,10 @@ extension ConsoleFilters {
     struct URL: ConsoleFilterProtocol {
         var hidden: Set<String> = []
         var focused: String?
+    }
+
+    struct TaskTypes: ConsoleFilterProtocol {
+        /// The set of enabled task types. By default, all types are included.
+        var types: Set<NetworkLogger.TaskType> = Set(NetworkLogger.TaskType.allCases)
     }
 }

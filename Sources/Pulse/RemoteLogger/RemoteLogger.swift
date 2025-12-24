@@ -657,6 +657,14 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             } catch {
                 os_log("Failed to encode network message %{public}@", log: log, type: .error, "\(error)")
             }
+        case .webSocketTaskOpened(let event):
+            connection?.send(code: .storeEventWebSocketTaskOpened, entity: event)
+        case .webSocketTaskClosed(let event):
+            connection?.send(code: .storeEventWebSocketTaskClosed, entity: event)
+        case .webSocketFrameSent(let frame):
+            connection?.send(code: .storeEventWebSocketFrameSent, entity: frame)
+        case .webSocketFrameReceived(let frame):
+            connection?.send(code: .storeEventWebSocketFrameReceived, entity: frame)
         }
     }
 
