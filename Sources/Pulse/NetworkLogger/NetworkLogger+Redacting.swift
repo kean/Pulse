@@ -12,7 +12,8 @@ extension LoggerStore.Event {
             return self
         }
         switch self {
-        case .messageStored, .networkTaskProgressUpdated:
+        case .messageStored, .networkTaskProgressUpdated,
+             .webSocketTaskOpened, .webSocketTaskClosed, .webSocketFrameSent, .webSocketFrameReceived:
             return self
         case .networkTaskCreated(let event):
             var event = event
@@ -34,7 +35,8 @@ extension LoggerStore.Event {
             return self
         }
         switch self {
-        case .messageStored, .networkTaskProgressUpdated:
+        case .messageStored, .networkTaskProgressUpdated,
+             .webSocketTaskOpened, .webSocketTaskClosed, .webSocketFrameSent, .webSocketFrameReceived:
             return self
         case .networkTaskCreated(let event):
             var event = event
@@ -55,13 +57,26 @@ extension LoggerStore.Event {
             return self
         }
         switch self {
-        case .messageStored, .networkTaskProgressUpdated, .networkTaskCreated:
+        case .messageStored, .networkTaskProgressUpdated, .networkTaskCreated,
+             .webSocketTaskOpened, .webSocketTaskClosed:
             return self
         case .networkTaskCompleted(let event):
             var event = event
             event.requestBody = event.requestBody?.redactingSensitiveFields(excludedDataFields)
             event.responseBody = event.responseBody?.redactingSensitiveFields(excludedDataFields)
             return .networkTaskCompleted(event)
+        case .webSocketFrameSent(let frame):
+            var frame = frame
+            if frame.frameType == .text {
+                frame.data = frame.data?.redactingSensitiveFields(excludedDataFields)
+            }
+            return .webSocketFrameSent(frame)
+        case .webSocketFrameReceived(let frame):
+            var frame = frame
+            if frame.frameType == .text {
+                frame.data = frame.data?.redactingSensitiveFields(excludedDataFields)
+            }
+            return .webSocketFrameReceived(frame)
         }
     }
 }

@@ -19,6 +19,7 @@
 		0C6460DE25F579B8002C55B1 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C6460D925F579B8002C55B1 /* Preview Assets.xcassets */; };
 		0C6460DF25F579B8002C55B1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6460DA25F579B8002C55B1 /* ContentView.swift */; };
 		0C70EA762A3F611B000B1071 /* Pulse_Demo_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C70EA752A3F611B000B1071 /* Pulse_Demo_iOSApp.swift */; };
+		0C70EA772A3F611B000B1072 /* WebSocketDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C70EA782A3F611B000B1072 /* WebSocketDemoView.swift */; };
 		0C70EA7A2A3F611C000B1071 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C70EA792A3F611C000B1071 /* Assets.xcassets */; };
 		0C70EA812A3F6190000B1071 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 		0C8FCB502C45F05400C4FD84 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C8FCB4F2C45F05400C4FD84 /* Pulse */; };
@@ -34,6 +35,7 @@
 		0C8FCB742C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
 		0C8FCB752C45F12900C4FD84 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8FCB692C45F12900C4FD84 /* MockTask.swift */; };
 		0CA245732C85E87A00B432DA /* PulseProxy in Frameworks */ = {isa = PBXBuildFile; productRef = 0CA245722C85E87A00B432DA /* PulseProxy */; };
+		0CA245742C85E87A00B432DB /* PulseStarscream in Frameworks */ = {isa = PBXBuildFile; productRef = 0CA245752C85E87A00B432DB /* PulseStarscream */; };
 		0CDACDE629EC6607007C15CD /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 /* End PBXBuildFile section */
 
@@ -92,6 +94,7 @@
 		0C6460DB25F579B8002C55B1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C70EA732A3F611B000B1071 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C70EA752A3F611B000B1071 /* Pulse_Demo_iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_Demo_iOSApp.swift; sourceTree = "<group>"; };
+		0C70EA782A3F611B000B1072 /* WebSocketDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketDemoView.swift; sourceTree = "<group>"; };
 		0C70EA792A3F611C000B1071 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C8CD5922A86F527003D116E /* Pulse-Demo-iOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Pulse-Demo-iOS-Info.plist"; sourceTree = "<group>"; };
 		0C8CD5932A86F581003D116E /* Pulse-Demo-macOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Pulse-Demo-macOS-Info.plist"; sourceTree = "<group>"; };
@@ -131,6 +134,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0CA245732C85E87A00B432DA /* PulseProxy in Frameworks */,
+				0CA245742C85E87A00B432DB /* PulseStarscream in Frameworks */,
 				0C8FCB522C45F05400C4FD84 /* PulseUI in Frameworks */,
 				0C8FCB502C45F05400C4FD84 /* Pulse in Frameworks */,
 			);
@@ -245,6 +249,7 @@
 			isa = PBXGroup;
 			children = (
 				0C70EA752A3F611B000B1071 /* Pulse_Demo_iOSApp.swift */,
+				0C70EA782A3F611B000B1072 /* WebSocketDemoView.swift */,
 				0C70EA792A3F611C000B1071 /* Assets.xcassets */,
 			);
 			path = iOS;
@@ -332,6 +337,7 @@
 				0C8FCB4F2C45F05400C4FD84 /* Pulse */,
 				0C8FCB512C45F05400C4FD84 /* PulseUI */,
 				0CA245722C85E87A00B432DA /* PulseProxy */,
+				0CA245752C85E87A00B432DB /* PulseStarscream */,
 			);
 			productName = "Pulse Demo iOS";
 			productReference = 0C70EA732A3F611B000B1071 /* Pulse Demo iOS.app */;
@@ -369,6 +375,7 @@
 			);
 			mainGroup = 0C57AD44245F0EFB005B3400;
 			packageReferences = (
+				0C8FCB4E2C45F05400C4FD83 /* XCLocalSwiftPackageReference "../" */,
 			);
 			productRefGroup = 0C57AD4E245F0EFB005B3400 /* Products */;
 			projectDirPath = "";
@@ -443,6 +450,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C70EA762A3F611B000B1071 /* Pulse_Demo_iOSApp.swift in Sources */,
+				0C70EA772A3F611B000B1072 /* WebSocketDemoView.swift in Sources */,
 				0C8FCB702C45F12900C4FD84 /* MockTask.swift in Sources */,
 				0C8FCB6A2C45F12900C4FD84 /* MockStore.swift in Sources */,
 			);
@@ -803,33 +811,52 @@
 /* Begin XCSwiftPackageProductDependency section */
 		0C8FCB4F2C45F05400C4FD84 /* Pulse */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 0C8FCB4E2C45F05400C4FD83 /* XCLocalSwiftPackageReference "../" */;
 			productName = Pulse;
 		};
 		0C8FCB512C45F05400C4FD84 /* PulseUI */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 0C8FCB4E2C45F05400C4FD83 /* XCLocalSwiftPackageReference "../" */;
 			productName = PulseUI;
 		};
 		0C8FCB5F2C45F06300C4FD84 /* Pulse */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 0C8FCB4E2C45F05400C4FD83 /* XCLocalSwiftPackageReference "../" */;
 			productName = Pulse;
 		};
 		0C8FCB612C45F06300C4FD84 /* PulseUI */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 0C8FCB4E2C45F05400C4FD83 /* XCLocalSwiftPackageReference "../" */;
 			productName = PulseUI;
 		};
 		0C8FCB632C45F06900C4FD84 /* Pulse */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 0C8FCB4E2C45F05400C4FD83 /* XCLocalSwiftPackageReference "../" */;
 			productName = Pulse;
 		};
 		0C8FCB652C45F06900C4FD84 /* PulseUI */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 0C8FCB4E2C45F05400C4FD83 /* XCLocalSwiftPackageReference "../" */;
 			productName = PulseUI;
 		};
 		0CA245722C85E87A00B432DA /* PulseProxy */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 0C8FCB4E2C45F05400C4FD83 /* XCLocalSwiftPackageReference "../" */;
 			productName = PulseProxy;
 		};
+		0CA245752C85E87A00B432DB /* PulseStarscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0C8FCB4E2C45F05400C4FD83 /* XCLocalSwiftPackageReference "../" */;
+			productName = PulseStarscream;
+		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		0C8FCB4E2C45F05400C4FD83 /* XCLocalSwiftPackageReference "../" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../";
+		};
+/* End XCLocalSwiftPackageReference section */
 	};
 	rootObject = 0C57AD45245F0EFB005B3400 /* Project object */;
 }

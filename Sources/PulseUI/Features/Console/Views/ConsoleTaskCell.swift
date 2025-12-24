@@ -54,6 +54,9 @@ package struct ConsoleTaskCell: View {
             if task.isMocked {
                 MockBadgeView()
             }
+            if task.isWebSocket {
+                WebSocketBadgeView()
+            }
             info.highlighted(highlightedArea == .header)
 
             Spacer()

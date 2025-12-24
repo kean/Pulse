@@ -172,6 +172,62 @@ private func process(event: LoggerStore.Event) {
 }
 ```
 
+## WebSocket Logging
+
+Pulse provides comprehensive WebSocket logging support for multiple frameworks.
+
+### URLSession WebSocket
+
+When using ``URLSessionProxy``, WebSocket tasks are automatically logged. Use the `webSocketTaskProxy` method to get full logging of sent and received messages:
+
+```swift
+let session = URLSessionProxy(configuration: .default)
+let wsTask = session.webSocketTaskProxy(with: URL(string: "wss://example.com/ws")!)
+wsTask.resume()
+
+// Send and receive messages - automatically logged
+try await wsTask.send(.string("Hello"))
+let message = try await wsTask.receive()
+```
+
+### Starscream
+
+Import the `PulseStarscream` module and enable logging with a single line:
+
+```swift
+import PulseStarscream
+import Starscream
+
+let socket = WebSocket(request: URLRequest(url: url))
+
+// Enable Pulse logging - optionally pass your own delegate to receive events
+let logger = socket.enablePulseLogging(delegate: myDelegate)
+
+socket.connect()
+
+// When sending messages manually, also log them
+socket.write(string: "Hello")
+logger.logSentText("Hello")
+```
+
+### Apollo GraphQL
+
+Import the `PulseApollo` module for GraphQL WebSocket subscription logging:
+
+```swift
+import PulseApollo
+import ApolloWebSocket
+
+let transport = WebSocketTransport(websocket: webSocket, store: store)
+
+// Enable Pulse logging
+let logger = transport.enablePulseLogging(delegate: self, url: websocketURL)
+
+// Log subscription events
+logger.logSubscriptionStarted("MySubscription")
+logger.logSubscriptionData("MySubscription", data: subscriptionData)
+```
+
 ## Network Debugging
 
 In addition to logging, Pulse provides network debugging features, such as logging. If you use the recommended ``URLSessionProxy``, these features are enabled automatically, and you don't need to do anything. In other cases, make sure to inject ``MockingURLProtocol`` in the set of URL protocols used by your `URLSession`:

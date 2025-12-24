@@ -33,6 +33,17 @@ struct MockBadgeView: View {
     }
 }
 
+struct WebSocketBadgeView: View {
+    var body: some View {
+        Text("WS")
+            .foregroundStyle(.white)
+            .font(.caption2.weight(.semibold))
+            .padding(EdgeInsets(top: 2, leading: 5, bottom: 1, trailing: 5))
+            .background(Color.blue.opacity(0.75))
+            .clipShape(Capsule())
+    }
+}
+
 struct StatusIndicatorView: View {
     let state: NetworkTaskEntity.State?
 
