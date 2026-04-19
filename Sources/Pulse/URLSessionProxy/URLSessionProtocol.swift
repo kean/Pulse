@@ -4,7 +4,7 @@
 
 import Foundation
 
-public protocol URLSessionProtocol {
+public protocol URLSessionProtocol: Sendable {
     // MARK: - Core
 
     func dataTask(with request: URLRequest) -> URLSessionDataTask
