@@ -95,8 +95,6 @@
 		0C70EA792A3F611C000B1071 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C8CD5922A86F527003D116E /* Pulse-Demo-iOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Pulse-Demo-iOS-Info.plist"; sourceTree = "<group>"; };
 		0C8CD5932A86F581003D116E /* Pulse-Demo-macOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Pulse-Demo-macOS-Info.plist"; sourceTree = "<group>"; };
-		0C8FCB4A2C45F01E00C4FD84 /* PulseCore.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; name = PulseCore.podspec; path = ../PulseCore.podspec; sourceTree = "<group>"; };
-		0C8FCB4B2C45F01E00C4FD84 /* PulseUI.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; name = PulseUI.podspec; path = ../PulseUI.podspec; sourceTree = "<group>"; };
 		0C8FCB4C2C45F01E00C4FD84 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		0C8FCB4D2C45F01E00C4FD84 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		0C8FCB4E2C45F03500C4FD84 /* Pulse */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Pulse; path = ..; sourceTree = "<group>"; };
@@ -195,8 +193,6 @@
 			children = (
 				0C8FCB4E2C45F03500C4FD84 /* Pulse */,
 				0C8FCB4D2C45F01E00C4FD84 /* CHANGELOG.md */,
-				0C8FCB4A2C45F01E00C4FD84 /* PulseCore.podspec */,
-				0C8FCB4B2C45F01E00C4FD84 /* PulseUI.podspec */,
 				0C8FCB4C2C45F01E00C4FD84 /* README.md */,
 				0C516FBB26015DD2004813B4 /* Sources */,
 				0C57AD4E245F0EFB005B3400 /* Products */,
