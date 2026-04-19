@@ -1,13 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
-
-#if !os(macOS)
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 extension NetworkInspectorView {
     @ViewBuilder
     static func makeRequestSection(task: NetworkTaskEntity, isCurrentRequest: Bool) -> some View {
@@ -31,7 +29,7 @@ extension NetworkInspectorView {
     }
 
     @ViewBuilder
-    static func makeHeaderView(task: NetworkTaskEntity, store: LoggerStore) -> some View {
+    static func makeHeaderView(task: NetworkTaskEntity, store: LoggerStoreProtocol) -> some View {
         ZStack {
             NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
                 .hidden()
@@ -61,5 +59,3 @@ struct NetworkInspectorRequestTypePicker: View {
         }
     }
 }
-
-#endif

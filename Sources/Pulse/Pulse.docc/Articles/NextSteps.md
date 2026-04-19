@@ -10,7 +10,7 @@ Pulse is highly customizable and you can tweak it to best match your style and y
 
 ### Configure Store
 
-``LoggerStore`` is the primary way to configure how logs are stored. It uses a database to record logs in an efficient binary format and employes a number of space [optimizations techniques](https://kean.blog/post/pulse-2#space-savings), including fast [lzfse](https://developer.apple.com/documentation/compression/algorithm/lzfse) compression. The store automatically limits how much spaces it takes and also removed old logs.
+``LoggerStore`` is the primary way to configure how logs are stored. It uses a database to record logs in an efficient binary format and employs a number of space [optimization techniques](https://kean.blog/post/pulse-2#space-savings), including fast [lzfse](https://developer.apple.com/documentation/compression/algorithm/lzfse) compression. The store automatically limits how much space it takes and also removes old logs.
 
 ```swift
 LoggerStore.shared.configuration.sizeLimit = 512 * 1_000_000  
@@ -58,7 +58,7 @@ struct AnalyticsLogsView: View {
 }
 ```
 
-> important: In the current schema, the alogger creates an associated ``LoggerMessageEntity`` entity for every ``NetworkTaskEntity``, but it will likely change in the future.
+> important: In the current schema, the logger creates an associated ``LoggerMessageEntity`` entity for every ``NetworkTaskEntity``, but it will likely change in the future.
 
 ## Network Logging & Debugging
 

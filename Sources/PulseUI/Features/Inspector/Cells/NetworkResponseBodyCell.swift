@@ -1,15 +1,15 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
-#if !os(macOS)
-
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct NetworkResponseBodyCell: View {
     let viewModel: NetworkResponseBodyCellViewModel
+
+    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
         NavigationLink(destination: destination) {
@@ -26,10 +26,9 @@ struct NetworkResponseBodyCell: View {
 
     private var destination: some View {
         NetworkInspectorResponseBodyView(viewModel: viewModel.detailsViewModel)
+            .injecting(environment)
     }
 }
-
-#endif
 
 struct NetworkResponseBodyCellViewModel {
     let details: String

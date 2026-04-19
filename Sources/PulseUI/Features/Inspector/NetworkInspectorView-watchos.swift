@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(watchOS)
 
@@ -9,6 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
 
@@ -18,7 +19,7 @@ struct NetworkInspectorView: View {
 
     var body: some View {
         contents
-            .inlineNavigationTitle(task.getShortTitle(options: settings.listDisplayOptions))
+            .inlineNavigationTitle(environment.shortTitle(for: task))
 //            .toolbar {
 //                if #available(watchOS 9, *), let url = viewModel.shareTaskAsHTML() {
 //                    ShareLink(item: url)
@@ -42,6 +43,9 @@ struct NetworkInspectorView: View {
                     NetworkInspectorView.makeResponseSection(task: task)
                 }
             }
+            if let custom = environment.delegate?.console(inspectorViewFor: task) {
+                custom
+            }
         }
     }
 
@@ -58,12 +62,11 @@ struct NetworkInspectorView: View {
 }
 
 #if DEBUG
-struct NetworkInspectorView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
-        }.navigationViewStyle(.stack)
-    }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
+    }.navigationViewStyle(.stack)
 }
 #endif
 

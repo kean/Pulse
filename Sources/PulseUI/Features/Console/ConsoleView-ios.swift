@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS) || os(visionOS)
 
@@ -8,7 +8,9 @@ import SwiftUI
 import CoreData
 import Pulse
 import Combine
+#if os(iOS)
 import WatchConnectivity
+#endif
 
 public struct ConsoleView: View {
     @StateObject private var environment: ConsoleEnvironment // Never reloads
@@ -20,29 +22,27 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        if #available(iOS 16, *) {
+        if #available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *) {
             contents
         } else {
-            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires iOS 16 or later").padding()
+            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires iOS 18 or later").padding()
         }
     }
 
-    @available(iOS 16, visionOS 1, *)
+    @available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
     private var contents: some View {
         ConsoleListView()
-            .navigationTitle(environment.title)
+#if os(iOS) || os(visionOS)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
                     if !isCloseButtonHidden && presentationMode.wrappedValue.isPresented {
-                        Button("Close") {
+                        makeButton(role: .close) {
                             presentationMode.wrappedValue.dismiss()
                         }
                     }
                 }
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    trailingNavigationBarItems
-                }
             }
+#endif
             .injecting(environment)
     }
 
@@ -52,31 +52,17 @@ public struct ConsoleView: View {
         copy.isCloseButtonHidden = isHidden
         return copy
     }
-
-    @available(iOS 16, visionOS 1, *)
-    @ViewBuilder private var trailingNavigationBarItems: some View {
-        Button(action: { environment.router.isShowingShareStore = true }) {
-            Image(systemName: "square.and.arrow.up")
-        }
-        Button(action: { environment.router.isShowingFilters = true }) {
-            Image(systemName: "line.horizontal.3.decrease.circle")
-        }
-        ConsoleContextMenu()
-    }
 }
 
 #if DEBUG
-struct ConsoleView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            NavigationView {
-                ConsoleView(environment: .init(store: .mock))
-            }.previewDisplayName("Console")
-            NavigationView {
-                ConsoleView(store: .mock, mode: .network)
-            }.previewDisplayName("Network")
-        }
+@available(iOS 18, macOS 15, visionOS 1, *)
+#Preview("Console") {
+    NavigationStack {
+        ConsoleView(store: LoggerStore.mock, delegate: MockConsoleDelegate.shared)
     }
+#if os(macOS)
+    .frame(width: 500, height: 600)
+#endif
 }
 #endif
 

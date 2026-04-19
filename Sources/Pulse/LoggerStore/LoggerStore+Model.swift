@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import CoreData
 
@@ -51,6 +51,7 @@ extension LoggerStore {
             Attribute("taskType", .integer16AttributeType),
             Attribute("url", .stringAttributeType),
             Attribute("host", .stringAttributeType),
+            Attribute("path", .stringAttributeType),
             Attribute("httpMethod", .stringAttributeType),
             Attribute("statusCode", .integer32AttributeType),
             Attribute("errorCode", .integer32AttributeType),

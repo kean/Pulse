@@ -1,13 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
-
-#if !os(macOS)
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct NetworkCookiesCell: View {
     let viewModel: NetworkCookiesCellViewModel
 
@@ -31,7 +29,7 @@ struct NetworkCookiesCell: View {
     }
 }
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct NetworkCookiesCellViewModel {
     let title: String
     let details: String
@@ -57,7 +55,7 @@ private func getCookies(from headers: [String: String]?, url: URL?) -> [HTTPCook
     return HTTPCookie.cookies(withResponseHeaderFields: headers, for: url)
 }
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 private func makeAttributedString(for cookies: [HTTPCookie]) -> NSAttributedString {
     guard !cookies.isEmpty else {
         return NSAttributedString(string: "Empty") // Should never happen
@@ -87,27 +85,23 @@ private func makeAttributedString(for cookies: [HTTPCookie]) -> NSAttributedStri
 }
 
 #if DEBUG
-@available(iOS 16, visionOS 1, *)
-struct NetworkCookiesCell_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            List {
-                ForEach(MockTask.allEntities, id: \.objectID) { task in
-                    Section {
-                        let url = URL(string: task.url!)!
-                        Text(url.absoluteString)
-                        NetworkCookiesCell(viewModel: .init(title: "Original Request Cookies", headers: task.originalRequest?.headers, url: url))
-                        NetworkCookiesCell(viewModel: .init(title: "Current Request Cookies", headers: task.currentRequest?.headers, url: url))
-                        NetworkCookiesCell(viewModel: .init(title: "Response Cookies", headers: task.response?.headers, url: url))
-                    }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        List {
+            ForEach(MockTask.allEntities, id: \.objectID) { task in
+                Section {
+                    let url = URL(string: task.url!)!
+                    Text(url.absoluteString)
+                    NetworkCookiesCell(viewModel: .init(title: "Original Request Cookies", headers: task.originalRequest?.headers, url: url))
+                    NetworkCookiesCell(viewModel: .init(title: "Current Request Cookies", headers: task.currentRequest?.headers, url: url))
+                    NetworkCookiesCell(viewModel: .init(title: "Response Cookies", headers: task.response?.headers, url: url))
                 }
             }
-#if os(macOS)
-            .frame(width: 260)
-#endif
         }
+#if os(macOS)
+        .frame(width: 260)
+#endif
     }
 }
-#endif
-
 #endif

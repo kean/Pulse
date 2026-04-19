@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -46,7 +46,7 @@ package struct ConsoleMessageCell: View {
             if message.isPinned {
                 BookmarkIconView()
             }
-            ConsoleTimestampView(date: message.createdAt)
+            ConsoleTimestampView(timestamp: message.formattedTimestamp)
                 .padding(.trailing, 3)
 #endif
         }
@@ -122,13 +122,10 @@ extension Color {
 }
 
 #if DEBUG
-@available(iOS 16, visionOS 1, *)
-struct ConsoleMessageCell_Previews: PreviewProvider {
-    static var previews: some View {
-        ConsoleMessageCell(message: try! LoggerStore.mock.messages()[0])
-            .injecting(ConsoleEnvironment(store: .mock))
-            .padding()
-            .previewLayout(.sizeThatFits)
-    }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview(traits: .sizeThatFitsLayout) {
+    ConsoleMessageCell(message: try! LoggerStore.mock.messages()[0])
+        .injecting(ConsoleEnvironment(store: LoggerStore.mock))
+        .padding()
 }
 #endif

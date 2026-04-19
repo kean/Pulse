@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -120,13 +120,11 @@ private let spacing: CGFloat? = nil
 // MARK: - Preview
 
 #if DEBUG
-struct NetworkInspectorTransferInfoView_Previews: PreviewProvider {
-    static var previews: some View {
-        NetworkInspectorTransferInfoView(viewModel: mockModel)
-            .padding()
-            .fixedSize()
-            .previewLayout(.sizeThatFits)
-    }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview(traits: .sizeThatFitsLayout) {
+    NetworkInspectorTransferInfoView(viewModel: mockModel)
+        .padding()
+        .fixedSize()
 }
 
 private let mockModel = NetworkInspectorTransferInfoViewModel(

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS) || os(visionOS)
 
@@ -9,7 +9,8 @@ import CoreData
 import Pulse
 import Combine
 
-struct RichTextView: View {
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+public struct RichTextView: View {
     @ObservedObject var viewModel: RichTextViewModel
     var isTextViewBarItemsHidden = false
 
@@ -18,13 +19,17 @@ struct RichTextView: View {
 
     @Environment(\.textViewSearchContext) private var searchContext
 
-    func textViewBarItemsHidden(_ isHidden: Bool) -> RichTextView {
+    public init(viewModel: RichTextViewModel) {
+        self.viewModel = viewModel
+    }
+
+    public func textViewBarItemsHidden(_ isHidden: Bool) -> RichTextView {
         var copy = self
         copy.isTextViewBarItemsHidden = isHidden
         return copy
     }
 
-    var body: some View {
+    public var body: some View {
         contents
             .onAppear { viewModel.prepare(searchContext) }
             .navigationBarItems(trailing: navigationBarTrailingItems)
@@ -98,12 +103,11 @@ struct RichTextView: View {
 }
 
 #if DEBUG
-struct RichTextView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            RichTextView(viewModel: makePreviewViewModel())
-                .inlineNavigationTitle("Rich Text View")
-        }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        RichTextView(viewModel: makePreviewViewModel())
+            .inlineNavigationTitle("Rich Text View")
     }
 }
 

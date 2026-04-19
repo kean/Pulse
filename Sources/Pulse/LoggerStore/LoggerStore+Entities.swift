@@ -1,8 +1,15 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import CoreData
+
+private let timestampFormatter: DateFormatter = {
+    let f = DateFormatter()
+    f.locale = Locale(identifier: "en_US")
+    f.dateFormat = "HH:mm:ss.SSS"
+    return f
+}()
 
 public final class LoggerSessionEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
@@ -25,6 +32,7 @@ public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var task: NetworkTaskEntity?
 
     public lazy var metadata = { KeyValueEncoding.decodeKeyValuePairs(rawMetadata) }()
+    public lazy var formattedTimestamp: String = timestampFormatter.string(from: createdAt)
 }
 
 public final class NetworkTaskEntity: NSManagedObject {
@@ -44,6 +52,7 @@ public final class NetworkTaskEntity: NSManagedObject {
 
     @NSManaged public var url: String?
     @NSManaged public var host: String?
+    @NSManaged public var path: String?
     @NSManaged public var httpMethod: String?
 
     // MARK: Response
@@ -103,6 +112,16 @@ public final class NetworkTaskEntity: NSManagedObject {
     // MARK: Helpers
 
     public lazy var metadata = { rawMetadata.map(KeyValueEncoding.decodeKeyValuePairs) }()
+    public lazy var formattedTimestamp: String = timestampFormatter.string(from: createdAt)
+    public lazy var parsedURLComponents: URLComponents? = url.flatMap { URLComponents(string: $0) }
+
+    // View-layer formatting caches populated by PulseUI. Keyed on the input
+    // value so they self-invalidate when the underlying field changes.
+    package var cachedFormattedURL: (key: AnyHashable, value: String?)?
+    package var cachedFormattedDuration: (duration: Double, value: String)?
+    package var cachedFormattedRequestBodySize: (size: Int64, value: String)?
+    package var cachedFormattedResponseBodySize: (size: Int64, value: String)?
+    package var cachedStatus: String?
 
     /// Returns request state.
     public var state: State {

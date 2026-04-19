@@ -37,10 +37,14 @@ struct ScrollableTextView: UIViewRepresentable {
     }
 }
 
-struct RichTextView: View {
+public struct RichTextView: View {
     let viewModel: RichTextViewModel
-    
-    var body: some View {
+
+    public init(viewModel: RichTextViewModel) {
+        self.viewModel = viewModel
+    }
+
+    public var body: some View {
         if let attributedText = viewModel.attributedString {
             ScrollableTextView(attributedText: attributedText)
         } else {

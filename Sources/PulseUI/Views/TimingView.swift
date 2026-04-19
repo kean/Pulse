@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if !os(watchOS)
 
@@ -184,16 +184,12 @@ package final class TimingRowViewModel: Identifiable {
 }
 
 #if DEBUG
-struct TimingView_Previews: PreviewProvider {
-    static var previews: some View {
-        ScrollView {
-            TimingView(viewModel: .init(sections: mockSections))
-        }
-            .padding()
-#if !os(tvOS)
-            .previewLayout(.sizeThatFits)
-#endif
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview(traits: .sizeThatFitsLayout) {
+    ScrollView {
+        TimingView(viewModel: .init(sections: mockSections))
     }
+    .padding()
 }
 
 private let mockSections = [

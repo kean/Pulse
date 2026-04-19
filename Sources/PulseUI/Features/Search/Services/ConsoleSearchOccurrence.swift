@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS) || os(macOS) || os(visionOS)
 
@@ -13,7 +13,6 @@ import Combine
 import AppKit
 #endif
 
-@available(iOS 16, visionOS 1, *)
 package final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
     package let id = ConsoleSearchOccurrenceId()
     package let scope: ConsoleSearchScope
@@ -42,24 +41,16 @@ package final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
 
 private let previewAttibutes = TextHelper().attributes(role: .body2, style: .monospaced)
 
-@available(iOS 16, visionOS 1, *)
 extension ConsoleSearchOccurrence {
     package static func makePreview(for match: ConsoleSearchMatch, attributes customAttributes: [NSAttributedString.Key: Any] = [:]) -> AttributedString {
         let segments = makePreviewSegments(for: match)
 
         var attributes = AttributeContainer(customAttributes)
-#if os(macOS)
         attributes.foregroundColor = .secondary
-        attributes.font = .callout
-#endif
 
         var middle = AttributedString(segments[1], attributes: attributes)
-#if os(macOS)
         middle.foregroundColor = .primary
-        middle.font = Font.callout.weight(.semibold)
-#else
-        middle.foregroundColor = .orange
-#endif
+
         return AttributedString(segments[0], attributes: attributes) + middle + AttributedString(segments[2], attributes: attributes)
     }
 

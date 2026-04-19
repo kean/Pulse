@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -26,11 +26,9 @@ struct SpinnerView: View {
 }
 
 #if DEBUG
-struct SpinnerView_Previews: PreviewProvider {
-    static var previews: some View {
-        SpinnerView(viewModel: .init(title: "Pending", details: "2.5 MB / 6.0 MB"))
-            .previewLayout(.fixed(width: 300, height: 300))
-    }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview(traits: .fixedLayout(width: 300, height: 300)) {
+    SpinnerView(viewModel: .init(title: "Pending", details: "2.5 MB / 6.0 MB"))
 }
 #endif
 

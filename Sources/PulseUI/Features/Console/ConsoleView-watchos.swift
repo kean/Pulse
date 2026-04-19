@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(watchOS)
 
@@ -9,25 +9,39 @@ import Pulse
 
 public struct ConsoleView: View {
     @StateObject private var environment: ConsoleEnvironment
-    @StateObject private var listViewModel: IgnoringUpdates<ConsoleListViewModel>
+    @StateObject private var listViewModel: ConsoleListViewModel
 
     init(environment: ConsoleEnvironment) {
         _environment = StateObject(wrappedValue: environment)
         let listViewModel = ConsoleListViewModel(environment: environment, filters: environment.filters)
-        _listViewModel = StateObject(wrappedValue: .init(listViewModel))
+        _listViewModel = StateObject(wrappedValue: listViewModel)
     }
 
     public var body: some View {
+        if #available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *) {
+            contents
+        } else {
+            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires iOS 18 or later").padding()
+        }
+    }
+
+    @available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+    private var contents: some View {
         List {
             ConsoleToolbarView(environment: environment)
             ConsoleListContentView()
-                .environmentObject(listViewModel.value)
+                .environmentObject(listViewModel)
         }
-        .navigationTitle(environment.title)
-        .onAppear { listViewModel.value.isViewVisible = true }
-        .onDisappear { listViewModel.value.isViewVisible = false }
+        .navigationTitle(environment.mode.formattedCount(listViewModel.entities.count))
+        .onAppear { listViewModel.isViewVisible = true }
+        .onDisappear { listViewModel.isViewVisible = false }
         .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
+            ToolbarItem(placement: .automatic) {
+                Button(action: { environment.router.isShowingSessions = true }) {
+                    Label("Sessions", systemImage: "list.clipboard")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { environment.router.isShowingSettings = true }) {
                     Image(systemName: "gearshape").font(.title3)
                 }
@@ -65,7 +79,8 @@ private struct ConsoleToolbarView: View {
             }
             .background(viewModel.isDefaultFilters(for: environment.mode) ? nil : Rectangle().foregroundColor(.blue).cornerRadius(8))
         }
-        .font(.title3)
+        .imageScale(.large)
+        .font(.footnote)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
         .buttonStyle(.bordered)
@@ -74,13 +89,12 @@ private struct ConsoleToolbarView: View {
 }
 
 #if DEBUG
-struct ConsoleView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            ConsoleView(store: .mock)
-        }
-        .navigationViewStyle(.stack)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        ConsoleView(store: .mock)
     }
+    .navigationViewStyle(.stack)
 }
 #endif
 

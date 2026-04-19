@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Pulse
@@ -10,11 +10,15 @@ import Combine
 
 #if os(iOS) || os(visionOS)
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct SessionsView: View {
     @State private var selection: Set<UUID> = []
     @State private var sharedSessions: SelectedSessionsIDs?
+
     @State private var editMode: EditMode = .inactive
+
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
+    private var sessions: FetchedResults<LoggerSessionEntity>
 
     @EnvironmentObject private var environment: ConsoleEnvironment
     @EnvironmentObject private var filters: ConsoleFiltersViewModel
@@ -31,90 +35,90 @@ struct SessionsView: View {
 
     @ViewBuilder
     private var content: some View {
-        list
+        SessionListView(selection: $selection, sharedSessions: $sharedSessions)
+            .environment(\.editMode, $editMode)
+            .onChange(of: selection) { _, newValue in
+                guard !editMode.isEditing, !newValue.isEmpty else { return }
+                showInConsole(sessions: newValue)
+            }
+            .navigationTitle(editMode.isEditing ? "\(selection.count) Session\(selection.count % 10 == 1 ? "" : "s") Selected" : "Sessions")
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(editMode.isEditing ? "Done" : "Edit") {
-                        withAnimation {
-                            editMode = editMode.isEditing ? .inactive : .active
-                        }
-                    }
-                }
-                ToolbarItem(placement: .bottomBar) {
-                    if editMode == .active {
-                        bottomBar
-                    }
-                }
+                toolbar
             }
             .sheet(item: $sharedSessions) { sessions in
                 NavigationView {
                     ShareStoreView(sessions: sessions.ids, onDismiss: { sharedSessions = nil })
                 }.presentationDetents([.medium, .large])
             }
-    }
-
-    private var list: some View {
-        SessionListView(selection: $selection, sharedSessions: $sharedSessions)
-            .environment(\.editMode, $editMode)
-            .onChange(of: selection) {
-                guard !editMode.isEditing, !$0.isEmpty else { return }
-                showInConsole(sessions: $0)
+            .onAppear {
+                if filters.sessions.count > 1 {
+                    selection = filters.sessions
+                    editMode = .active
+                }
             }
     }
 
-#if os(iOS) || os(visionOS)
-    var bottomBar: some View {
-        HStack {
-            Button(role: .destructive, action: {
-                store.removeSessions(withIDs: selection)
-                selection = []
-            }, label: { Image(systemName: "trash") })
-            .disabled(selection.isEmpty || selection == [store.session.id])
-
-            Spacer()
-
-            // It should ideally be done using stringsdict, but Pulse
-            // doesn't support localization.
-            if selection.count % 10 == 1 {
-                Text("\(selection.count) Session Selected")
-            } else {
-                Text("\(selection.count) Sessions Selected")
-            }
-
-            Spacer()
-
-            Button(action: { sharedSessions = SelectedSessionsIDs(ids: selection) }, label: {
-                Image(systemName: "square.and.arrow.up")
-            })
-            .disabled(selection.isEmpty)
-
-            Menu(content: {
-                Button("Show in Console") {
+    @ToolbarContentBuilder
+    private var toolbar: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarTrailing) {
+            if editMode.isEditing {
+                Button("Done") {
                     showInConsole(sessions: selection)
-                }.disabled(selection.isEmpty)
-            }, label: {
-                Image(systemName: "ellipsis.circle")
-            })
+                }
+            } else {
+                Button("Select") {
+                    withAnimation {
+                        selection = filters.sessions
+                        editMode = .active
+                    }
+                }
+            }
+        }
+        if editMode == .active {
+            ToolbarItemGroup(placement: .bottomBar) {
+                if !store.isReadonly {
+                    Button(role: .destructive, action: {
+                        store.removeSessions(withIDs: selection)
+                        selection = []
+                    }, label: { Image(systemName: "trash") })
+                    .disabled(selection.isEmpty || store.currentSessionID.map { selection == [$0] } ?? false)
+                }
+
+                Spacer()
+
+                let allIDs = Set(sessions.map(\.id))
+                let isAllSelected = !allIDs.isEmpty && selection.intersection(allIDs).count == allIDs.count
+                Button(isAllSelected ? "Deselect All" : "Select All") {
+                    if isAllSelected {
+                        selection.subtract(allIDs)
+                    } else {
+                        selection.formUnion(allIDs)
+                    }
+                }
+
+                Spacer()
+
+                Button(action: { sharedSessions = SelectedSessionsIDs(ids: selection) }, label: {
+                    Image(systemName: "square.and.arrow.up")
+                })
+                .disabled(selection.isEmpty)
+            }
         }
     }
 
     private func showInConsole(sessions: Set<UUID>) {
-        filters.select(sessions: sessions)
+        filters.sessions = sessions
         router.isShowingSessions = false
     }
-#endif
 }
 
 #if DEBUG
-@available(iOS 16, visionOS 1, *)
-struct Previews_SessionsView_Previews: PreviewProvider {
-    static let environment = ConsoleEnvironment(store: .mock)
-
-    static var previews: some View {
-        NavigationView {
-            SessionsView()
-                .injecting(environment)
-        }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        SessionsView()
+            .injecting(ConsoleEnvironment(store: LoggerStore.mock))
     }
 }
 #endif

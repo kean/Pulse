@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(tvOS)
 
@@ -19,6 +19,15 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
+        if #available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *) {
+            contents
+        } else {
+            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires iOS 18 or later").padding()
+        }
+    }
+
+    @available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+    private var contents: some View {
         GeometryReader { _ in
             HStack {
                 List {
@@ -37,16 +46,18 @@ public struct ConsoleView: View {
             .onAppear { listViewModel.isViewVisible = true }
             .onDisappear { listViewModel.isViewVisible = false }
         }
-        .disableScrollClip()
+        .scrollClipDisabled()
         .injecting(environment)
         .environmentObject(listViewModel)
     }
 }
 
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 private struct ConsoleMenuView: View {
     @EnvironmentObject private var viewModel: ConsoleFiltersViewModel
     @EnvironmentObject private var environment: ConsoleEnvironment
     @Environment(\.store) private var store
+    @Environment(\.router) private var router
 
     var body: some View {
         Section {
@@ -60,7 +71,12 @@ private struct ConsoleMenuView: View {
                 Label(environment.bindingForNetworkMode.wrappedValue ? "Network Filters" : "Message Filters", systemImage: "line.3.horizontal.decrease.circle")
             }
         } header: { Text("Quick Filters") }
-        if !(store.options.contains(.readonly)) {
+        Section {
+            Button(action: { router.isShowingSessions = true }) {
+                Label("Sessions", systemImage: "list.clipboard")
+            }
+        } header: { Text("Sessions") }
+        if !store.isReadonly {
             Section {
                 if #available(iOS 16, tvOS 16, *) {
                     NavigationLink {
@@ -84,8 +100,11 @@ private struct ConsoleMenuView: View {
         } header: { Text("Settings") }
     }
 
+    @ViewBuilder
     private var destinationSettings: some View {
-        SettingsView(store: store).padding()
+        if let store = store as? LoggerStore {
+            SettingsView(store: store).padding()
+        }
     }
 
     private var destinationFilters: some View {
@@ -105,11 +124,10 @@ extension View {
 }
 
 #if DEBUG
-struct ConsoleView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            ConsoleView(store: .mock)
-        }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        ConsoleView(store: .mock)
     }
 }
 #endif

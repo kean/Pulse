@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Pulse
@@ -156,6 +156,161 @@ extension MockTask {
         ],
         delay: 0.4,
         decodingError: URLError(URLError.Code.notConnectedToInternet)
+    )
+
+    // MARK: - Additional Mock Tasks
+
+    package static let searchRepos = _mockTask(
+        url: "https://api.github.com/search/repositories?q=swift&sort=stars",
+        responseBody: #"{"total_count":245832,"incomplete_results":false,"items":[{"id":44838949,"name":"swift","full_name":"apple/swift","description":"The Swift Programming Language","stargazers_count":67891,"language":"C++"},{"id":79171906,"name":"Alamofire","full_name":"Alamofire/Alamofire","description":"Elegant HTTP Networking in Swift","stargazers_count":41234,"language":"Swift"}]}"#,
+        duration: 0.48
+    )
+
+    package static let notifications = _mockTask(
+        url: "https://api.github.com/notifications",
+        responseBody: #"[{"id":"1","reason":"subscribed","subject":{"title":"Fix memory leak in ImagePipeline","url":"https://api.github.com/repos/kean/nuke/issues/432","type":"Issue"},"updated_at":"2024-01-15T10:30:00Z"},{"id":"2","reason":"mention","subject":{"title":"Add Swift 6 support","url":"https://api.github.com/repos/kean/pulse/pulls/89","type":"PullRequest"},"updated_at":"2024-01-15T09:15:00Z"}]"#,
+        duration: 0.22
+    )
+
+    package static let starRepo = _mockTask(
+        url: "https://api.github.com/user/starred/kean/Nuke",
+        method: "PUT",
+        statusCode: 204,
+        responseBody: "",
+        duration: 0.15
+    )
+
+    package static let pullRequests = _mockTask(
+        url: "https://api.github.com/repos/kean/nuke/pulls?state=open",
+        responseBody: #"[{"number":456,"title":"Add support for progressive JPEG decoding","state":"open","user":{"login":"contributor1"},"created_at":"2024-01-14T08:00:00Z"},{"number":455,"title":"Fix race condition in prefetcher","state":"open","user":{"login":"contributor2"},"created_at":"2024-01-13T14:30:00Z"},{"number":453,"title":"Update documentation for v12","state":"open","user":{"login":"kean"},"created_at":"2024-01-12T10:00:00Z"}]"#,
+        duration: 0.35
+    )
+
+    package static let userOrgs = _mockTask(
+        url: "https://api.github.com/user/orgs",
+        responseBody: #"[{"login":"CreateAPI","id":12345,"description":"Swift OpenAPI tools","url":"https://api.github.com/orgs/CreateAPI"},{"login":"swift-server","id":67890,"description":"Swift on server","url":"https://api.github.com/orgs/swift-server"}]"#,
+        duration: 0.19
+    )
+
+    package static let gists = _mockTask(
+        url: "https://api.github.com/gists",
+        responseBody: #"[{"id":"abc123","description":"Swift concurrency examples","files":{"example.swift":{"filename":"example.swift","language":"Swift","size":1024}},"created_at":"2024-01-10T08:00:00Z","public":true},{"id":"def456","description":"URLSession configuration snippets","files":{"config.swift":{"filename":"config.swift","language":"Swift","size":512}},"created_at":"2024-01-08T12:00:00Z","public":false}]"#,
+        duration: 0.28
+    )
+
+    package static let issues = _mockTask(
+        url: "https://api.github.com/repos/kean/nuke/issues?state=open&labels=bug",
+        responseBody: #"[{"number":430,"title":"Image flickering on iOS 17.2","state":"open","labels":[{"name":"bug","color":"d73a4a"}],"user":{"login":"user1"}},{"number":428,"title":"Memory spike when loading large GIFs","state":"open","labels":[{"name":"bug","color":"d73a4a"},{"name":"performance","color":"fbca04"}],"user":{"login":"user2"}}]"#,
+        duration: 0.31
+    )
+
+    package static let userEvents = _mockTask(
+        url: "https://api.github.com/users/kean/received_events",
+        responseBody: #"[{"type":"PushEvent","repo":{"name":"kean/nuke"},"created_at":"2024-01-15T11:00:00Z","payload":{"commits":[{"message":"Fix image cache eviction"}]}},{"type":"IssuesEvent","repo":{"name":"kean/pulse"},"created_at":"2024-01-15T10:30:00Z","payload":{"action":"opened","issue":{"title":"Console crash on watchOS"}}}]"#,
+        duration: 0.26
+    )
+
+    package static let followers = _mockTask(
+        url: "https://api.github.com/users/kean/followers",
+        responseBody: #"[{"login":"alice","id":1001,"avatar_url":"https://avatars.githubusercontent.com/u/1001"},{"login":"bob","id":1002,"avatar_url":"https://avatars.githubusercontent.com/u/1002"},{"login":"charlie","id":1003,"avatar_url":"https://avatars.githubusercontent.com/u/1003"}]"#,
+        duration: 0.20
+    )
+
+    package static let createIssue = _mockTask(
+        url: "https://api.github.com/repos/kean/nuke/issues",
+        method: "POST",
+        statusCode: 201,
+        requestBody: #"{"title":"Crash when cancelling prefetch","body":"Steps to reproduce:\n1. Start prefetching\n2. Cancel immediately\n3. App crashes","labels":["bug"]}"#,
+        responseBody: #"{"number":435,"title":"Crash when cancelling prefetch","state":"open","user":{"login":"kean"},"created_at":"2024-01-15T12:00:00Z","html_url":"https://github.com/kean/nuke/issues/435"}"#,
+        duration: 0.41
+    )
+
+    package static let deleteRepo = _mockTask(
+        url: "https://api.github.com/repos/kean/deprecated-project",
+        method: "DELETE",
+        statusCode: 403,
+        responseBody: #"{"message":"Must have admin rights to Repository.","documentation_url":"https://docs.github.com/rest/repos/repos#delete-a-repository"}"#,
+        duration: 0.12
+    )
+
+    package static let rateLimit = _mockTask(
+        url: "https://api.github.com/rate_limit",
+        responseBody: #"{"resources":{"core":{"limit":5000,"remaining":4892,"reset":1705312800},"search":{"limit":30,"remaining":28,"reset":1705309260},"graphql":{"limit":5000,"remaining":4999,"reset":1705312800}},"rate":{"limit":5000,"remaining":4892,"reset":1705312800}}"#,
+        duration: 0.08
+    )
+
+    package static let graphQL = _mockTask(
+        url: "https://api.github.com/graphql",
+        method: "POST",
+        requestBody: #"{"query":"{ viewer { login repositories(first: 5, orderBy: {field: STARGAZERS, direction: DESC}) { nodes { name stargazerCount } } } }"}"#,
+        responseBody: #"{"data":{"viewer":{"login":"kean","repositories":{"nodes":[{"name":"Nuke","stargazerCount":8142},{"name":"Pulse","stargazerCount":6280},{"name":"Align","stargazerCount":845},{"name":"Get","stargazerCount":812},{"name":"CreateAPI","stargazerCount":465}]}}}}"#,
+        duration: 0.55,
+        taskDescription: "GetViewerRepositories"
+    )
+
+    package static let releaseLatest = _mockTask(
+        url: "https://api.github.com/repos/kean/nuke/releases/latest",
+        responseBody: #"{"tag_name":"12.4.0","name":"Nuke 12.4","draft":false,"prerelease":false,"published_at":"2024-01-10T10:00:00Z","body":"Improved progressive JPEG decoding. Fixed memory leak in ImagePipeline. Added Swift 6 support.","assets":[{"name":"Nuke-12.4.0.zip","size":6695689,"download_count":1523}]}"#,
+        duration: 0.33
+    )
+
+    package static let updateProfile = _mockTask(
+        url: "https://api.github.com/user",
+        method: "PATCH",
+        requestBody: #"{"bio":"Creator of Nuke, Pulse, and other open-source Swift libraries","location":"New York","hireable":false}"#,
+        responseBody: #"{"login":"kean","id":1567433,"bio":"Creator of Nuke, Pulse, and other open-source Swift libraries","location":"New York","hireable":false,"public_repos":42,"followers":2891}"#,
+        duration: 0.29
+    )
+
+    package static let rateLimitExceeded = _mockTask(
+        url: "https://api.github.com/repos/kean/nuke/traffic/views",
+        statusCode: 429,
+        requestHeaders: ["Authorization": "Bearer ghp_xxxxxxxxxxxx"],
+        responseBody: #"{"message":"API rate limit exceeded for user ID 1567433.","documentation_url":"https://docs.github.com/rest/overview/rate-limits-for-the-rest-api"}"#,
+        duration: 0.05
+    )
+
+    package static let repoContributors = _mockTask(
+        url: "https://api.github.com/repos/kean/nuke/contributors",
+        responseBody: #"[{"login":"kean","contributions":1847},{"login":"jshier","contributions":23},{"login":"MaxDesiatov","contributions":12},{"login":"AvdLee","contributions":8}]"#,
+        duration: 0.25
+    )
+
+    package static let mergeRequest = _mockTask(
+        url: "https://api.github.com/repos/kean/nuke/pulls/452/merge",
+        method: "PUT",
+        requestBody: #"{"merge_method":"squash","commit_title":"Fix race condition in prefetcher (#452)"}"#,
+        responseBody: #"{"sha":"abc123def456","merged":true,"message":"Pull Request successfully merged"}"#,
+        duration: 0.38
+    )
+
+    package static let serverError = _mockTask(
+        url: "https://api.github.com/repos/kean/nuke/dispatches",
+        method: "POST",
+        statusCode: 500,
+        requestBody: #"{"event_type":"build","client_payload":{"ref":"main"}}"#,
+        responseBody: #"{"message":"Internal Server Error","documentation_url":"https://docs.github.com/rest"}"#,
+        duration: 0.72
+    )
+
+    package static let labels = _mockTask(
+        url: "https://api.github.com/repos/kean/nuke/labels",
+        responseBody: #"[{"name":"bug","color":"d73a4a","description":"Something isn't working"},{"name":"enhancement","color":"a2eeef","description":"New feature or request"},{"name":"performance","color":"fbca04","description":"Performance improvements"},{"name":"documentation","color":"0075ca","description":"Improvements or additions to documentation"}]"#,
+        duration: 0.16
+    )
+
+    /// A protobuf response — exercises
+    /// ``ConsoleDelegate/console(responseBodyViewFor:)`` so integrators can
+    /// decode the wire format with their own generated types.
+    package static let protoUser = MockTask(
+        originalRequest: mockProtoUserOriginalRequest,
+        response: mockProtoUserResponse,
+        responseBody: mockProtoUserResponseBody,
+        transactions: [
+            .init(fetchType: .networkLoad, request: mockProtoUserCurrentRequest, response: mockProtoUserResponse, duration: 0.18)
+        ],
+        delay: 0.2,
+        taskDescription: "example.v1.UserService.GetUser"
     )
 }
 
@@ -495,6 +650,86 @@ private let mockUploadPulseResponse = HTTPURLResponse(url: "https://objects-orig
 // MARK: - PDF
 
 package let mockPDF = Data(base64Encoded: "JVBERi0xLjMNCiXi48/TDQoNCjEgMCBvYmoNCjw8DQovVHlwZSAvQ2F0YWxvZw0KL091dGxpbmVzIDIgMCBSDQovUGFnZXMgMyAwIFINCj4+DQplbmRvYmoNCg0KMiAwIG9iag0KPDwNCi9UeXBlIC9PdXRsaW5lcw0KL0NvdW50IDANCj4+DQplbmRvYmoNCg0KMyAwIG9iag0KPDwNCi9UeXBlIC9QYWdlcw0KL0NvdW50IDINCi9LaWRzIFsgNCAwIFIgNiAwIFIgXSANCj4+DQplbmRvYmoNCg0KNCAwIG9iag0KPDwNCi9UeXBlIC9QYWdlDQovUGFyZW50IDMgMCBSDQovUmVzb3VyY2VzIDw8DQovRm9udCA8PA0KL0YxIDkgMCBSIA0KPj4NCi9Qcm9jU2V0IDggMCBSDQo+Pg0KL01lZGlhQm94IFswIDAgNjEyLjAwMDAgNzkyLjAwMDBdDQovQ29udGVudHMgNSAwIFINCj4+DQplbmRvYmoNCg0KNSAwIG9iag0KPDwgL0xlbmd0aCAxMDc0ID4+DQpzdHJlYW0NCjIgSg0KQlQNCjAgMCAwIHJnDQovRjEgMDAyNyBUZg0KNTcuMzc1MCA3MjIuMjgwMCBUZA0KKCBBIFNpbXBsZSBQREYgRmlsZSApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDY4OC42MDgwIFRkDQooIFRoaXMgaXMgYSBzbWFsbCBkZW1vbnN0cmF0aW9uIC5wZGYgZmlsZSAtICkgVGoNCkVUDQpCVA0KL0YxIDAwMTAgVGYNCjY5LjI1MDAgNjY0LjcwNDAgVGQNCigganVzdCBmb3IgdXNlIGluIHRoZSBWaXJ0dWFsIE1lY2hhbmljcyB0dXRvcmlhbHMuIE1vcmUgdGV4dC4gQW5kIG1vcmUgKSBUag0KRVQNCkJUDQovRjEgMDAxMCBUZg0KNjkuMjUwMCA2NTIuNzUyMCBUZA0KKCB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDYyOC44NDgwIFRkDQooIEFuZCBtb3JlIHRleHQuIEFuZCBtb3JlIHRleHQuIEFuZCBtb3JlIHRleHQuIEFuZCBtb3JlIHRleHQuIEFuZCBtb3JlICkgVGoNCkVUDQpCVA0KL0YxIDAwMTAgVGYNCjY5LjI1MDAgNjE2Ljg5NjAgVGQNCiggdGV4dC4gQW5kIG1vcmUgdGV4dC4gQm9yaW5nLCB6enp6ei4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kICkgVGoNCkVUDQpCVA0KL0YxIDAwMTAgVGYNCjY5LjI1MDAgNjA0Ljk0NDAgVGQNCiggbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDU5Mi45OTIwIFRkDQooIEFuZCBtb3JlIHRleHQuIEFuZCBtb3JlIHRleHQuICkgVGoNCkVUDQpCVA0KL0YxIDAwMTAgVGYNCjY5LjI1MDAgNTY5LjA4ODAgVGQNCiggQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgKSBUag0KRVQNCkJUDQovRjEgMDAxMCBUZg0KNjkuMjUwMCA1NTcuMTM2MCBUZA0KKCB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBFdmVuIG1vcmUuIENvbnRpbnVlZCBvbiBwYWdlIDIgLi4uKSBUag0KRVQNCmVuZHN0cmVhbQ0KZW5kb2JqDQoNCjYgMCBvYmoNCjw8DQovVHlwZSAvUGFnZQ0KL1BhcmVudCAzIDAgUg0KL1Jlc291cmNlcyA8PA0KL0ZvbnQgPDwNCi9GMSA5IDAgUiANCj4+DQovUHJvY1NldCA4IDAgUg0KPj4NCi9NZWRpYUJveCBbMCAwIDYxMi4wMDAwIDc5Mi4wMDAwXQ0KL0NvbnRlbnRzIDcgMCBSDQo+Pg0KZW5kb2JqDQoNCjcgMCBvYmoNCjw8IC9MZW5ndGggNjc2ID4+DQpzdHJlYW0NCjIgSg0KQlQNCjAgMCAwIHJnDQovRjEgMDAyNyBUZg0KNTcuMzc1MCA3MjIuMjgwMCBUZA0KKCBTaW1wbGUgUERGIEZpbGUgMiApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDY4OC42MDgwIFRkDQooIC4uLmNvbnRpbnVlZCBmcm9tIHBhZ2UgMS4gWWV0IG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gKSBUag0KRVQNCkJUDQovRjEgMDAxMCBUZg0KNjkuMjUwMCA2NzYuNjU2MCBUZA0KKCBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDY2NC43MDQwIFRkDQooIHRleHQuIE9oLCBob3cgYm9yaW5nIHR5cGluZyB0aGlzIHN0dWZmLiBCdXQgbm90IGFzIGJvcmluZyBhcyB3YXRjaGluZyApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDY1Mi43NTIwIFRkDQooIHBhaW50IGRyeS4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gKSBUag0KRVQNCkJUDQovRjEgMDAxMCBUZg0KNjkuMjUwMCA2NDAuODAwMCBUZA0KKCBCb3JpbmcuICBNb3JlLCBhIGxpdHRsZSBtb3JlIHRleHQuIFRoZSBlbmQsIGFuZCBqdXN0IGFzIHdlbGwuICkgVGoNCkVUDQplbmRzdHJlYW0NCmVuZG9iag0KDQo4IDAgb2JqDQpbL1BERiAvVGV4dF0NCmVuZG9iag0KDQo5IDAgb2JqDQo8PA0KL1R5cGUgL0ZvbnQNCi9TdWJ0eXBlIC9UeXBlMQ0KL05hbWUgL0YxDQovQmFzZUZvbnQgL0hlbHZldGljYQ0KL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcNCj4+DQplbmRvYmoNCg0KMTAgMCBvYmoNCjw8DQovQ3JlYXRvciAoUmF2ZSBcKGh0dHA6Ly93d3cubmV2cm9uYS5jb20vcmF2ZVwpKQ0KL1Byb2R1Y2VyIChOZXZyb25hIERlc2lnbnMpDQovQ3JlYXRpb25EYXRlIChEOjIwMDYwMzAxMDcyODI2KQ0KPj4NCmVuZG9iag0KDQp4cmVmDQowIDExDQowMDAwMDAwMDAwIDY1NTM1IGYNCjAwMDAwMDAwMTkgMDAwMDAgbg0KMDAwMDAwMDA5MyAwMDAwMCBuDQowMDAwMDAwMTQ3IDAwMDAwIG4NCjAwMDAwMDAyMjIgMDAwMDAgbg0KMDAwMDAwMDM5MCAwMDAwMCBuDQowMDAwMDAxNTIyIDAwMDAwIG4NCjAwMDAwMDE2OTAgMDAwMDAgbg0KMDAwMDAwMjQyMyAwMDAwMCBuDQowMDAwMDAyNDU2IDAwMDAwIG4NCjAwMDAwMDI1NzQgMDAwMDAgbg0KDQp0cmFpbGVyDQo8PA0KL1NpemUgMTENCi9Sb290IDEgMCBSDQovSW5mbyAxMCAwIFINCj4+DQoNCnN0YXJ0eHJlZg0KMjcxNA0KJSVFT0YNCg==")!
+
+// MARK: - Mock Task Factory
+
+private func _mockTask(
+    url: String,
+    method: String = "GET",
+    statusCode: Int = 200,
+    requestHeaders: [String: String] = [:],
+    requestBody: String? = nil,
+    responseBody: String = "{}",
+    duration: TimeInterval = 0.3,
+    delay: TimeInterval = 1.0,
+    decodingError: Error? = nil,
+    taskDescription: String? = nil
+) -> MockTask {
+    let originalRequest = URLRequest(url: url, method: method, headers: requestHeaders, body: requestBody)
+    let currentRequest = originalRequest.adding(headers: [
+        "User-Agent": "Pulse Demo/2.0",
+        "Accept-Encoding": "gzip",
+        "Accept-Language": "en-us",
+        "Accept": "application/json"
+    ])
+    let response = HTTPURLResponse(url: url, statusCode: statusCode, headers: [
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "private, max-age=60"
+    ])
+    return MockTask(
+        originalRequest: originalRequest,
+        response: response,
+        responseBody: responseBody.data(using: .utf8) ?? Data(),
+        transactions: [
+            .init(fetchType: .networkLoad, request: currentRequest, response: response, duration: duration)
+        ],
+        delay: delay,
+        decodingError: decodingError,
+        taskDescription: taskDescription
+    )
+}
+
+// MARK: - Proto User (GET, application/x-protobuf)
+
+private let mockProtoUserOriginalRequest = URLRequest(
+    url: "https://api.example.com/example.v1.UserService/GetUser",
+    method: "POST",
+    headers: [
+        "Content-Type": "application/x-protobuf",
+        "Accept": "application/x-protobuf",
+        "X-Grpc-Message-Type": "example.v1.GetUserRequest"
+    ]
+)
+
+private let mockProtoUserCurrentRequest = mockProtoUserOriginalRequest.adding(headers: [
+    "User-Agent": "Pulse Demo/2.0"
+])
+
+private let mockProtoUserResponse = HTTPURLResponse(
+    url: "https://api.example.com/example.v1.UserService/GetUser",
+    statusCode: 200,
+    headers: [
+        "Content-Type": "application/x-protobuf",
+        "X-Grpc-Message-Type": "example.v1.GetUserResponse"
+    ]
+)
+
+private let mockProtoUserResponseBody = Data([
+    // id = 1567433
+    0x08, 0xc9, 0xf5, 0x5f,
+    // username = "kean"
+    0x12, 0x04, 0x6b, 0x65, 0x61, 0x6e,
+    // email = "alex@example.com"
+    0x1a, 0x10, 0x61, 0x6c, 0x65, 0x78, 0x40, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x2e, 0x63, 0x6f, 0x6d,
+    // roles = ["owner", "maintainer"]
+    0x22, 0x05, 0x6f, 0x77, 0x6e, 0x65, 0x72,
+    0x22, 0x0a, 0x6d, 0x61, 0x69, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72,
+    // profile { display_name = "Alex Kean", followers = 354, verified = true }
+    0x2a, 0x10,
+    0x0a, 0x09, 0x41, 0x6c, 0x65, 0x78, 0x20, 0x4b, 0x65, 0x61, 0x6e,
+    0x10, 0xe2, 0x02,
+    0x18, 0x01
+])
 
 // MARK: Helpers
 

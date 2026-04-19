@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Pulse
@@ -67,7 +67,7 @@ enum ConsoleFormatter {
         return label.capitalized
     }
 
-    static func subheadline(for task: NetworkTaskEntity, hasTime: Bool = true, store: LoggerStore) -> String {
+    static func subheadline(for task: NetworkTaskEntity, hasTime: Bool = true, store: LoggerStoreProtocol) -> String {
         return [
             hasTime ? time(for: task.createdAt) : nil,
             task.httpMethod ?? "GET",
@@ -99,17 +99,20 @@ enum ConsoleFormatter {
         }
     }
 
-    static func status(for task: NetworkTaskEntity, store: LoggerStore) -> String {
+    static func status(for task: NetworkTaskEntity, store: LoggerStoreProtocol) -> String {
         guard let state = task.state(in: store) else {
             return "Unknown"
         }
         switch state {
         case .pending:
             return ProgressViewModel.title(for: task)
-        case .success:
-            return StatusCodeFormatter.string(for: Int(task.statusCode))
-        case .failure:
-            return ErrorFormatter.shortErrorDescription(for: task)
+        case .success, .failure:
+            if let cached = task.cachedStatus { return cached }
+            let value = state == .success
+                ? StatusCodeFormatter.string(for: Int(task.statusCode))
+                : ErrorFormatter.shortErrorDescription(for: task)
+            task.cachedStatus = value
+            return value
         }
     }
 
@@ -133,8 +136,14 @@ enum ConsoleFormatter {
     }
 
     static func duration(for task: NetworkTaskEntity) -> String? {
-        guard task.duration > 0 else { return nil }
-        return DurationFormatter.string(from: task.duration, isPrecise: false)
+        let duration = task.duration
+        guard duration > 0 else { return nil }
+        if let cache = task.cachedFormattedDuration, cache.duration == duration {
+            return cache.value
+        }
+        let value = DurationFormatter.string(from: duration, isPrecise: false)
+        task.cachedFormattedDuration = (duration, value)
+        return value
     }
 
     static func progress(for task: NetworkTaskEntity) -> String? {

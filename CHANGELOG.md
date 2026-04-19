@@ -1,5 +1,86 @@
 # Pulse 5.x
 
+## Pulse 5.2
+
+*Apr 19, 2026*
+
+This release introduces improvements to search, filters, session management, performance, and more. See them in action in the [recording](https://github.com/user-attachments/assets/778381e8-6c83-48e2-a601-a138100515c9).
+
+### Search
+
+- Rewrite the console search engine around a new `ConsoleSearchSession` that owns a private-queue Core Data context and runs fetching, matching, and live-update observation entirely off the main thread. Results are incremental, cancelable, and batched through a short flush interval, so the UI no longer hitches on large stores — tested end-to-end on stores with 1M+ messages
+- Preserve grouping while searching the console: search results are now rendered under the same section headers as the main list and share collapse state, so switching into and out of search no longer flattens the view
+- Bring the full search suggestions experience to PulseUI: the search bar now surfaces both recent searches and filter suggestions (domains, paths, status codes, methods) sourced from the store index, and tapping a suggested filter applies it directly to the active criteria. Previously this was only available in Rift, and PulseUI showed recent searches only
+- Add simplified search tokens so you can quickly filter by domain, path, status code, and HTTP method (work-in-progress)
+- Add a separate "Query" search scope so you can search URL query strings independently of the path
+- Merge "Original Request Headers" and "Current Request Headers" into a single "Request Headers" scope
+- Change the default network search scopes to include the response body alongside the URL — searching for a JSON value now works out of the box
+- Redesign the search scopes picker: it's now sectioned by Logs and Network, with per-section "All / None" toggles and a "Reset to Defaults" action
+- Scope changes within a search session are temporary. Use the new "Save as Default" action in the scopes picker to persist your preferred selection across app launches
+- Stop resetting scopes and string search options when the search sheet is dismissed
+- The scopes pill now shows a meaningful label ("All", "Logs", "Network", the scope title, …) instead of just a count
+- Extend `StringSearchOptions`: add a new "Multiple Words" kind that matches strings containing every space-separated word, and "Matching" / "Matching Word" matching rules for exact and word-boundary matches. Reword the existing rules for consistency ("Containing", "Starting With", "Ending With"). Applied uniformly across every search surface
+- Fix a bug where the URL scope silently stripped the query string before searching
+
+### Filters
+
+- Bring the advanced filters into the main console: every network and message predicate is now available
+- Add "Status Code", "Content Type", "Duration", "Request Body Size", and "Request State" to the built-in network filters, organised into Response, Request, and Advanced sections
+- Add "Path" to the "Field" options in custom network filters, backed by a new stored attribute on `NetworkTaskEntity`, and organize the field picker into groups with section headers for easier navigation
+- Add "Error Domain" and "Task Description" to the "Field" options in custom filters
+- Auto-save recent filters: the last-used filter combinations are now remembered and shown in a dedicated "Recent Filters" section, letting you re-apply previous criteria in one tap
+- Improve filters on watchOS: replace the Status Code range picker with a standard Picker offering predefined options (Any, Success 2xx, Redirects 3xx, Client Errors 4xx, Server Errors 5xx, All Errors), and remove Duration, Response Body Size, and Request Body Size filters that didn't fit the small screen. The available network filters on watchOS are now: Status Code, Content Type, HTTP Method, Custom Filters, Hosts, Task Type, Request State, Response Source, and Redirect. Message filters: Custom Filters, Levels, and Labels.
+
+### Sessions
+
+- Add a "Sessions" shortcut to the console toolbar for quick access to the sessions picker. When a non-current session is selected, the icon is highlighted as a reminder
+- Add a "Show Previous Session" footer to the console list: appears at the bottom of the list and loads the next older session on tap
+- Redesign session cells: session numbering, a "Current" badge for the active session, message counts, and relative timestamps for today's sessions (e.g. "5 min ago")
+- Add a context menu to session cells with a preview showing the session date, app version, and UUID
+- Add a "Remove Logs" swipe action and context-menu item for the current session that clears its logs without deleting the session itself
+- Move the Share swipe action to the leading edge and Delete to the trailing edge in the session list
+- Add "Select" mode to the session list. Each date-grouped section now shows a "Select All" / "Deselect All" button in Select mode, so you can grab every session for a given day in one tap. The selection count is shown in the navigation title and actions live on the bottom bar — which now also appears correctly in read-only stores
+- Bring the full sessions picker to watchOS and tvOS — previously these platforms only showed a truncated list
+
+### Console list & toolbar
+
+- Redesign the console heading: the navigation title is now inline and doubles as a menu for switching between "All", "Logs", and "Network", with a subtitle showing the current count (e.g. "21 Tasks"). While searching, the title reflects the search state
+- Add "Select" mode to the console list: enter via the context menu or a two-finger swipe gesture, pick multiple log entries, and share them using the toolbar at the bottom. Selection works in search mode too
+- Consolidate the regular and search toolbars into a single `ConsoleToolbarView`. Filters and the "Only Errors" toggle now live on the leading edge in both modes; the search scopes pill and string-options menu appear on the trailing edge only while searching
+- Add "Sort By" and "Group By" pills to the console toolbar (non-search mode). Sort By exposes the field and ascending/descending order; Group By is wired all the way through `ConsoleDataSource` so the list is now rendered as proper sections in PulseUI on iOS for the first time. Both menus remain available from the "More" menu
+- Add a quick-reset `xmark.circle` to the Filters, Sort By, and Group By pills: when non-default, tap to reset in one tap
+- Make grouped sections in the console list collapsible: tap a section header to toggle expansion, with a chevron indicating the current state. The group name is followed by the item count
+- Persist manually collapsed console sections across launches, scoped to the current `(mode, groupBy)`. "Collapse All" / "Expand All" stay in-memory only
+- Move "Filters" out of the inline navigation bar items and into the "More" menu
+- Unify all console toolbar pills (Filters, Only Errors, Sort By, Group By, search scopes/options) on a shared layout so they share the same height and visual style
+
+### Customisation API (`ConsoleDelegate`)
+
+- Add `ConsoleDelegate` protocol for per-task customization of `ConsoleView`. `ConsoleView.init` now accepts an optional `delegate` that can return a different `ConsoleListDisplaySettings` for each task. The protocol is `@MainActor` and uses `UserSettings.shared.listDisplayOptions` as the default
+- Add `ConsoleDelegate.console(contentViewFor:)` to replace the task cell's main content area (method + URL) with a caller-supplied SwiftUI view. When non-nil, it supersedes `ConsoleListDisplaySettings.ContentSettings` entirely; the header and footer still render from settings as usual
+- Add `ConsoleDelegate.console(responseBodyViewFor:)` to replace the built-in response body viewer with a caller-supplied SwiftUI view. Use it to plug in a protobuf decoder (via the integrator's own `SwiftProtobuf` types) or any other format the default `FileViewer` doesn't understand
+- Add `ConsoleDelegate.console(inspectorViewFor:)` to inject a custom SwiftUI section into the network inspector (e.g. decoded GraphQL variables, parsed protobuf). Rendered after the built-in response/metrics sections
+- Add `ConsoleDelegate.console(contextMenuFor:)` to inject app-specific items (e.g. "Replay", "Open in admin panel") into the task cell's context menu and into the network inspector's "More" menu
+- Add `ConsoleDelegate.console(redact:field:for:)` for masking sensitive strings (auth tokens, PII) before they are rendered. Applied to URL, host, header, task-description, and caller-supplied strings in the task cell as well as the inspector's navigation title. A new `ConsoleRedactionField` enum identifies which field is about to be rendered
+- Make `RichTextView` and `RichTextViewModel` public so integrators building custom `responseBodyViewFor:` views can reuse the standard text-viewer chrome (search, line numbers, link detection, share). Construct a `RichTextViewModel(string:contentType:)` from an `NSAttributedString` (optionally produced by the existing attributed-string helpers) and wrap it in `RichTextView`
+- Add `ConsoleListDisplaySettings.ContentSettings.customText` to render a caller-supplied string verbatim in place of the default method + URL content (e.g. a GraphQL operation name). When set, `showMethod` and `components` are ignored
+- Add `ConsoleListDisplaySettings.TaskField.url(components:)` to render the full URL, or a specific `URLComponent` when provided, in header/footer fields
+- Add `ConsoleListDisplaySettings.TaskField.custom(String)` to render a caller-supplied string verbatim in header/footer fields
+- Add `NetworkLogger.ContentType.isProtobuf` for matching `application/x-protobuf` and `application/grpc` content types
+
+### Performance
+
+- Optimize the console list rendering path: cache formatted timestamps on `LoggerMessageEntity` / `NetworkTaskEntity` so each visible cell no longer re-runs `DateFormatter`, switch the task cell to SwiftUI's `AttributedString` for header/footer text (measurably faster than bridging through `NSAttributedString`), and drop an expensive `.tracking()` modifier that was dominating cell layout time
+- Replace `ManagedObjectsCountObserver`'s `NSFetchedResultsController` with a direct `count(for:)` query driven by `NSManagedObjectContextObjectsDidChange`, so the toolbar log/task counters no longer materialize every matching object just to read `.count`
+- Optimize `LoggerStore.reduceDatabaseSize` — the new implementation is roughly 2× faster
+- Switch the SQLite journal mode from `DELETE` to WAL (Write-Ahead Logging), improving write performance and reducing contention between readers and writers
+
+### Fixes
+
+- Fix a crash when tapping "Remove All"
+- Fix a crash when saving to a Core Data store on devices with no disk space
+- Fix deprecation warnings
+
 ## Pulse 5.1.2
 
 *Oct 10, 2024*

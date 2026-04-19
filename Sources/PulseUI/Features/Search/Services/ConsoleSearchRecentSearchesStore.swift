@@ -1,18 +1,18 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS) || os(macOS) || os(visionOS)
 
 import Foundation
 import SwiftUI
 
-final class ConsoleSearchRecentSearchesStore {
+package final class ConsoleSearchRecentSearchesStore {
     private let mode: ConsoleMode
 
-    private(set) var searches: [ConsoleSearchTerm] = []
+    package private(set) var searches: [ConsoleSearchTerm] = []
 
-    init(mode: ConsoleMode) {
+    package init(mode: ConsoleMode) {
         self.mode = mode
 
         self.searches = decode([ConsoleSearchTerm].self, from: UserDefaults.standard.string(forKey: searchesKey) ?? "[]") ?? []
@@ -20,7 +20,7 @@ final class ConsoleSearchRecentSearchesStore {
 
     private var searchesKey: String { "\(mode.rawValue)-recent-searches" }
 
-    func saveSearch(_ search: ConsoleSearchTerm) {
+    package func saveSearch(_ search: ConsoleSearchTerm) {
         // If the user changes the type o the search, remove the old ones:
         // we only care about the term.
         searches.removeAll { $0.text == search.text }
@@ -28,7 +28,12 @@ final class ConsoleSearchRecentSearchesStore {
         saveSearches()
     }
 
-    func clearRecentSearches() {
+    package func removeSearch(_ search: ConsoleSearchTerm) {
+        searches.removeAll { $0 == search }
+        saveSearches()
+    }
+
+    package func clearRecentSearches() {
         searches = []
         saveSearches()
     }

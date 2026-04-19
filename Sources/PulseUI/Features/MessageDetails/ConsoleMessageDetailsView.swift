@@ -1,13 +1,13 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
-#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
+#if os(iOS) || os(tvOS) || os(macOS) || os(watchOS) || os(visionOS)
 
-@available(iOS 16, macOS 13, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 package struct ConsoleMessageDetailsView: View {
     package let message: LoggerMessageEntity
 
@@ -43,6 +43,18 @@ package struct ConsoleMessageDetailsView: View {
             }
         }
     }
+#elseif os(macOS)
+    package var body: some View {
+        contents
+            .inlineNavigationTitle("")
+            .toolbar {
+                ToolbarItemGroup(placement: .automatic) {
+                    NavigationLink(destination: ConsoleMessageMetadataView(message: message)) {
+                        Image(systemName: "info.circle")
+                    }
+                }
+            }
+    }
 #elseif os(tvOS)
     package var body: some View {
         contents
@@ -61,12 +73,10 @@ package struct ConsoleMessageDetailsView: View {
 }
 
 #if DEBUG
-@available(iOS 16, macOS 13, visionOS 1, *)
-struct ConsoleMessageDetailsView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            ConsoleMessageDetailsView(message: makeMockMessage())
-        }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        ConsoleMessageDetailsView(message: makeMockMessage())
     }
 }
 #endif

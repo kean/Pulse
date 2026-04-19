@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if !os(watchOS)
 
@@ -8,7 +8,7 @@ import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct NetworkInspectorTransactionView: View {
     @ObservedObject var viewModel: NetworkInspectorTransactionViewModel
 
@@ -36,7 +36,7 @@ struct NetworkInspectorTransactionView: View {
         NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
     }
 
-    @available(iOS 16, visionOS 1, *)
+    @available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
     private func transferSizeView(size: NetworkInspectorTransferInfoViewModel) -> some View {
         let font = TextHelper().font(style: .init(role: .subheadline, style: .monospacedDigital, width: .condensed))
         return (Text(Image(systemName: "arrow.down.circle")) +
@@ -92,23 +92,21 @@ package final class NetworkInspectorTransactionViewModel: ObservableObject, Iden
 }
 
 #if DEBUG
-@available(iOS 16, visionOS 1, *)
-struct NetworkInspectorTransactionView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            List {
-                ForEach(mockTask.orderedTransactions, id: \.index) {
-                    NetworkInspectorTransactionView(viewModel: .init(transaction: $0, task: mockTask))
-                }
-            }.frame(width: 600)
-        }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        List {
+            ForEach(mockTask.orderedTransactions, id: \.index) {
+                NetworkInspectorTransactionView(viewModel: .init(transaction: $0, task: mockTask))
+            }
+        }.frame(width: 600)
+    }
 #if os(macOS)
-            .frame(width: 1000, height: 1000)
+        .frame(width: 1000, height: 1000)
 #endif
 #if os(watchOS)
-        .navigationViewStyle(.stack)
+    .navigationViewStyle(.stack)
 #endif
-    }
 }
 
 private let mockTask = LoggerStore.preview.entity(for: .createAPI)

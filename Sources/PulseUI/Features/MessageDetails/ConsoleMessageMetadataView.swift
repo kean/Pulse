@@ -1,11 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
-@available(iOS 16, macOS 13, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct ConsoleMessageMetadataView: View {
     let message: LoggerMessageEntity
 
@@ -54,12 +54,10 @@ private extension String {
 }
 
 #if DEBUG
-@available(iOS 16, macOS 13, visionOS 1, *)
-struct ConsoleMessageMetadataView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            ConsoleMessageMetadataView(message: makeMockMessage())
-        }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        ConsoleMessageMetadataView(message: makeMockMessage())
     }
 }
 #endif

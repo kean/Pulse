@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS) || os(macOS) || os(visionOS)
 
@@ -28,28 +28,13 @@ package struct DateRangePicker: View {
     }
 #else
     package var body: some View {
-#if os(iOS) || os(visionOS)
-        if #available(iOS 16, *) {
-            ViewThatFits {
-                horizontal
-
-                VStack(alignment: .leading) {
-                    Text(title + " Date")
-                    contents
-                }
-            }
-        } else {
-            horizontal
-        }
-#else
         horizontal
-#endif
     }
 
     private var horizontal: some View {
-        HStack {
+        HStack(spacing: 0) {
             Text(title)
-            Spacer()
+            Spacer(minLength: 8)
             contents
         }
     }
@@ -70,7 +55,6 @@ package struct DateRangePicker: View {
             let binding = Binding(get: { date }, set: { self.date = $0 })
             DatePicker(title, selection: binding)
                 .environment(\.locale, Locale(identifier: "en_US"))
-                .fixedSize()
                 .labelsHidden()
             Button(action: { self.date = nil }) {
                 Image(systemName: "minus.circle.fill")

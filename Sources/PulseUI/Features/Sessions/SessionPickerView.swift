@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Pulse
@@ -10,7 +10,7 @@ import Combine
 
 #if os(iOS) || os(visionOS)
 
-@available(iOS 16, macOS 13, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct SessionPickerView: View {
     @Binding var selection: Set<UUID>
 

@@ -1,11 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 package struct NetworkRequestStatusCell: View {
     package let viewModel: NetworkRequestStatusCellModel
 
@@ -66,7 +66,7 @@ package struct NetworkRequestStatusCellModel {
     package let isMock: Bool
     fileprivate let duration: DurationViewModel?
 
-    package init(task: NetworkTaskEntity, store: LoggerStore?) {
+    package init(task: NetworkTaskEntity, store: LoggerStoreProtocol?) {
         self.status = StatusLabelViewModel(task: task, store: store)
         self.duration = DurationViewModel(task: task)
         self.isMock = task.isMocked
@@ -137,19 +137,17 @@ private let spacing: CGFloat? = nil
 #endif
 
 #if DEBUG
-@available(iOS 16, visionOS 1, *)
-struct NetworkRequestStatusCell_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            List {
-                ForEach(MockTask.allEntities, id: \.objectID) { task in
-                    NetworkRequestStatusCell(viewModel: .init(task: task, store: LoggerStore.mock))
-                }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        List {
+            ForEach(MockTask.allEntities, id: \.objectID) { task in
+                NetworkRequestStatusCell(viewModel: .init(task: task, store: LoggerStore.mock))
             }
-#if os(macOS)
-            .frame(width: 260)
-#endif
         }
+#if os(macOS)
+        .frame(width: 260)
+#endif
     }
 }
 #endif

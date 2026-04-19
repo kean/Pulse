@@ -1,12 +1,13 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(watchOS)
 
 import SwiftUI
 import Pulse
 
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 public struct SettingsView: View {
     private let store: LoggerStore
 
@@ -58,12 +59,11 @@ public struct SettingsView: View {
 }
 
 #if DEBUG
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            SettingsView(store: .mock)
-        }.navigationViewStyle(.stack)
-    }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        SettingsView(store: .mock)
+    }.navigationViewStyle(.stack)
 }
 #endif
 #endif

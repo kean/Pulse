@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 
@@ -103,6 +103,7 @@ package struct ShareView: View {
 #endif
 
 #if os(macOS)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 package struct ShareNetworkTaskView: View {
     @ObservedObject var task: NetworkTaskEntity
 
@@ -171,11 +172,10 @@ package struct ShareNetworkTaskView: View {
 }
 
 #if DEBUG
-struct Previews_ShareView_Previews: PreviewProvider {
-    static var previews: some View {
-        ShareNetworkTaskView(task: LoggerStore.demo.entity(for: .login))
-            .frame(height: 400)
-    }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    ShareNetworkTaskView(task: LoggerStore.demo.entity(for: .login))
+        .frame(height: 400)
 }
 #endif
 

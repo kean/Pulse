@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS) || os(macOS) || os(watchOS) || os(visionOS)
 
@@ -9,7 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
-@available(iOS 16, macOS 13, watchOS 9, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 package struct ShareStoreView: View {
     /// Preselected sessions.
     var sessions: Set<UUID> = []
@@ -19,7 +19,7 @@ package struct ShareStoreView: View {
     @State private var isShowingPreparingForShareView = false
     @StateObject private var viewModel = ShareStoreViewModel()
 
-    @Environment(\.store) private var store: LoggerStore
+    @Environment(\.store) private var store
 
     package init(sessions: Set<UUID> = [], onDismiss: @escaping () -> Void) {
         self.sessions = sessions
@@ -31,10 +31,10 @@ package struct ShareStoreView: View {
             .onAppear {
                 if !sessions.isEmpty {
                     viewModel.sessions = sessions
-                } else if viewModel.sessions.isEmpty {
-                    viewModel.sessions = [store.session.id]
+                } else if viewModel.sessions.isEmpty, let sessionID = store.currentSessionID {
+                    viewModel.sessions = [sessionID]
                 }
-                viewModel.store = store
+                viewModel.store = store as? LoggerStore
             }
     }
 
@@ -160,18 +160,16 @@ package struct ShareStoreView: View {
 }
 
 #if DEBUG
-@available(iOS 16, macOS 13, watchOS 9, visionOS 1, *)
-struct ShareStoreView_Previews: PreviewProvider {
-    static var previews: some View {
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
 #if os(iOS) || os(visionOS)
-        NavigationView {
-            ShareStoreView(onDismiss: {})
-        }
-#else
+    NavigationView {
         ShareStoreView(onDismiss: {})
-            .frame(width: 240).fixedSize()
-#endif
     }
+#else
+    ShareStoreView(onDismiss: {})
+        .frame(width: 240).fixedSize()
+#endif
 }
 #endif
 

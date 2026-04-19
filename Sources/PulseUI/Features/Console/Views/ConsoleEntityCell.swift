@@ -1,29 +1,43 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(tvOS) || os(visionOS) || os(watchOS)
+#if os(iOS) || os(tvOS) || os(macOS) || os(visionOS) || os(watchOS)
 
 import Foundation
 import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct ConsoleEntityCell: View {
     let entity: NSManagedObject
+    var urlMatch: ConsoleSearchMatch?
+
+    init(entity: NSManagedObject) {
+        self.entity = entity
+    }
+
+    consuming func urlMatch(_ match: ConsoleSearchMatch?) -> ConsoleEntityCell {
+        self.urlMatch = match
+        return self
+    }
 
     var body: some View {
-        switch LoggerEntity(entity) {
-        case .message(let message):
-            _ConsoleMessageCell(message: message)
-        case .task(let task):
-            _ConsoleTaskCell(task: task)
+        if entity.isDeleted {
+            EmptyView()
+        } else {
+            switch LoggerEntity(entity) {
+            case .message(let message):
+                _ConsoleMessageCell(message: message)
+            case .task(let task):
+                _ConsoleTaskCell(task: task, urlMatch: urlMatch)
+            }
         }
     }
 }
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 private struct _ConsoleMessageCell: View {
     let message: LoggerMessageEntity
 
@@ -59,9 +73,10 @@ private struct _ConsoleMessageCell: View {
     }
 }
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 private struct _ConsoleTaskCell: View {
     let task: NetworkTaskEntity
+    var urlMatch: ConsoleSearchMatch?
     @State private var shareItems: ShareItems?
     @State private var sharedTask: NetworkTaskEntity?
     @Environment(\.store) private var store
@@ -69,11 +84,11 @@ private struct _ConsoleTaskCell: View {
 
     var body: some View {
 #if os(iOS) || os(visionOS)
-        let cell = ConsoleTaskCell(task: task, isDisclosureNeeded: true)
+        let cell = ConsoleTaskCell(task: task, isDisclosureNeeded: true).urlMatch(urlMatch)
             .background(NavigationLink("", destination: inspector).opacity(0))
 #else
         let cell = NavigationLink(destination: inspector) {
-            ConsoleTaskCell(task: task)
+            ConsoleTaskCell(task: task).urlMatch(urlMatch)
         }
 #endif
 
@@ -95,6 +110,9 @@ private struct _ConsoleTaskCell: View {
 #else
             ContextMenu.NetworkTaskContextMenuItems(task: task, sharedTask: $sharedTask)
 #endif
+            if let custom = environment.delegate?.console(contextMenuFor: task) {
+                custom
+            }
         }
 #if os(iOS) || os(visionOS)
         .sheet(item: $shareItems, content: ShareView.init)

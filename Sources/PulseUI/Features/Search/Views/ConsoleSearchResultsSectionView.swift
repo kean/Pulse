@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -9,37 +9,55 @@ import Combine
 
 #if os(iOS) || os(visionOS)
 
-@available(iOS 16, visionOS 1, macOS 13, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct ConsoleSearchResultView: View {
     let viewModel: ConsoleSearchResultViewModel
-    var isSeparatorNeeded = false
 
     @ScaledMetric(relativeTo: .body) private var fontMultiplier = 1.0
     @ObservedObject private var settings: UserSettings = .shared
     @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
-        ConsoleEntityCell(entity: viewModel.entity)
-        ForEach(makeMatches(from: viewModel.occurrences)) { item in
+        let matches = makeMatches(from: viewModel.occurrences)
+        let urlMatch = viewModel.occurrences.first(where: { $0.scope == .url })?.match
+        ConsoleEntityCell(entity: viewModel.entity).urlMatch(urlMatch)
+            .tag(viewModel.entity.objectID)
+            .listRowInsets(EdgeInsets(top: 12, leading: 20, bottom: matches.isEmpty ? 12 : 6, trailing: 16))
+        ForEach(matches) { item in
             NavigationLink(destination: ConsoleSearchResultView.makeDestination(for: item.occurrence, entity: viewModel.entity).injecting(environment)) {
                 makeCell(for: item)
             }
-        }
-        if isSeparatorNeeded {
-            PlainListGroupSeparator()
+            .listRowInsets(
+                EdgeInsets(
+                    top: item.id != matches.first?.id ? 3 : 3,
+                    leading: 20,
+                    bottom: item.id != matches.last?.id ? 3 : 9,
+                    trailing: 12
+                )
+            )
+            .listRowSeparator(.hidden, edges: .top)
         }
     }
 
     @ViewBuilder
     private func makeCell(for item: ConsoleSearchResultsItem) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(item.title)
-                .font(detailsFont)
-                .foregroundColor(.secondary)
-            Text(item.occurrence.preview)
-                .font(contentFont)
-                .lineLimit(3)
-        }.padding(.vertical, 4)
+        HStack(alignment: .top, spacing: 10) {
+            RoundedRectangle(cornerRadius: 1)
+                .fill(Color.separator)
+                .frame(width: 2)
+                .clipShape(RoundedRectangle(cornerRadius: 2))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(item.caption)
+                    .font(.caption)
+                    .foregroundColor(.primary)
+                Text(item.occurrence.preview)
+                    .font(contentFont)
+                    .lineLimit(2)
+                    .truncationMode(.middle)
+
+            }
+        }
+        .padding(.vertical, 6)
     }
 
     @ViewBuilder
@@ -61,13 +79,13 @@ struct ConsoleSearchResultView: View {
     @ViewBuilder
     private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
         switch occurrence.scope {
-        case .originalRequestHeaders, .currentRequestHeaders, .responseHeaders:
+        case .requestHeaders, .responseHeaders:
             EmptyView() // Reserved
         case .requestBody:
             NetworkInspectorRequestBodyView(viewModel: .init(task: task))
         case .responseBody:
             NetworkInspectorResponseBodyView(viewModel: .init(task: task))
-        case .url, .message, .metadata:
+        case .url, .query, .message, .metadata:
             EmptyView()
         }
     }
@@ -76,14 +94,9 @@ struct ConsoleSearchResultView: View {
         let baseSize = CGFloat(settings.listDisplayOptions.content.fontSize)
         return Font.system(size: baseSize * fontMultiplier)
     }
-
-    private var detailsFont: Font {
-        let baseSize = CGFloat(settings.listDisplayOptions.header.fontSize)
-        return Font.system(size: baseSize * fontMultiplier).monospacedDigit()
-    }
 }
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 private func makeMatches(from occurrences: [ConsoleSearchOccurrence]) -> [ConsoleSearchResultsItem] {
     var items: [ConsoleSearchResultsItem] = []
     var index = 0
@@ -109,23 +122,23 @@ private func makeMatches(from occurrences: [ConsoleSearchOccurrence]) -> [Consol
     return items
 }
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct ConsoleSearchResultsItem: Identifiable {
     var id: ConsoleSearchOccurrence { occurrence }
     let totalCount: Int
     let occurrence: ConsoleSearchOccurrence
 
-    var title: String {
+    var caption: String {
         let suffix: String
         if totalCount == 1 {
             suffix = ""
         } else if totalCount < ConsoleSearchMatch.limit {
-            suffix = " (\(totalCount) matches)"
+            suffix = " · \(totalCount) matches"
         } else {
-            // we know there is 6, showin
-            suffix = " (\(ConsoleSearchMatch.limit-1)+ matches)"
+            suffix = " · \(ConsoleSearchMatch.limit-1)+ matches"
         }
-        return "\(occurrence.scope.title)\(suffix)"
+        let location = "(\(occurrence.line + 1):\(occurrence.range.location + 1))"
+        return "\(occurrence.scope.title) \(location)\(suffix)"
     }
 }
 
@@ -133,7 +146,7 @@ struct ConsoleSearchResultsItem: Identifiable {
 
 #if os(iOS) || os(visionOS) || os(macOS)
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 package struct PlainListGroupSeparator: View {
     package init() {}
 
@@ -146,7 +159,7 @@ package struct PlainListGroupSeparator: View {
     }
 }
 
-@available(iOS 16, macOS 13, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 package struct PlainListSectionHeader<Content: View>: View {
     package var title: String?
     @ViewBuilder package let content: () -> Content
@@ -179,7 +192,7 @@ package struct PlainListSectionHeader<Content: View>: View {
     }
 }
 
-@available(iOS 16, macOS 13, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 extension PlainListSectionHeader where Content == Text {
     init(title: String) {
         self.init(title: title, content: { Text(title) })

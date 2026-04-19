@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import CoreData
@@ -8,7 +8,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, ConsoleEntitiesSource {
+final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 #if os(iOS) || os(visionOS)
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
 #else
@@ -17,7 +17,14 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     @Published private(set) var entities: [NSManagedObject] = []
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
 
+    /// Names of grouped sections the user has collapsed. Restored per
+    /// `(mode, groupBy)` from on-disk cache when the data source is rebuilt.
+    @Published var collapsedSections: Set<String> = []
+
     @Published private(set) var mode: ConsoleMode
+
+    private var currentGroupByKey: String?
+    private let collapsedSectionsCache = CollapsedSectionsCache.shared
 
     var isViewVisible = false {
         didSet {
@@ -31,6 +38,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     }
 
     @Published private(set) var previousSession: LoggerSessionEntity?
+    @Published private(set) var allSessionsCount: Int = 0
 
     let events = PassthroughSubject<ConsoleUpdateEvent, Never>()
 
@@ -41,11 +49,11 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 #endif
 
-    private let store: LoggerStore
+    private let store: LoggerStoreProtocol
     private let environment: ConsoleEnvironment
     private let filters: ConsoleFiltersViewModel
     private let sessions: ManagedObjectsObserver<LoggerSessionEntity>
-    private var dataSource: ConsoleDataSource?
+    @Published package private(set) var dataSource: ConsoleDataSource?
     private var cancellables: [AnyCancellable] = []
     private var filtersCancellable: AnyCancellable?
 
@@ -55,12 +63,14 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         self.mode = environment.mode
         self.filters = filters
         self.sessions = .sessions(for: store.viewContext)
+        self.allSessionsCount = self.sessions.objects.count
 
         $entities.sink { [weak self] in
             self?.filters.entities.send($0)
         }.store(in: &cancellables)
 
         sessions.$objects.dropFirst().sink { [weak self] in
+            self?.allSessionsCount = $0.count
             self?.refreshPreviousSessionButton(sessions: $0)
         }.store(in: &cancellables)
 
@@ -83,18 +93,55 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     private func resetDataSource(options: ConsoleListOptions) {
         dataSource = ConsoleDataSource(store: store, mode: mode, options: options)
         dataSource?.delegate = self
+        let groupByKey = Self.groupByKey(mode: mode, options: options)
+        currentGroupByKey = groupByKey
+        collapsedSections = collapsedSectionsCache.sections(forKey: groupByKey)
         filtersCancellable = filters.$options.sink { [weak self] in
             self?.dataSource?.predicate = $0
         }
     }
 
+    // MARK: Collapsible Sections
+
+    func toggleSection(_ name: String) {
+        if collapsedSections.contains(name) {
+            collapsedSections.remove(name)
+        } else {
+            collapsedSections.insert(name)
+        }
+        if let key = currentGroupByKey {
+            collapsedSectionsCache.setSections(collapsedSections, forKey: key)
+        }
+    }
+
+    func collapseAllSections() {
+        collapsedSections = Set((sections ?? []).map(\.name))
+    }
+
+    func expandAllSections() {
+        collapsedSections.removeAll()
+    }
+
+    private static func groupByKey(mode: ConsoleMode, options: ConsoleListOptions) -> String {
+        let groupBy: String
+        switch mode {
+        case .all, .logs: groupBy = options.messageGroupBy.rawValue
+        case .network: groupBy = options.taskGroupBy.rawValue
+        }
+        return "\(mode.rawValue):\(groupBy)"
+    }
+
     func buttonShowPreviousSessionTapped(for session: LoggerSessionEntity) {
-        filters.criteria.shared.sessions.selection.insert(session.id)
+        filters.sessions.insert(session.id)
         refreshPreviousSessionButton(sessions: self.sessions.objects)
     }
 
     private func refreshPreviousSessionButton(sessions: [LoggerSessionEntity]) {
-        let selection = filters.criteria.shared.sessions.selection
+        let selection = filters.sessions
+        guard !selection.isEmpty else {
+            previousSession = nil
+            return
+        }
         let isDisplayingPrefix = sessions.prefix(selection.count).allSatisfy {
             selection.contains($0.id)
         }
@@ -112,6 +159,8 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         guard isViewVisible else { return }
 
         entities = dataSource.entities
+        sections = dataSource.sections
+        refreshPreviousSessionButton(sessions: sessions.objects)
 #if os(iOS) || os(visionOS)
         refreshVisibleEntities()
 #endif
@@ -120,12 +169,17 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
 
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
         entities = dataSource.entities
+        sections = dataSource.sections
 #if os(iOS) || os(visionOS)
         if scrollPosition == .nearTop {
             refreshVisibleEntities()
         }
 #endif
         events.send(.update(diff))
+    }
+
+    func name(for section: NSFetchedResultsSectionInfo) -> String {
+        dataSource?.name(for: section) ?? ""
     }
 
     // MARK: Visible Entities

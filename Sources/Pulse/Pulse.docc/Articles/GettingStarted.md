@@ -16,7 +16,7 @@ Add **Pulse** and **PulseUI** libraries to your app.
 
 ## 2. Integrate Pulse Framework
 
-**Pulse** framework contains APIs for logging, capturing, and mocking network requests, as well as connecting to the Pulse Pro apps.
+**Pulse** framework contains APIs for logging, capturing, and mocking network requests, as well as connecting to the Pulse Pro apps.
 
 ### 2.1. Capture Network Requests
 
@@ -44,7 +44,7 @@ NetworkLogger.enableProxy()
 #endif
 ```
 
-> important: **PulseProxy** uses swizzling and private APIs and it is not recommended that you include it in the production builds of your app.
+> important: **PulseProxy** uses method swizzling and private APIs, and it is not recommended that you include it in the production builds of your app. It is also not guaranteed to continue working with new versions of the system SDKs.
 
 ### 2.2. Collect Logs
 
@@ -79,7 +79,7 @@ NavigationLink(destination: ConsoleView()) {
 
 ## 4. Get Pulse Apps
 
-Pulse also provides separate indispensable [macOS and iOS apps](https://pulselogger.com) that you can use to view logs collected by the Pulse SDK and even debug your apps in real-time with features like response mocking. The app are [available on the App Store](https://apps.apple.com/us/app/pulse-network-logger/id6661031747).
+Pulse also provides separate, indispensable [macOS and iOS apps](https://pulselogger.com) that you can use to view logs collected by the Pulse SDK and even debug your apps in real-time with features like response mocking. The apps are [available on the App Store](https://apps.apple.com/us/app/pulse-network-logger/id6661031747).
 
 The apps require two more simple configuration steps.
 

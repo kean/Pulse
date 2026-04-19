@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Pulse
@@ -61,7 +61,7 @@ package enum ShareService {
         return share(string, as: output)
     }
 
-    package static func share(_ task: NetworkTaskEntity, as output: ShareOutput, store: LoggerStore) -> ShareItems {
+    package static func share(_ task: NetworkTaskEntity, as output: ShareOutput, store: LoggerStoreProtocol) -> ShareItems {
         let string = TextRenderer(options: .sharing).make { $0.render(task, content: .sharing, store: store) }
         return share(string, as: output)
     }

@@ -1,16 +1,20 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
 #if os(watchOS) || os(macOS)
 
-struct RichTextView: View {
+public struct RichTextView: View {
     let viewModel: RichTextViewModel
 
-    var body: some View {
+    public init(viewModel: RichTextViewModel) {
+        self.viewModel = viewModel
+    }
+
+    public var body: some View {
         ScrollView {
             if let string = viewModel.attributedString {
                 Text(string)

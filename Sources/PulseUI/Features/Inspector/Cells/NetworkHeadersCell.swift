@@ -1,12 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
-
-#if !os(macOS)
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct NetworkHeadersCell: View {
     let viewModel: NetworkHeadersCellViewModel
 
@@ -49,22 +48,19 @@ struct NetworkHeadersCellViewModel {
 }
 
 #if DEBUG
-struct NetworkHeadersCell_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            List {
-                ForEach(MockTask.allEntities, id: \.objectID) { task in
-                    Section {
-                        Text(task.url ?? "–")
-                        NetworkHeadersCell(viewModel: .init(title: "Original Request Headers", headers: task.originalRequest?.headers))
-                        NetworkHeadersCell(viewModel: .init(title: "Current Request Headers", headers: task.currentRequest?.headers))
-                        NetworkHeadersCell(viewModel: .init(title: "Response Headers", headers: task.response?.headers))
-                    }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        List {
+            ForEach(MockTask.allEntities, id: \.objectID) { task in
+                Section {
+                    Text(task.url ?? "–")
+                    NetworkHeadersCell(viewModel: .init(title: "Original Request Headers", headers: task.originalRequest?.headers))
+                    NetworkHeadersCell(viewModel: .init(title: "Current Request Headers", headers: task.currentRequest?.headers))
+                    NetworkHeadersCell(viewModel: .init(title: "Response Headers", headers: task.response?.headers))
                 }
             }
         }
     }
 }
-#endif
-
 #endif

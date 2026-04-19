@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS) || os(visionOS)
 
@@ -10,24 +10,30 @@ import Foundation
 import SwiftUI
 import Pulse
 
-struct DecodingErrors_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            fileViewer(error: typeMismatchError())
-                .previewDisplayName("Type Mismatch (Object)")
-            fileViewer(error: typeMismatchErrorInArray())
-                .previewDisplayName("Type Mismatch (Array)")
-            fileViewer(error: valueNotFound())
-                .previewDisplayName("Value Not Found")
-            fileViewer(error: keyNotFound())
-                .previewDisplayName("Key Not Found")
-            fileViewer(error: dataCorrupted())
-                .previewDisplayName("Data Corrupted")
-        }
-    }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("Type Mismatch (Object)") {
+    fileViewer(error: typeMismatchError())
+}
 
-    @ViewBuilder
-    private static func fileViewer(error: NetworkLogger.DecodingError) -> some View {
+#Preview("Type Mismatch (Array)") {
+    fileViewer(error: typeMismatchErrorInArray())
+}
+
+#Preview("Value Not Found") {
+    fileViewer(error: valueNotFound())
+}
+
+#Preview("Key Not Found") {
+    fileViewer(error: keyNotFound())
+}
+
+#Preview("Data Corrupted") {
+    fileViewer(error: dataCorrupted())
+}
+
+@ViewBuilder
+private func fileViewer(error: NetworkLogger.DecodingError) -> some View {
+    if #available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *) {
         let viewer = FileViewer(viewModel: .init(title: "Response", context: .init(contentType: .init(rawValue: "application/json"), originalSize: 1200, error: error), data: { MockJSON.allPossibleValues }))
         NavigationView {
             viewer

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Pulse
@@ -151,6 +151,8 @@ extension NetworkTaskEntity {
             case .taskDescription: return "Task Description"
             case .requestHeaderField(let name): return name
             case .responseHeaderField(let name): return name
+            case .url: return "URL"
+            case .custom: return "Custom"
             }
         }
     }
@@ -165,9 +167,9 @@ extension NetworkTaskEntity {
         case .method:
             httpMethod
         case .requestSize:
-            byteCount(for: requestBodySize)
+            formattedRequestBodySize()
         case .responseSize:
-            byteCount(for: responseBodySize)
+            formattedResponseBodySize()
         case .responseContentType:
             responseContentType.map(NetworkLogger.ContentType.init)?.lastComponent.uppercased()
         case .duration:
@@ -184,6 +186,14 @@ extension NetworkTaskEntity {
             (currentRequest?.headers ?? [:])[key]
         case .responseHeaderField(let key):
             (response?.headers ?? [:])[key]
+        case .url(let components):
+            if let components {
+                formattedURL(components: components)
+            } else {
+                url
+            }
+        case .custom(let value):
+            value
         }
     }
 
@@ -198,20 +208,37 @@ extension NetworkTaskEntity {
     }
 
     package func getFormattedContent(settings: ConsoleListDisplaySettings.ContentSettings) -> String? {
+        if let customText = settings.customText {
+            return customText
+        }
         if settings.showTaskDescription, let taskDescription, !taskDescription.isEmpty {
             return taskDescription
         }
-        guard let url else {
+        guard url != nil else {
             return nil
         }
-        return NetworkTaskEntity.formattedURL(url, components:  settings.components)
+        return formattedURL(components: settings.components)
+    }
+
+    package func formattedURL(components displayed: Set<ConsoleListDisplaySettings.URLComponent>) -> String? {
+        let key = AnyHashable(displayed)
+        if let cache = cachedFormattedURL, cache.key == key {
+            return cache.value
+        }
+        let value = NetworkTaskEntity.formattedURL(parsed: parsedURLComponents, displayed: displayed)
+        cachedFormattedURL = (key, value)
+        return value
     }
 
     package static func formattedURL(_ url: String, components displayed: Set<ConsoleListDisplaySettings.URLComponent>) -> String? {
+        formattedURL(parsed: URLComponents(string: url), displayed: displayed)
+    }
+
+    fileprivate static func formattedURL(parsed: URLComponents?, displayed: Set<ConsoleListDisplaySettings.URLComponent>) -> String? {
         guard !displayed.isEmpty else {
             return nil
         }
-        guard var components = URLComponents(string: url) else {
+        guard var components = parsed else {
             return nil
         }
         if displayed.count == 1 && displayed.first == .path {
@@ -235,6 +262,26 @@ extension NetworkTaskEntity {
             string.removeFirst(2)
         }
         return string
+    }
+
+    fileprivate func formattedRequestBodySize() -> String {
+        let size = requestBodySize
+        if let cache = cachedFormattedRequestBodySize, cache.size == size {
+            return cache.value
+        }
+        let value = byteCount(for: size)
+        cachedFormattedRequestBodySize = (size, value)
+        return value
+    }
+
+    fileprivate func formattedResponseBodySize() -> String {
+        let size = responseBodySize
+        if let cache = cachedFormattedResponseBodySize, cache.size == size {
+            return cache.value
+        }
+        let value = byteCount(for: size)
+        cachedFormattedResponseBodySize = (size, value)
+        return value
     }
 }
 

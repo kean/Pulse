@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(tvOS)
 
@@ -16,7 +16,8 @@ public struct SettingsView: View {
 
     public var body: some View {
         Form {
-            if !UserSettings.shared.isRemoteLoggingHidden,
+            if #available(tvOS 18, *),
+                !UserSettings.shared.isRemoteLoggingHidden,
                 store === RemoteLogger.shared.store {
                 RemoteLoggerSettingsView(viewModel: .shared)
             }
@@ -39,12 +40,10 @@ public struct SettingsView: View {
 }
 
 #if DEBUG
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            SettingsView(store: .mock)
-        }.navigationViewStyle(.stack)
-    }
+#Preview {
+    NavigationView {
+        SettingsView(store: .mock)
+    }.navigationViewStyle(.stack)
 }
 #endif
 #endif

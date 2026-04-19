@@ -1,10 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 package struct NetworkDetailsView: View {
     private var title: String
     private let viewModel: NetworkDetailsViewModel?
@@ -31,9 +32,7 @@ package struct NetworkDetailsView: View {
     @ViewBuilder
     private var contents: some View {
         if let viewModel = viewModel?.text, !viewModel.isEmpty {
-#if !os(macOS)
             RichTextView(viewModel: viewModel)
-#endif
         } else {
             PlaceholderView(imageName: "nosign", title: "Empty")
         }

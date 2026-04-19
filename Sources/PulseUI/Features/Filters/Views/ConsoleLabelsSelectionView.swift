@@ -1,17 +1,15 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 import Combine
 
-#if !os(macOS)
-
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct ConsoleLabelsSelectionView: View {
     @ObservedObject var viewModel: ConsoleFiltersViewModel
-    @EnvironmentObject private var index: LoggerStoreIndex
+    @ObservedObject var index: LoggerStoreIndex
 
     var body: some View {
         ConsoleSearchListSelectionView(
@@ -24,8 +22,6 @@ struct ConsoleLabelsSelectionView: View {
         )
     }
 }
-
-#endif
 
 extension ConsoleFiltersViewModel {
     package func bindingForSelectedLabels(index: LoggerStoreIndex) -> Binding<Set<String>> {

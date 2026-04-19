@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 
@@ -51,7 +51,9 @@ var isAutomaticNetworkLoggingEnabled: Bool {
 }
 
 func isConfiguringSessionSafe(delegate: URLSessionDelegate?) -> Bool {
-    if String(describing: delegate).contains("GTMSessionFetcher") {
+    guard let delegate else { return true }
+    let className = NSStringFromClass(type(of: delegate))
+    if className.contains("GTMSessionFetcher") {
         return false
     }
     return true

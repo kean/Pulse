@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 
@@ -23,7 +23,7 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
         /// The line limit for messages in the console. By default, `1`.
         public var lineLimit: Int
 
-        /// Additinoal fields to display below the in the header.
+        /// Additional fields to display below the in the header.
         public var fields: [TaskField]
 
         public init(fontSize: Int? = nil, lineLimit: Int = 1, fields: [TaskField]? = nil) {
@@ -65,18 +65,26 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
         /// If enabled, use monospaced font to display the content.
         public var isMonospaced = false
 
+        /// A caller-supplied string rendered verbatim in place of the default
+        /// method + URL content. When set, ``showMethod`` and ``components``
+        /// are ignored. Typically produced by a ``ConsoleDelegate`` that
+        /// derives per-task content (e.g., a GraphQL operation name).
+        public var customText: String?
+
         public init(
             showTaskDescription: Bool = false,
             showMethod: Bool = true,
             components: Set<URLComponent> = [.path],
             fontSize: Int? = nil,
-            lineLimit: Int = 3
+            lineLimit: Int = 3,
+            customText: String? = nil
         ) {
             self.showTaskDescription = showTaskDescription
             self.showMethod = showMethod
             self.components = components
             self.fontSize = fontSize ?? ConsoleListDisplaySettings.defaultContentFontSize
             self.lineLimit = lineLimit
+            self.customText = customText
         }
     }
 
@@ -103,7 +111,7 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
         }
     }
 
-    public enum URLComponent: String, CaseIterable, Codable {
+    public enum URLComponent: String, Sendable, CaseIterable, Codable {
         case scheme, user, password, host, port, path, query, fragment
     }
 
@@ -119,6 +127,13 @@ public struct ConsoleListDisplaySettings: Hashable, Codable {
         case taskDescription
         case requestHeaderField(String)
         case responseHeaderField(String)
+        /// A specific URL component (e.g., `.path`, `.host`). When `nil`, the
+        /// full URL string is rendered.
+        case url(components: Set<URLComponent>? = nil)
+        /// A caller-supplied string rendered verbatim. Typically produced by a
+        /// ``ConsoleDelegate`` that derives per-task information (e.g., a
+        /// GraphQL operation name) and embeds it in the header or footer.
+        case custom(String)
     }
 
     public init() {}

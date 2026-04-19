@@ -1,11 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Network
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct RemoteLoggerErrorView: View {
     let error: NWError
 
@@ -55,7 +55,7 @@ private struct RemoteLoggerPolicyDeniedView: View {
     }
 }
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 private struct RemoteLoggerNoAuthView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -93,16 +93,14 @@ private let plistContents = """
 """
 
 #if DEBUG
-@available(iOS 16, visionOS 1, *)
-struct Previews_RemoteLoggerNoAuthView_Previews: PreviewProvider {
-    static var previews: some View {
-        Form {
-            Section {
-                RemoteLoggerPolicyDeniedView()
-            }
-            Section {
-                RemoteLoggerNoAuthView()
-            }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    Form {
+        Section {
+            RemoteLoggerPolicyDeniedView()
+        }
+        Section {
+            RemoteLoggerNoAuthView()
         }
     }
 }

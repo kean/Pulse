@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Pulse
@@ -89,7 +89,7 @@ package final class TextRenderer {
         }
     }
 
-    package func render(_ task: NetworkTaskEntity, content: NetworkContent, store: LoggerStore) {
+    package func render(_ task: NetworkTaskEntity, content: NetworkContent, store: LoggerStoreProtocol) {
         if content.contains(.largeHeader) {
             renderLargeHeader(for: task, store: store)
         } else if content.contains(.header) {
@@ -161,7 +161,7 @@ package final class TextRenderer {
         string.deleteCharacters(in: NSRange(location: string.length - 1, length: 1))
     }
 
-    private func renderLargeHeader(for task: NetworkTaskEntity, store: LoggerStore) {
+    private func renderLargeHeader(for task: NetworkTaskEntity, store: LoggerStoreProtocol) {
         let status = NetworkRequestStatusCellModel(task: task, store: store)
 
         let suffix = status.isMock ? " (mock)" : ""
@@ -174,7 +174,7 @@ package final class TextRenderer {
         addSpacer()
     }
 
-    private func renderHeader(for task: NetworkTaskEntity, store: LoggerStore) {
+    private func renderHeader(for task: NetworkTaskEntity, store: LoggerStoreProtocol) {
         let isTitleColored = task.state == .failure && options.color != .monochrome
         let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
         let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
@@ -186,7 +186,7 @@ package final class TextRenderer {
         addSpacer()
     }
 
-    package func renderCompact(_ task: NetworkTaskEntity, store: LoggerStore) {
+    package func renderCompact(_ task: NetworkTaskEntity, store: LoggerStoreProtocol) {
         let isTitleColored = task.state == .failure && options.color != .monochrome
         let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
         let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
@@ -419,52 +419,64 @@ extension NSAttributedString.Key {
 // MARK: - Previews
 
 #if DEBUG && !os(macOS)
-struct ConsoleTextRenderer_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            let string = TextRenderer(options: .sharing).make {
-                $0.render(task, content: .sharing, store: .mock)
-            }
-            let stringWithColor = TextRenderer(options: .init(color: .full)).make {
-                $0.render(task, content: .all, store: .mock)
-            }
-            let html = try! TextUtilities.html(from: TextRenderer(options: .sharing).make {
-                $0.render(task, content: .sharing, store: .mock)
-            })
+private let _previewTask = LoggerStore.preview.entity(for: .login)
 
-            RichTextView(viewModel: .init(string: string))
-                .previewDisplayName("Task")
-
-            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task, content: .sharing, store: .mock) }))
-                .previewDisplayName("Task (Share)")
-
-            RichTextView(viewModel: .init(string: stringWithColor))
-                .previewDisplayName("Task (Color)")
-
-            RichTextView(viewModel: .init(string: NSAttributedString(string: ShareStoreTask(entities: try! LoggerStore.mock.messages(), store: .mock, output: .plainText, completion: { _ in }).share().items[0] as! String)))
-                .previewDisplayName("Task (Plain)")
-
-            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task.orderedTransactions[0]) }))
-                .previewDisplayName("Transaction")
-
-            RichTextView(viewModel: .init(string: TextRendererHTML(html: String(data: html, encoding: .utf8)!).render()))
-                .previewLayout(.fixed(width: 1160, height: 2000)) // Disable interaction to view it
-                .previewDisplayName("HTML (Raw)")
-
-#if os(iOS)
-            WebView(data: html, contentType: "application/html")
-                .edgesIgnoringSafeArea([.bottom])
-                .previewDisplayName("HTML")
-
-            PDFKitRepresentedView(document: PDFDocument(data: try! TextUtilities.pdf(from: string))!)
-                .edgesIgnoringSafeArea([.all])
-                .previewDisplayName("PDF")
-#endif
-        }
-    }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("Task") {
+    RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make {
+        $0.render(_previewTask, content: .sharing, store: LoggerStore.mock)
+    }))
 }
 
-private let task = LoggerStore.preview.entity(for: .login)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("Task (Share)") {
+    RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(_previewTask, content: .sharing, store: LoggerStore.mock) }))
+}
+
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("Task (Color)") {
+    RichTextView(viewModel: .init(string: TextRenderer(options: .init(color: .full)).make {
+        $0.render(_previewTask, content: .all, store: LoggerStore.mock)
+    }))
+}
+
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("Task (Plain)") {
+    RichTextView(viewModel: .init(string: NSAttributedString(string: ShareStoreTask(entities: try! LoggerStore.mock.messages(), store: .mock, output: .plainText, completion: { _ in }).share().items[0] as! String)))
+}
+
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("Transaction") {
+    RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(_previewTask.orderedTransactions[0]) }))
+}
+
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("HTML (Raw)", traits: .fixedLayout(width: 1160, height: 2000)) {
+    let html = try! TextUtilities.html(from: TextRenderer(options: .sharing).make {
+        $0.render(_previewTask, content: .sharing, store: LoggerStore.mock)
+    })
+    RichTextView(viewModel: .init(string: TextRendererHTML(html: String(data: html, encoding: .utf8)!).render()))
+}
+
+#if os(iOS)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("HTML") {
+    let html = try! TextUtilities.html(from: TextRenderer(options: .sharing).make {
+        $0.render(_previewTask, content: .sharing, store: LoggerStore.mock)
+    })
+    WebView(data: html, contentType: "application/html")
+        .edgesIgnoringSafeArea([.bottom])
+}
+
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("PDF") {
+    let string = TextRenderer(options: .sharing).make {
+        $0.render(_previewTask, content: .sharing, store: LoggerStore.mock)
+    }
+    PDFKitRepresentedView(document: PDFDocument(data: try! TextUtilities.pdf(from: string))!)
+        .edgesIgnoringSafeArea([.all])
+}
+#endif
 #endif
 
 package struct NetworkContent: OptionSet {

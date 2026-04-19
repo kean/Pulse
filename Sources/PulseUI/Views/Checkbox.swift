@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 
@@ -38,14 +38,12 @@ extension Checkbox where Label == Text {
 }
 
 #if DEBUG
-struct Previews_CheckboxView_Previews: PreviewProvider {
-    static var previews: some View {
-        List {
-            Checkbox("Checkbox", isOn: .constant(true)).disabled(false)
-            Checkbox("Checkbox", isOn: .constant(false)).disabled(false)
-            Checkbox("Checkbox", isOn: .constant(true)).disabled(true)
-            Checkbox("Checkbox", isOn: .constant(false)).disabled(true)
-        }
+#Preview {
+    List {
+        Checkbox("Checkbox", isOn: .constant(true)).disabled(false)
+        Checkbox("Checkbox", isOn: .constant(false)).disabled(false)
+        Checkbox("Checkbox", isOn: .constant(true)).disabled(true)
+        Checkbox("Checkbox", isOn: .constant(false)).disabled(true)
     }
 }
 #endif

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import CoreData
@@ -46,6 +46,12 @@ extension LoggerStore {
         /// There is no need to pass the ``create`` option. The ``sweep`` option
         /// will still work with the in-memory store.
         public static let inMemory = Options(rawValue: 1 << 4)
+
+        /// Disables SQLite durability features (WAL, fsync, shared locking)
+        /// in favor of raw write speed. Intended for one-shot bulk ingestion
+        /// — mock data generation, imports — where crash safety does not
+        /// matter. A crash mid-write may leave the store corrupted.
+        package static let unsafe = Options(rawValue: 1 << 5)
     }
 
     /// The store configuration.
@@ -81,7 +87,7 @@ extension LoggerStore {
         /// value is `8 MB`. The same limit applies to requests.
         public var responseBodySizeLimit: Int = 8 * 1048576
 
-        var inlineLimit = 16384 // 16 KB
+        package var inlineLimit = 16384 // 16 KB
 
         /// By default, two weeks. The messages and requests that are older that
         /// two weeks will get automatically deleted.

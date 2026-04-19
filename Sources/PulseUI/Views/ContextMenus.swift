@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS) || os(macOS) || os(visionOS)
 
@@ -10,7 +10,7 @@ import Combine
 import CoreData
 
 package enum ContextMenu {
-    @available(iOS 16, visionOS 1, *)
+    @available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
     package struct MessageContextMenu: View {
         package let message: LoggerMessageEntity
 
@@ -260,7 +260,7 @@ package struct StringSearchOptionsMenu: View {
 }
 
 #if os(iOS) || os(visionOS)
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct OpenOnMacOverlay: View {
     let entity: NSManagedObject
     @ObservedObject var logger: RemoteLogger = .shared
@@ -336,24 +336,22 @@ package struct AttributedStringShareMenu: View {
 }
 
 #if DEBUG
-struct StringSearchOptionsMenu_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(spacing: 32) {
-            Spacer()
-            Menu(content: {
-                AttributedStringShareMenu(shareItems: .constant(nil)) {
-                    TextRenderer(options: .sharing).make { $0.render(LoggerStore.preview.entity(for: .login), content: .sharing, store: .mock) }
-                }
-            }) {
-                Text("Attributed String Share")
+#Preview {
+    VStack(spacing: 32) {
+        Spacer()
+        Menu(content: {
+            AttributedStringShareMenu(shareItems: .constant(nil)) {
+                TextRenderer(options: .sharing).make { $0.render(LoggerStore.preview.entity(for: .login), content: .sharing, store: LoggerStore.mock) }
             }
-            Menu(content: {
-                Section(header: Label("Search Options", systemImage: "magnifyingglass")) {
-                    StringSearchOptionsMenu(options: .constant(.default))
-                }
-            }) {
-                Text("Search Options")
+        }) {
+            Text("Attributed String Share")
+        }
+        Menu(content: {
+            Section(header: Label("Search Options", systemImage: "magnifyingglass")) {
+                StringSearchOptionsMenu(options: .constant(.default))
             }
+        }) {
+            Text("Search Options")
         }
     }
 }

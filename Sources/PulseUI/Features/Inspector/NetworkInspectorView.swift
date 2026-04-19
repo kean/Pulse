@@ -1,21 +1,22 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(visionOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
 
-@available(iOS 16, visionOS 1, macOS 13, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 package struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
 
     @State private var shareItems: ShareItems?
     @State private var sharedTask: NetworkTaskEntity?
     @ObservedObject private var settings: UserSettings = .shared
+    @EnvironmentObject private var environment: ConsoleEnvironment
     @Environment(\.store) private var store
 
     package init(task: NetworkTaskEntity) {
@@ -27,11 +28,15 @@ package struct NetworkInspectorView: View {
             contents
         }
         .animation(.default, value: task.state)
+#if os(iOS) || os(visionOS)
         .listStyle(.insetGrouped)
         .safeAreaInset(edge: .bottom) {
             OpenOnMacOverlay(entity: task)
         }
-        .inlineNavigationTitle(task.getShortTitle(options: settings.listDisplayOptions))
+#else
+        .listStyle(.inset)
+#endif
+        .inlineNavigationTitle(environment.shortTitle(for: task))
         .sheet(item: $shareItems, content: ShareView.init)
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
@@ -60,6 +65,9 @@ package struct NetworkInspectorView: View {
                 NetworkCURLCell(task: task)
             }
         }
+        if let custom = environment.delegate?.console(inspectorViewFor: task) {
+            custom
+        }
     }
 
     @ViewBuilder
@@ -78,6 +86,7 @@ package struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
+#if os(iOS) || os(visionOS)
         Menu(content: {
             AttributedStringShareMenu(shareItems: $shareItems) {
                 TextRenderer(options: .sharing).make {
@@ -92,26 +101,40 @@ package struct NetworkInspectorView: View {
         })
         Menu(content: {
             ContextMenu.NetworkTaskContextMenuItems(task: task, sharedItems: $shareItems, isDetailsView: true)
+            if let custom = environment.delegate?.console(contextMenuFor: task) {
+                custom
+            }
         }, label: {
-            Image(systemName: "ellipsis.circle")
+            Image(systemName: "ellipsis")
         })
+#else
+        Menu(content: {
+            ContextMenu.NetworkTaskContextMenuItems(task: task, sharedTask: $sharedTask, isDetailsView: true)
+            if let custom = environment.delegate?.console(contextMenuFor: task) {
+                custom
+            }
+        }, label: {
+            Image(systemName: "ellipsis")
+        })
+#endif
     }
 }
 
 #if DEBUG
-@available(iOS 16, visionOS 1, macOS 13, *)
-struct NetworkInspectorView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            NavigationView {
-                NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
-            }.previewDisplayName("Success")
-
-            NavigationView {
-                NetworkInspectorView(task: LoggerStore.preview.entity(for: .patchRepo))
-            }.previewDisplayName("Failure")
-        }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("Success") {
+    NavigationView {
+        NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
     }
+    .injecting(ConsoleEnvironment(store: LoggerStore.preview))
+}
+
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("Failure") {
+    NavigationView {
+        NetworkInspectorView(task: LoggerStore.preview.entity(for: .patchRepo))
+    }
+    .injecting(ConsoleEnvironment(store: LoggerStore.preview))
 }
 #endif
 

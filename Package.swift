@@ -13,14 +13,12 @@ let package = Package(
     products: [
         .library(name: "Pulse", targets: ["Pulse"]),
         .library(name: "PulseProxy", targets: ["PulseProxy"]),
-        .library(name: "PulseUI", targets: ["PulseUI"])
+        .library(name: "PulseUI", targets: ["PulseUI"]),
     ],
     targets: [
-        .target(name: "Pulse"),
+        .target(name: "Pulse", dependencies: ["PulseObjCHelpers"]),
         .target(name: "PulseProxy", dependencies: ["Pulse"]),
         .target(name: "PulseUI", dependencies: ["Pulse"]),
-    ],
-    swiftLanguageVersions: [
-      .v5
+        .target(name: "PulseObjCHelpers"),
     ]
 )

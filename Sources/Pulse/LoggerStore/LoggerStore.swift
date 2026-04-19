@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import CoreData
@@ -246,8 +246,17 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     private static func makeContainer(databaseURL: URL, options: Options) -> NSPersistentContainer {
         let container = NSPersistentContainer(name: databaseURL.lastPathComponent, managedObjectModel: Self.model)
         let store = NSPersistentStoreDescription(url: databaseURL)
-        store.setValue("DELETE" as NSString, forPragmaNamed: "journal_mode")
         store.type = options.contains(.inMemory) ? NSInMemoryStoreType : NSSQLiteStoreType
+        if options.contains(.unsafe) {
+            // journal_mode=OFF  — no rollback/WAL; writes go straight to the main file
+            // synchronous=OFF   — skip fsyncs; rely on the OS to flush
+            // temp_store=MEMORY — keep transient b-trees in RAM
+            // locking_mode=EXCLUSIVE — we're the only writer; skip the shared-cache handshake
+            store.setValue("OFF" as NSString, forPragmaNamed: "journal_mode")
+            store.setValue("OFF" as NSString, forPragmaNamed: "synchronous")
+            store.setValue("MEMORY" as NSString, forPragmaNamed: "temp_store")
+            store.setValue("EXCLUSIVE" as NSString, forPragmaNamed: "locking_mode")
+        }
         container.persistentStoreDescriptions = [store]
         return container
     }
@@ -271,7 +280,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         entity.id = session.id
         entity.version = info.version
         entity.build = info.build
-        try? backgroundContext.save()
+        try? backgroundContext.safeSave()
     }
 }
 
@@ -346,7 +355,7 @@ extension LoggerStore {
         perform { _ in self._handle(event) }
     }
 
-    private func _handle(_ event: Event) {
+    package func _handle(_ event: Event) {
         switch event {
         case .messageStored(let event): process(event)
         case .networkTaskCreated(let event): process(event)
@@ -375,6 +384,7 @@ extension LoggerStore {
 
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url.flatMap { $0.getHost() }
+        entity.path = event.originalRequest.url.flatMap { $0.getPath() }
         entity.httpMethod = event.originalRequest.httpMethod
         entity.requestState = NetworkTaskEntity.State.pending.rawValue
         entity.originalRequest = makeRequest(for: event.originalRequest)
@@ -401,6 +411,7 @@ extension LoggerStore {
 
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url.flatMap { $0.getHost() }
+        entity.path = event.originalRequest.url.flatMap { $0.getPath() }
         entity.httpMethod = event.originalRequest.httpMethod
         entity.statusCode = Int32(event.response?.statusCode ?? 0)
         entity.responseContentType = event.response?.contentType?.type
@@ -744,7 +755,7 @@ extension LoggerStore {
 
     private func saveAndReset() {
         do {
-            try backgroundContext.save()
+            try backgroundContext.safeSave()
         } catch {
 #if DEBUG
             debugPrint(error)
@@ -963,7 +974,7 @@ extension LoggerStore {
             try removeMessages(with: NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
         }
         if backgroundContext.hasChanges {
-            try backgroundContext.save()
+            try backgroundContext.safeSave()
         }
     }
 
@@ -1049,7 +1060,7 @@ extension LoggerStore {
             infoBlob.key = "info"
             infoBlob.data = try JSONEncoder().encode(info)
 
-            try document.context.save()
+            try document.context.safeSave()
             try? document.close()
         }
     }
@@ -1104,12 +1115,18 @@ extension LoggerStore {
         }
 
         // First remove some old messages
-        let messages = try backgroundContext.fetch(LoggerMessageEntity.self, sortedBy: \.createdAt, ascending: false)
-        let count = messages.count
+        let count = try backgroundContext.count(for: LoggerMessageEntity.self)
         guard count > 10 else { return } // Sanity check
 
-        let cutoffDate = messages[Int(Double(count) * configuration.trimRatio)].createdAt
-        try removeMessages(before: cutoffDate)
+        let offset = Int(Double(count) * configuration.trimRatio)
+        let cutoffMessages = try backgroundContext.fetch(LoggerMessageEntity.self) {
+            $0.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: false)]
+            $0.fetchOffset = offset
+            $0.fetchLimit = 1
+        }
+        if let cutoffDate = cutoffMessages.first?.createdAt {
+            try removeMessages(before: cutoffDate)
+        }
     }
 
     private func removeMessages(before date: Date) throws {
@@ -1288,7 +1305,7 @@ extension LoggerStore {
 
 extension Version {
     package static let minimumSupportedVersion = LoggerStore.Version(3, 1, 0)
-    package static let currentStoreVersion = LoggerStore.Version(3, 6, 0)
+    package static let currentStoreVersion = LoggerStore.Version(3, 7, 0)
     package static let currentProtocolVersion = LoggerStore.Version(4, 0, 0)
 }
 

@@ -1,16 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
-
-package protocol ConsoleEntitiesSource {
-    var events: PassthroughSubject<ConsoleUpdateEvent, Never> { get }
-    var entities: [NSManagedObject] { get }
-}
 
 #if os(iOS) || os(macOS) || os(visionOS)
 
@@ -18,71 +13,128 @@ final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
 }
 
-@available(iOS 16, visionOS 1, *)
-final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchSessionDelegate {
+    @Published var isSearching: Bool = false {
+        didSet {
+            guard oldValue != isSearching else { return }
+            if !isSearching {
+                session?.cancel()
+                session = nil
+                searchBar.text = ""
+                // Don't reset filters, scopes, or options: filters are part of
+                // the main list state and persist across search sessions, and
+                // scopes/options are user preferences.
+            }
+        }
+    }
+
     @Published var options: StringSearchOptions = .default
     @Published var scopes: Set<ConsoleSearchScope> = []
+    @Published private(set) var savedDefaultScopes: Set<ConsoleSearchScope> = []
+
+    @Published var editingFilterState: EditingFilterState?
+
+    struct EditingFilterState: Identifiable {
+        var id: UUID { filter.id }
+        var filter: ConsoleCustomFilter
+        var token: ConsoleSearchToken
+    }
+
+    func applyEditedFilter(_ filter: ConsoleCustomFilter) {
+        guard let state = editingFilterState else { return }
+        applyToken(state.token, filter: filter)
+    }
+
+    private func applyToken(_ token: ConsoleSearchToken, filter: ConsoleCustomFilter?) {
+        searchBar.text = ""
+        var criteria = filters.criteria
+        token.apply(to: &criteria, filter: filter)
+        filters.criteria = criteria
+    }
 
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
     @Published private(set) var hasMore = false
-    @Published private(set) var isNewResultsButtonShown = false
+    @Published private(set) var newResultsCount = 0
+    var isNewResultsButtonShown: Bool { newResultsCount > 0 }
 
     @Published private(set) var isSpinnerNeeded = false
-    @Published private(set) var isSearching = false
+    @Published private(set) var isPerformingSearch = false
+
+    /// Matches from sessions outside the active selection. Populated after the
+    /// primary search exhausts; empty when the user is already searching every
+    /// session.
+    @Published private(set) var extendedResults: [ConsoleSearchResultViewModel] = []
+    @Published private(set) var hasMoreExtended = false
+    @Published private(set) var isPerformingExtendedSearch = false
 
     var hasRecentSearches: Bool { !recents.searches.isEmpty }
 
     let searchBar: ConsoleSearchBarViewModel
+    let filters: ConsoleFiltersViewModel
 
     var toolbarTitle: String {
         if parameters.isEmpty {
             return "Search"
-        } else {
-            return "\(results.count)\(hasMore ? "+" : "") results"
         }
+        let base = "\(results.count)\(hasMore ? "+" : "") results"
+        return isPerformingSearch ? "\(base) (searching…)" : base
     }
 
     var parameters: ConsoleSearchParameters {
-        var term: ConsoleSearchTerm?
         let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
+        var params = ConsoleSearchParameters()
         if !searchTerm.isEmpty {
-            term = ConsoleSearchTerm(text: searchTerm, options: options)
+            params.terms.append(.init(text: searchTerm, options: options))
         }
-        return ConsoleSearchParameters(term: term, scopes: scopes)
+        params.scopes = Array(scopes)
+        return params
     }
 
     var allScopes: [ConsoleSearchScope] {
-        (environment.mode.hasLogs ? ConsoleSearchScope.messageScopes : []) +
-        (environment.mode.hasNetwork ? ConsoleSearchScope.networkScopes : [])
+        ConsoleSearchScope.allScopes(for: environment.mode)
     }
 
-    private var dirtyDate: Date?
-    private var buffer: [ConsoleSearchResultViewModel] = []
-    private var operation: ConsoleSearchOperation?
-    private var refreshResultsOperation: ConsoleSearchOperation?
+    var availableLogScopes: [ConsoleSearchScope] {
+        environment.mode.hasLogs ? ConsoleSearchScope.messageScopes : []
+    }
 
-    private let recents: ConsoleSearchRecentSearchesStore
+    var availableNetworkScopes: [ConsoleSearchScope] {
+        environment.mode.hasNetwork ? ConsoleSearchScope.networkScopes : []
+    }
+
+    var defaultScopes: [ConsoleSearchScope] {
+        isDeepSearch ? allScopes : ConsoleSearchScope.defaultScopes(for: environment.mode)
+    }
+
+    private var session: ConsoleSearchSession?
+    /// True from the moment a session is created until its first batch (or
+    /// `finished` with no batches) lands. Lets us atomically replace the
+    /// previous session's results instead of appending to them.
+    private var isAwaitingFirstResults = false
+
+    private var recents: ConsoleSearchRecentSearchesStore { suggestionsService.recents }
+    private var suggestionsService: ConsoleNetworkSearchSuggestionsService!
     @Published private(set) var suggestionsViewModel: ConsoleSearchSuggestionsViewModel!
 
-    private let source: ConsoleEntitiesSource
-    private let searchService = ConsoleSearchService()
-
-    private let environment: ConsoleEnvironment
-    private let store: LoggerStore
+    let environment: ConsoleEnvironment
+    private let store: LoggerStoreProtocol
     private let index: LoggerStoreIndex
     private var cancellables: [AnyCancellable] = []
-    private let context: NSManagedObjectContext
+    private var isDeepSearch = false
+    private var configuredMode: ConsoleMode?
 
-    init(environment: ConsoleEnvironment, source: ConsoleEntitiesSource, searchBar: ConsoleSearchBarViewModel) {
+    init(
+        environment: ConsoleEnvironment,
+        searchBar: ConsoleSearchBarViewModel,
+        isDeepSearch: Bool = false
+    ) {
         self.environment = environment
         self.store = environment.store
         self.index = environment.index
-        self.recents = ConsoleSearchRecentSearchesStore(mode: environment.mode)
-        self.source = source
         self.searchBar = searchBar
-
-        self.context = store.newBackgroundContext()
-        self.scopes = Set(allScopes)
+        self.filters = environment.filters
+        self.isDeepSearch = isDeepSearch
 
         let text = searchBar.$text
             .map { $0.trimmingCharacters(in: .whitespaces ) }
@@ -107,9 +159,23 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             self?.updateSearchTokens()
         }.store(in: &cancellables)
 
-        source.events.sink { [weak self] in
-            self?.didReceive($0)
-        }.store(in: &cancellables)
+        searchBar.$text
+            .sink { [weak self] in self?.handleTab(in: $0) }
+            .store(in: &cancellables)
+
+        // Filter changes used to reach us via the list VM's `.refresh` event,
+        // which piggy-backed on the data source's FRC refetch. The session now
+        // owns its own fetch, so we observe filters directly and rebuild.
+        // `@Published` fires in `willSet`, so hop to the main queue before
+        // reading `filters.options` — otherwise `updateSession` would rebuild
+        // the predicate from the pre-toggle value.
+        filters.$options
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.didUpdateSearchCriteria()
+            }
+            .store(in: &cancellables)
 
         environment.$mode.sink { [weak self] in
             self?.configure(mode: $0)
@@ -117,144 +183,186 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     private func configure(mode: ConsoleMode) {
-        self.suggestionsViewModel = getRecentSearches()
+        self.suggestionsService = ConsoleNetworkSearchSuggestionsService(mode: mode)
+        self.suggestionsViewModel = suggestionsService.makeSuggestions(for: makeContextForSuggestions())
+        if configuredMode != mode {
+            configuredMode = mode
+            if isDeepSearch {
+                self.scopes = Set(allScopes)
+            } else {
+                let loaded = ConsoleSearchScope.loadPersistedScopes(for: mode)
+                self.scopes = loaded
+                self.savedDefaultScopes = loaded
+            }
+        }
         DispatchQueue.main.async {
             self.refreshNow()
         }
     }
 
-    private func didReceive(_ event: ConsoleUpdateEvent) {
-        switch event {
-        case .refresh:
-            refreshNow()
-        case .update:
-            checkForNewSearchMatches(for: source.entities)
+    func resetScopesToDefault() {
+        scopes = Set(defaultScopes)
+        if let mode = configuredMode {
+            ConsoleSearchScope.clearPersistedScopes(for: mode)
+            savedDefaultScopes = scopes
         }
+    }
+
+    func saveCurrentScopesAsDefault() {
+        guard !isDeepSearch, let mode = configuredMode else { return }
+        ConsoleSearchScope.savePersistedScopes(scopes, for: mode)
+        savedDefaultScopes = scopes
+    }
+
+    func setScopes(_ newScopes: Set<ConsoleSearchScope>) {
+        scopes = newScopes
     }
 
     // MARK: Search
 
     private func didUpdateSearchCriteria() {
-        isNewResultsButtonShown = false
-        startSearch(parameters: parameters)
+        newResultsCount = 0
+        updateSession()
     }
 
-    private func startSearch(parameters: ConsoleSearchParameters) {
-        operation?.cancel()
-        operation = nil
-        hasMore = false
+    private func updateSession() {
+        session?.cancel()
+        session = nil
 
-        guard !parameters.isEmpty else {
-            isSearching = false
+        let params = parameters
+        guard !params.isEmpty else {
+            isPerformingSearch = false
             results = []
+            hasMore = false
+            extendedResults = []
+            hasMoreExtended = false
+            isPerformingExtendedSearch = false
             return
         }
 
-        isSearching = true
-        buffer = []
+        let mode = environment.mode
+        let primaryPredicate = ConsoleDataSource.makePredicate(mode: mode, options: filters.options)
 
-        // We want to continue showing old results for just a little bit longer
-        // to prevent screen from flickering. If the search is slow, we'll just
-        // remove the results eventually.
-        if !results.isEmpty {
-            dirtyDate = Date()
+        var extendedPredicate: NSPredicate?
+        if !filters.options.sessions.isEmpty {
+            var other = filters.options
+            other.sessions = []
+            extendedPredicate = ConsoleDataSource.makePredicate(mode: mode, options: other)
         }
 
-        let operation = ConsoleSearchOperation(entities: source.entities, parameters: parameters, service: searchService, context: context)
-        operation.delegate = self
-        operation.resume()
-        self.operation = operation
+        let session = ConsoleSearchSession(
+            store: store,
+            mode: mode,
+            primaryPredicate: primaryPredicate,
+            extendedPredicate: extendedPredicate,
+            sortDescriptors: makeSortDescriptors(mode: mode),
+            parameters: params
+        )
+        session.delegate = self
+        if isDeepSearch { session.cutoff = 1000 }
+
+        isPerformingSearch = true
+        isAwaitingFirstResults = true
+        hasMore = false
+        extendedResults = []
+        hasMoreExtended = false
+        isPerformingExtendedSearch = false
+
+        self.session = session
+        session.start()
     }
 
-    // MARK: Refresh Results
-
-    private func didReloadEntities(for entities: [NSManagedObject]) {
-        checkForNewSearchMatches(for: entities)
+    private func makeSortDescriptors(mode: ConsoleMode) -> [NSSortDescriptor] {
+        let options = environment.listOptions
+        let sortKey: String
+        switch mode {
+        case .all, .logs: sortKey = options.messageSortBy.key
+        case .network: sortKey = options.taskSortBy.key
+        }
+        return [NSSortDescriptor(key: sortKey, ascending: options.order == .ascending)]
     }
 
-    private func checkForNewSearchMatches(for entities: [NSManagedObject]) {
-        guard operation == nil && refreshResultsOperation == nil else {
-            return // Let's wait until the next refresh
+    // MARK: ConsoleSearchSessionDelegate
+
+    func searchSession(_ session: ConsoleSearchSession, didEmit events: [ConsoleSearchSession.Event]) {
+        guard session === self.session else { return }
+        for event in events {
+            apply(event, from: session)
         }
-        guard !isNewResultsButtonShown else {
-            return // We already know there are new results
-        }
-        guard !parameters.isEmpty else {
-            return
-        }
-        let operation = ConsoleSearchOperation(entities: entities, parameters: parameters, service: searchService, context: context)
-        operation.delegate = self
-        operation.resume()
-        self.refreshResultsOperation = operation
     }
 
-    // MARK: ConsoleSearchOperationDelegate
-
-    func searchOperation(_ operation: ConsoleSearchOperation, didAddResults results: [ConsoleSearchResultViewModel]) {
-        if operation === self.operation {
-            if let dirtyDate = dirtyDate {
-                self.buffer += results
-                if Date().timeIntervalSince(dirtyDate) > 0.25 {
-                    self.dirtyDate = nil
-                    self.results = buffer
-                    self.buffer = []
-                }
+    private func apply(_ event: ConsoleSearchSession.Event, from session: ConsoleSearchSession) {
+        switch event {
+        case .results(let results):
+            let resolved = results.map(makeResultViewModel)
+            if isAwaitingFirstResults {
+                isAwaitingFirstResults = false
+                self.results = resolved
             } else {
-                self.results += results
+                self.results += resolved
             }
-        } else if operation === self.refreshResultsOperation {
-            // If the first element changed, that should be enough of the
-            // indicator that there are new search matches. We can assume
-            // that the messages are only ever inserted at the top and skip
-            // a ton of work.
-            if results.first?.entity.objectID !== self.results.first?.entity.objectID {
-                withAnimation {
-                    self.isNewResultsButtonShown = true
-                }
-            }
-            self.refreshResultsOperation?.cancel()
-            self.refreshResultsOperation = nil
-        }
-    }
-
-    func searchOperationDidFinish(_ operation: ConsoleSearchOperation, hasMore: Bool) {
-        if operation === self.operation {
-            isSearching = false
-            if dirtyDate != nil {
-                self.dirtyDate = nil
-                self.results = buffer
+        case .finished(let hasMore):
+            isPerformingSearch = false
+            if isAwaitingFirstResults {
+                // Finished without delivering anything: clear leftover
+                // results from the previous search.
+                isAwaitingFirstResults = false
+                self.results = []
             }
             self.hasMore = hasMore
-        } else if operation === self.refreshResultsOperation {
-            self.refreshResultsOperation = nil
+            if !hasMore, !isDeepSearch {
+                isPerformingExtendedSearch = true
+                session.startExtendedSearch()
+            }
+        case .extendedResults(let results):
+            self.extendedResults += results.map(makeResultViewModel)
+        case .extendedFinished(let hasMore):
+            isPerformingExtendedSearch = false
+            hasMoreExtended = hasMore
+        case .newMatches(let count):
+            withAnimation {
+                newResultsCount += count
+            }
+        case .removedMatches(let ids):
+            if !ids.isEmpty {
+                results.removeAll { ids.contains($0.entity.objectID) }
+                extendedResults.removeAll { ids.contains($0.entity.objectID) }
+            }
         }
+    }
+
+    private func makeResultViewModel(_ result: ConsoleSearchSession.Result) -> ConsoleSearchResultViewModel {
+        ConsoleSearchResultViewModel(
+            entity: store.viewContext.object(with: result.objectID),
+            occurrences: result.occurrences
+        )
     }
 
     // MARK: Actions
 
     func refreshNow() {
-        if isNewResultsButtonShown {
+        if newResultsCount > 0 {
             withAnimation {
-                isNewResultsButtonShown = false
+                newResultsCount = 0
             }
         }
-        startSearch(parameters: parameters)
+        updateSession()
     }
 
     func perform(_ suggestion: ConsoleSearchSuggestion) {
         switch suggestion.action {
-        case .apply(let token):
-            apply(token)
-        case .autocomplete(let text):
-            searchBar.text = text
+        case .applyTerm(let term):
+            searchBar.text = term.text
+            options = term.options
+            recents.saveSearch(term)
+        case .applyFilter(let filter):
+            applyFilter(filter)
         }
         updateSearchTokens()
     }
 
-    private func apply(_ term: ConsoleSearchTerm) {
-        searchBar.text = term.text
-        options = term.options
-        recents.saveSearch(term)
+    private func applyFilter(_ filter: ConsoleSearchFilterSuggestion) {
+        applyToken(filter.token, filter: filter.makeCustomFilter())
     }
 
     func onSubmitSearch() {
@@ -268,84 +376,110 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         refreshNow()
     }
 
+    func searchInOtherSessions() {
+        filters.sessions = []
+    }
+
     func buttonClearRecentSearchesTapped() {
         recents.clearRecentSearches()
         updateSearchTokens()
     }
 
-    func didScroll(to result: ConsoleSearchResultViewModel) {
-        guard results.count > 3 && results[results.endIndex - 2].entity.objectID == result.entity.objectID else {
-            return
+    var recentSearches: [ConsoleSearchTerm] {
+        recents.searches
+    }
+
+    func removeRecentSearch(_ term: ConsoleSearchTerm) {
+        recents.removeSearch(term)
+        updateSearchTokens()
+    }
+
+    func didScroll(to result: ConsoleSearchResultViewModel, isExtended: Bool = false) {
+        if isExtended {
+            guard extendedResults.count > 3 && extendedResults[extendedResults.endIndex - 2].entity.objectID == result.entity.objectID else {
+                return
+            }
+            guard !isPerformingExtendedSearch && hasMoreExtended else {
+                return
+            }
+            isPerformingExtendedSearch = true
+            session?.loadMoreExtended()
+        } else {
+            guard results.count > 3 && results[results.endIndex - 2].entity.objectID == result.entity.objectID else {
+                return
+            }
+            guard !isPerformingSearch && hasMore else {
+                return
+            }
+            isPerformingSearch = true
+            session?.loadMore()
         }
-        guard !isSearching && hasMore else {
-            return
+    }
+
+    // MARK: Tab Completion
+
+    private func handleTab(in text: String) {
+        guard text.contains("\t") else { return }
+        DispatchQueue.main.async { // Fixes text not clearing
+            if let first = self.suggestionsViewModel?.filters.first {
+                self.perform(first)
+            }
         }
-        isSearching = true
-        operation?.resume() // Load more
     }
 
     // MARK: Suggested Tokens
 
     private func updateSearchTokens() {
-        let searchText = searchBar.text.trimmingCharacters(in: .whitespaces)
-        if searchText.isEmpty {
-            self.suggestionsViewModel = getRecentSearches()
-        } else {
-            self.suggestionsViewModel = ConsoleSearchSuggestionsViewModel(searches: [])
-        }
+        self.suggestionsViewModel = suggestionsService.makeSuggestions(for: makeContextForSuggestions())
     }
 
-    private func getRecentSearches() -> ConsoleSearchSuggestionsViewModel {
-        let recentSearches = recents.searches.prefix(3).map { term in
-            ConsoleSearchSuggestion(text: {
-                AttributedString("\(term.options.title) ") { $0.foregroundColor = .primary } +
-                AttributedString(term.text) { $0.foregroundColor = .accentColor }
-            }(), action: .apply(term))
-        }
-        return ConsoleSearchSuggestionsViewModel(searches: recentSearches)
+    private func makeContextForSuggestions() -> ConsoleSearchSuggestionsContext {
+        ConsoleSearchSuggestionsContext(
+            searchText: searchBar.text.trimmingCharacters(in: .whitespaces),
+            index: index,
+            parameters: parameters
+        )
     }
 }
 
-@available(iOS 16, visionOS 1, *)
-struct ConsoleSearchResultViewModel: Identifiable {
-    var id: ConsoleSearchResultKey { ConsoleSearchResultKey(id: entity.objectID) }
-    let entity: NSManagedObject
-    let occurrences: [ConsoleSearchOccurrence]
-}
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+extension ConsoleSearchViewModel: ConsoleSearchOptionsHost {}
 
-struct ConsoleSearchResultKey: Hashable {
-    let id: NSManagedObjectID
-}
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+package struct ConsoleSearchResultViewModel: Identifiable {
+    package var id: ConsoleSearchResultKey { ConsoleSearchResultKey(id: entity.objectID) }
+    package let entity: NSManagedObject
+    package let occurrences: [ConsoleSearchOccurrence]
 
-struct ConsoleSearchParameters: Equatable, Hashable {
-    var scopes: [ConsoleSearchScope] = []
-    var term: ConsoleSearchTerm?
-
-    init(term: ConsoleSearchTerm?, scopes: Set<ConsoleSearchScope>) {
-        self.term = term
-        self.scopes = Array(scopes)
-    }
-
-    var isEmpty: Bool {
-        term == nil
+    package init(entity: NSManagedObject, occurrences: [ConsoleSearchOccurrence]) {
+        self.entity = entity
+        self.occurrences = occurrences
     }
 }
 
-@available(iOS 16, visionOS 1, *)
-struct ConsoleSearchSuggestionsViewModel {
-    let searches: [ConsoleSearchSuggestion]
+package struct ConsoleSearchResultKey: Hashable {
+    package let id: NSManagedObjectID
 }
 
-@available(iOS 16, visionOS 1, *)
-struct ConsoleSearchSuggestion: Identifiable {
-    let id = UUID()
-    let text: AttributedString
-    var action: Action
+package struct ConsoleSearchParameters {
+    package var scopes: [ConsoleSearchScope] = []
+    package var terms: [ConsoleSearchTerm] = []
 
-    enum Action {
-        case apply(ConsoleSearchTerm)
-        case autocomplete(String)
+    package var isEmpty: Bool {
+        terms.isEmpty
+    }
+
+    package init(scopes: [ConsoleSearchScope] = [], terms: [ConsoleSearchTerm] = []) {
+        self.scopes = scopes
+        self.terms = terms
     }
 }
 
 #endif
+
+package enum ConsoleUpdateEvent {
+    /// Full refresh of data.
+    case refresh
+    /// Incremental update.
+    case update(CollectionDifference<NSManagedObjectID>?)
+}

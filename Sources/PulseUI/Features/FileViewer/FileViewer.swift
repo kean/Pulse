@@ -1,12 +1,13 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
+#if os(iOS) || os(tvOS) || os(macOS) || os(watchOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
 
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct FileViewer: View {
     @ObservedObject var viewModel: FileViewerViewModel
 
@@ -34,6 +35,9 @@ struct FileViewer: View {
         case .pdf(let document):
             PDFKitRepresentedView(document: document)
                 .edgesIgnoringSafeArea(.all)
+#elseif os(macOS)
+        case .pdf:
+            PlaceholderView(imageName: "doc.richtext", title: "PDF Preview", subtitle: "PDF preview is not available")
 #endif
         case .other(let viewModel):
             RichTextView(viewModel: viewModel)
@@ -44,29 +48,38 @@ struct FileViewer: View {
 // MARK: - Preview
 
 #if DEBUG
-struct FileViewer_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            PreviewContainer {
-                FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/json", originalSize: 1200), data: { MockJSON.allPossibleValues }))
-            }.previewDisplayName("JSON")
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("JSON") {
+    PreviewContainer {
+        FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/json", originalSize: 1200), data: { MockJSON.allPossibleValues }))
+    }
+}
 
-            PreviewContainer {
-                FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "image/png", originalSize: 219543), data: { MockTask.octocat.responseBody }))
-            }.previewDisplayName("Image")
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("Image") {
+    PreviewContainer {
+        FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "image/png", originalSize: 219543), data: { MockTask.octocat.responseBody }))
+    }
+}
 
-            PreviewContainer {
-                FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/html", originalSize: 1200), data: { MockTask.profile.responseBody }))
-            }.previewDisplayName("HTML")
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("HTML") {
+    PreviewContainer {
+        FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/html", originalSize: 1200), data: { MockTask.profile.responseBody }))
+    }
+}
 
-            PreviewContainer {
-                FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/x-www-form-urlencoded", originalSize: 1200), data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
-            }.previewDisplayName("Query Items")
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("Query Items") {
+    PreviewContainer {
+        FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/x-www-form-urlencoded", originalSize: 1200), data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
+    }
+}
 
-            PreviewContainer {
-                FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/pdf", originalSize: 1000), data: { mockPDF }))
-            }.previewDisplayName("PDF")
-        }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview("PDF") {
+    PreviewContainer {
+        FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/pdf", originalSize: 1000), data: { mockPDF }))
     }
 }
 

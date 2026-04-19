@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -75,7 +75,7 @@ struct StoreDetailsContentsView: View {
                         Button("Show in Finder") {
                             NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
                         }
-                        if !(store.options.contains(.readonly)) {
+                        if !store.isReadonly {
                             Button("Remove Logs") {
                                 store.removeAll()
                             }
@@ -90,7 +90,7 @@ struct StoreDetailsContentsView: View {
 
 enum StoreDetailsViewSource {
     /// Loads the info when the view appears on screen.
-    case store(LoggerStore)
+    case store(LoggerStoreProtocol)
     /// Displays prefetched info.
     case info(LoggerStore.Info)
 }
@@ -112,10 +112,10 @@ enum StoreDetailsViewSource {
         }
     }
 
-    private func loadInfo(for store: LoggerStore) async {
+    private func loadInfo(for store: LoggerStoreProtocol) async {
         do {
             let info = try await store.info()
-            if store === LoggerStore.shared {
+            if let store = store as? LoggerStore, store === LoggerStore.shared {
                 self.storeSizeLimit = store.configuration.sizeLimit
             }
             self.display(info)
@@ -163,10 +163,8 @@ private let dateFormatter = DateFormatter(dateStyle: .medium, timeStyle: .medium
 
 #if DEBUG
 @available(iOS 16, tvOS 16, macOS 13, watchOS 9, visionOS 1, *)
-struct StoreDetailsView_Previews: PreviewProvider {
-    static var previews: some View {
-        StoreDetailsView(source: .store(.mock))
-            .frame(width: 280)
-    }
+#Preview {
+    StoreDetailsView(source: .store(LoggerStore.mock))
+        .frame(width: 280)
 }
 #endif

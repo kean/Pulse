@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import SwiftUI
@@ -8,7 +8,7 @@ import Combine
 import Pulse
 import Network
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct RemoteLoggerSettingsView: View {
     @ObservedObject private var logger: RemoteLogger = .shared
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
@@ -130,7 +130,7 @@ struct RemoteLoggerSettingsView: View {
     }
 }
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct RemoteLoggerSettingsRouterView: View {
     @ObservedObject private var logger: RemoteLogger = .shared
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
@@ -164,21 +164,19 @@ struct RemoteLoggerSettingsRouterView: View {
 }
 
 #if DEBUG
-@available(iOS 16, visionOS 1, *)
-struct RemoteLoggerSettingsView_Previews: PreviewProvider {
-    static var previews: some View {
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
 #if os(macOS)
+    List {
+        RemoteLoggerSettingsView(viewModel: .init())
+    }
+#else
+    NavigationView {
         List {
             RemoteLoggerSettingsView(viewModel: .init())
         }
-#else
-        NavigationView {
-            List {
-                RemoteLoggerSettingsView(viewModel: .init())
-            }
-            .navigationTitle("Settings")
-        }
-#endif
+        .navigationTitle("Settings")
     }
+#endif
 }
 #endif

@@ -1,13 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
-
-#if !os(macOS)
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 package struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable, Label: View>: View {
     package let title: String
     package let items: Data
@@ -125,31 +123,20 @@ package struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: 
 }
 
 #if DEBUG
-@available(iOS 16, visionOS 1, *)
-struct ConsoleSearchListSelectionView_Previews: PreviewProvider {
-    static var previews: some View {
-        ConsoleSearchListSelectionViewDemo()
-            .frame(width: 320)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    @Previewable @State var selection: Set<String> = []
+    List {
+        ConsoleSearchListSelectionView(
+            title: "Labels",
+            items: ["Debug", "Warning", "Error"],
+            id: \.self,
+            selection: $selection,
+            description: { $0 },
+            label: { Text($0) }
+        )
     }
+    .listStyle(.plain)
+    .frame(width: 320)
 }
-
-@available(iOS 16, visionOS 1, *)
-private struct ConsoleSearchListSelectionViewDemo: View {
-    @State private var selection: Set<String>  = []
-
-    var body: some View {
-        List {
-            ConsoleSearchListSelectionView(
-                title: "Labels",
-                items: ["Debug", "Warning", "Error"],
-                id: \.self,
-                selection: $selection,
-                description: { $0 },
-                label: { Text($0) }
-            )
-        }.listStyle(.plain)
-    }
-}
-#endif
-
 #endif

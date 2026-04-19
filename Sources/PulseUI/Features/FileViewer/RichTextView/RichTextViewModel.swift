@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -8,7 +8,7 @@ import Combine
 
 #if os(iOS) || os(visionOS)
 
-final class RichTextViewModel: ObservableObject {
+public final class RichTextViewModel: ObservableObject {
     // Search
     @Published var searchOptions: StringSearchOptions = .default
     @Published private(set) var selectedMatchIndex: Int = 0
@@ -16,15 +16,15 @@ final class RichTextViewModel: ObservableObject {
     @Published var searchTerm: String = ""
 
     // Configuration
-    @Published var isLinkDetectionEnabled = true
+    @Published public var isLinkDetectionEnabled = true
     var isToolbarHidden = false
 
-    let contentType: NetworkLogger.ContentType?
-    let originalText: NSAttributedString
+    public let contentType: NetworkLogger.ContentType?
+    public let originalText: NSAttributedString
 
-    var onLinkTapped: ((URL) -> Bool)?
+    public var onLinkTapped: ((URL) -> Bool)?
 
-    var isEmpty: Bool { originalText.length == 0 }
+    public var isEmpty: Bool { originalText.length == 0 }
 
     weak var textView: UXTextView? // Not proper MVVM
     var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(string: "") }
@@ -41,11 +41,11 @@ final class RichTextViewModel: ObservableObject {
         let originalBackgroundColor: UXColor?
     }
 
-    convenience init(string: NSAttributedString = NSAttributedString()) {
+    public convenience init(string: NSAttributedString = NSAttributedString()) {
         self.init(string: string, contentType: nil)
     }
 
-    init(string: NSAttributedString, contentType: NetworkLogger.ContentType?) {
+    public init(string: NSAttributedString, contentType: NetworkLogger.ContentType?) {
         self.originalText = string
         self.contentType = contentType
 
@@ -229,19 +229,19 @@ package struct TextViewSearchContext {
 }
 
 #if os(watchOS) || os(tvOS) || os(macOS)
-final class RichTextViewModel: ObservableObject {
-    let text: String
-    let attributedString: AttributedString?
+public final class RichTextViewModel: ObservableObject {
+    public let text: String
+    public let attributedString: AttributedString?
 
-    var isLinkDetectionEnabled = true
-    var isEmpty: Bool { text.isEmpty }
+    public var isLinkDetectionEnabled = true
+    public var isEmpty: Bool { text.isEmpty }
 
-    init(string: String) {
+    public init(string: String) {
         self.text = string
         self.attributedString = nil
     }
 
-    init(string: NSAttributedString, contentType: NetworkLogger.ContentType? = nil) {
+    public init(string: NSAttributedString, contentType: NetworkLogger.ContentType? = nil) {
 #if os(macOS)
         self.attributedString = try? AttributedString(string, including: \.appKit)
 #else

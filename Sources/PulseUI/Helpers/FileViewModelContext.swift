@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Pulse
 import Foundation
@@ -47,9 +47,9 @@ extension NetworkTaskEntity {
 
     /// - returns `nil` if the task is an unknown state. It may happen if the
     /// task is pending, but it's from the previous app run.
-    package func state(in store: LoggerStore?) -> NetworkTaskEntity.State? {
+    package func state(in store: LoggerStoreProtocol?) -> NetworkTaskEntity.State? {
         let state = self.state
-        if state == .pending, let store, self.session != store.session.id {
+        if state == .pending, let sessionID = store?.currentSessionID, self.session != sessionID {
             return nil
         }
         return state

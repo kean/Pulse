@@ -1,17 +1,21 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 16, macOS 13, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 package struct ConsoleSessionsPickerView: View {
     @Binding var selection: Set<UUID>
     @State private var isShowingPicker = false
 
-    @Environment(\.store) private var store: LoggerStore
+    package init(selection: Binding<Set<UUID>>) {
+        self._selection = selection
+    }
+
+    @Environment(\.store) private var store
 
 #if os(iOS) || os(visionOS) || os(macOS)
     package static var makeSessionPicker: (_ selection: Binding<Set<UUID>>) -> AnyView = {
@@ -62,7 +66,7 @@ package struct ConsoleSessionsPickerView: View {
     private var selectedSessionTitle: String {
         if selection.isEmpty {
             return "None"
-        } else if selection == [store.session.id] {
+        } else if let sessionID = store.currentSessionID, selection == [sessionID] {
             return "Current"
         } else if selection.count == 1, let session = session(withID: selection.first!) {
             return session.formattedDate

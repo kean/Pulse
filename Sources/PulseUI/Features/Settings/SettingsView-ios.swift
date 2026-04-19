@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS) || os(visionOS)
 
@@ -8,7 +8,7 @@ import SwiftUI
 import Pulse
 import UniformTypeIdentifiers
 
-@available(iOS 16, visionOS 1, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 public struct SettingsView: View {
     private let store: LoggerStore
     @State private var newHeaderName = ""
@@ -37,15 +37,13 @@ public struct SettingsView: View {
 }
 
 #if DEBUG
-@available(iOS 16, visionOS 1, *)
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            SettingsView(store: .mock)
-                .environmentObject(UserSettings.shared)
-                .injecting(ConsoleEnvironment(store: .mock))
-                .navigationTitle("Settings")
-        }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview {
+    NavigationView {
+        SettingsView(store: .mock)
+            .environmentObject(UserSettings.shared)
+            .injecting(ConsoleEnvironment(store: LoggerStore.mock))
+            .navigationTitle("Settings")
     }
 }
 #endif

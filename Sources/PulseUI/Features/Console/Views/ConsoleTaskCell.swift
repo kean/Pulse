@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -13,7 +13,8 @@ package struct ConsoleTaskCell: View {
 
     @ScaledMetric(relativeTo: .body) private var fontMultiplier = 1.0
     @ObservedObject private var settings: UserSettings = .shared
-    @Environment(\.store) private var store: LoggerStore
+    @EnvironmentObject private var environment: ConsoleEnvironment
+    @Environment(\.store) private var store
 
     package enum EditableArea {
         case header, content, footer
@@ -21,19 +22,33 @@ package struct ConsoleTaskCell: View {
 
     package var highlightedArea: EditableArea?
 
+    package var urlMatch: ConsoleSearchMatch?
+
     package init(task: NetworkTaskEntity, isDisclosureNeeded: Bool = false, highlightedArea: EditableArea? = nil) {
         self.task = task
         self.isDisclosureNeeded = isDisclosureNeeded
         self.highlightedArea = highlightedArea
     }
 
+    package consuming func urlMatch(_ match: ConsoleSearchMatch?) -> ConsoleTaskCell {
+        self.urlMatch = match
+        return self
+    }
+
     package var body: some View {
+        let displayOptions = environment.listDisplayOptions(for: task)
         VStack(alignment: .leading, spacing: 4) {
-            header
-            makeContent(settings: settings.listDisplayOptions.content)
-                .highlighted(highlightedArea == .content)
+            makeHeader(settings: displayOptions.header)
+            Group {
+                if let custom = environment.delegate?.console(contentViewFor: task) {
+                    custom
+                } else {
+                    makeContent(settings: displayOptions.content)
+                }
+            }
+            .highlighted(highlightedArea == .content)
 #if os(iOS) || os(watchOS)
-            makeFooter(settings: settings.listDisplayOptions.footer)
+            makeFooter(settings: displayOptions.footer)
                 .highlighted(highlightedArea == .footer)
 #endif
         }
@@ -42,25 +57,25 @@ package struct ConsoleTaskCell: View {
     // MARK: – Header
 
 #if os(watchOS)
-    private var header: some View {
+    private func makeHeader(settings: ConsoleListDisplaySettings.HeaderSettings) -> some View {
         HStack {
             StatusIndicatorView(state: task.state(in: store))
-            info
+            makeInfo(settings: settings)
         }
     }
 #else
-    private var header: some View {
+    private func makeHeader(settings: ConsoleListDisplaySettings.HeaderSettings) -> some View {
         HStack(spacing: 6) {
             if task.isMocked {
                 MockBadgeView()
             }
-            info.highlighted(highlightedArea == .header)
+            makeInfo(settings: settings).highlighted(highlightedArea == .header)
 
             Spacer()
             if task.isPinned {
                 BookmarkIconView()
             }
-            ConsoleTimestampView(date: task.createdAt)
+            ConsoleTimestampView(timestamp: task.formattedTimestamp)
                 .padding(.trailing, 3)
         }
         .overlay(alignment: .leading) {
@@ -80,28 +95,25 @@ package struct ConsoleTaskCell: View {
     }
 
 #endif
-    private var info: some View {
-        let status: Text = Text(ConsoleFormatter.status(for: task, store: store))
-            .font(makeFont(size: settings.listDisplayOptions.header.fontSize).weight(.medium))
-            .foregroundColor(task.state == .failure ? .red : .primary)
+    private func makeInfo(settings: ConsoleListDisplaySettings.HeaderSettings) -> some View {
+        let font = makeFont(size: settings.fontSize)
+        var attributed = AttributedString(ConsoleFormatter.status(for: task, store: store))
+        attributed.font = font.weight(.medium)
+        attributed.foregroundColor = task.state == .failure ? .red : .primary
 
 #if os(watchOS)
-        return status // Not enough space for anything else
+        return Text(attributed) // Not enough space for anything else
 #else
-
-        var text: Text {
-            let details = settings.listDisplayOptions.header.fields
-                .compactMap(task.makeInfoText)
-                .joined(separator: " · ")
-            guard !details.isEmpty else {
-                return status
-            }
-            return status + Text(" · \(details)")
-                .font(makeFont(size: settings.listDisplayOptions.header.fontSize))
+        let details = settings.fields
+            .compactMap { environment.makeInfoText(for: $0, task: task) }
+            .joined(separator: " · ")
+        if !details.isEmpty {
+            var detailsAttr = AttributedString(" · \(details)")
+            detailsAttr.font = font
+            attributed.append(detailsAttr)
         }
-        return text
-            .tracking(-0.1)
-            .lineLimit(settings.listDisplayOptions.header.lineLimit)
+        return Text(attributed)
+            .lineLimit(settings.lineLimit)
             .foregroundStyle(.secondary)
 #endif
     }
@@ -110,29 +122,23 @@ package struct ConsoleTaskCell: View {
 
     private func makeContent(settings: ConsoleListDisplaySettings.ContentSettings) -> some View {
         let design: Font.Design? = settings.isMonospaced ? .monospaced : nil
-        var method: Text? {
-            guard settings.showMethod, let method = task.httpMethod else {
-                return nil
-            }
-            return Text(method.appending(" "))
-                .font(makeFont(size: settings.fontSize, design: design).weight(.medium).smallCaps())
-                .tracking(-0.2)
+        let font = makeFont(size: settings.fontSize, design: design)
+
+        let content = environment.formattedContent(for: task, settings: settings) ?? "–"
+        var main = makeHighlightedContent(content)
+        main.font = font
+
+        let attributed: AttributedString
+        if settings.showMethod, let method = task.httpMethod {
+            var methodAttr = AttributedString(method.appending(" "))
+            methodAttr.font = font.weight(.medium).smallCaps()
+            methodAttr.append(main)
+            attributed = methodAttr
+        } else {
+            attributed = main
         }
 
-        var main: Text {
-            Text(task.getFormattedContent(settings: settings) ?? "–")
-                .font(makeFont(size: settings.fontSize, design: design))
-        }
-
-        var text: Text {
-            if let method {
-                method + main
-            } else {
-                main
-            }
-        }
-
-        return text
+        return Text(attributed)
             .lineLimit(settings.lineLimit)
     }
 
@@ -141,14 +147,14 @@ package struct ConsoleTaskCell: View {
     @ViewBuilder
     private func makeFooter(settings: ConsoleListDisplaySettings.FooterSettings) -> some View {
         let design: Font.Design? = settings.isMonospaced ? .monospaced : nil
-        let fields = settings.fields.compactMap(task.makeInfoText)
+        let fields = settings.fields.compactMap { environment.makeInfoText(for: $0, task: task) }
         if !fields.isEmpty {
             Text(fields.joined(separator: " · "))
                 .lineLimit(settings.lineLimit)
                 .font(makeFont(size: settings.fontSize, design: design))
                 .foregroundStyle(.secondary)
         }
-        let additional = settings.additionalFields.compactMap(task.makeInfoItem)
+        let additional = settings.additionalFields.compactMap { environment.makeInfoItem(for: $0, task: task) }
         if !additional.isEmpty {
             Divider().opacity(0.5).padding(.vertical, 2)
             VStack(alignment: .leading, spacing: 4) {
@@ -163,6 +169,18 @@ package struct ConsoleTaskCell: View {
     }
 
     // MARK: - Helpers
+
+    private func makeHighlightedContent(_ content: String) -> AttributedString {
+        var attributed = AttributedString(content)
+        guard let urlMatch else { return attributed }
+        let matchedText = String(urlMatch.line[urlMatch.range])
+        guard !matchedText.isEmpty, let range = attributed.range(of: matchedText) else {
+            return attributed
+        }
+        attributed.foregroundColor = .secondary
+        attributed[range].foregroundColor = .primary
+        return attributed
+    }
 
     private func makeFont(size: Int, weight: Font.Weight? = nil, design: Font.Design? = nil) -> Font {
         if #available(iOS 16, tvOS 16, *) {
@@ -195,12 +213,10 @@ private extension View {
 #endif
 
 #if DEBUG
-@available(iOS 16, visionOS 1, *)
-struct ConsoleTaskCell_Previews: PreviewProvider {
-    static var previews: some View {
-        ConsoleTaskCell(task: LoggerStore.preview.entity(for: .login))
-            .padding()
-            .previewLayout(.sizeThatFits)
-    }
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview(traits: .sizeThatFitsLayout) {
+    ConsoleTaskCell(task: LoggerStore.preview.entity(for: .login))
+        .padding()
+        .injecting(ConsoleEnvironment(store: LoggerStore.preview))
 }
 #endif

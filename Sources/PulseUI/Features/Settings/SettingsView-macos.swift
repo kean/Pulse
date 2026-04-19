@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(macOS)
 
@@ -18,7 +18,7 @@ struct SettingsView: View {
     var body: some View {
         List {
             if !UserSettings.shared.isRemoteLoggingHidden {
-                if store === RemoteLogger.shared.store {
+                if #available(macOS 15, *), store === RemoteLogger.shared.store {
                     RemoteLoggerSettingsView(viewModel: .shared)
                 } else {
                     Text("Not available")
@@ -37,7 +37,7 @@ struct SettingsView: View {
                     Button("Show in Finder") {
                         NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
                     }
-                    if !(store.options.contains(.readonly)) {
+                    if !store.isReadonly {
                         Button("Remove Logs") {
                             store.removeAll()
                         }
@@ -52,10 +52,8 @@ struct SettingsView: View {
 
 #if DEBUG
 @available(macOS 13, *)
-struct UserSettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsView()
-    }
+#Preview {
+    SettingsView()
 }
 #endif
 #endif

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 
@@ -79,7 +79,7 @@ enum AppInfo {
 }
 
 extension LoggerStore.Info.AppInfo {
-    static let current = LoggerStore.Info.AppInfo(
+    package static let current = LoggerStore.Info.AppInfo(
         bundleIdentifier: AppInfo.bundleIdentifier,
         name: AppInfo.appName,
         version: AppInfo.appVersion,

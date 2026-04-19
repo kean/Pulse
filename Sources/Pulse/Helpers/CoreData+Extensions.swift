@@ -1,10 +1,31 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import CoreData
+import PulseObjCHelpers
+
+extension PulseObjCExceptionCatcher {
+    /// Executes the given throwing block, catching any Objective-C exceptions
+    /// and converting them to Swift errors.
+    public static func perform<T>(_ block: () throws -> T) throws -> T {
+        var result: Result<T, Swift.Error>?
+        try perform {
+            result = Result(catching: block)
+        }
+        return try result!.get()
+    }
+}
 
 extension NSManagedObjectContext {
+    /// Saves the context, catching Objective-C exceptions (e.g. from CoreData
+    /// when the disk is full) that would otherwise bypass Swift error handling.
+    public func safeSave() throws {
+        try PulseObjCExceptionCatcher.perform {
+            try self.save()
+        }
+    }
+
     package func fetch<T: NSManagedObject>(_ entity: T.Type, _ configure: (NSFetchRequest<T>) -> Void = { _ in }) throws -> [T] {
         let request = NSFetchRequest<T>(entityName: String(describing: entity))
         configure(request)
@@ -39,7 +60,7 @@ extension NSManagedObjectContext {
 }
 
 extension NSPersistentContainer {
-    static var inMemoryReadonlyContainer: NSPersistentContainer {
+    package static var inMemoryReadonlyContainer: NSPersistentContainer {
         let container = NSPersistentContainer(name: "EmptyStore", managedObjectModel: LoggerStore.model)
         let description = NSPersistentStoreDescription()
         description.type = NSInMemoryStoreType

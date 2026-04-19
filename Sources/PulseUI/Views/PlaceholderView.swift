@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 
@@ -49,9 +49,7 @@ package struct PlaceholderView: View {
 }
 
 #if DEBUG
-struct PlaceholderView_Previews: PreviewProvider {
-    static var previews: some View {
-        PlaceholderView(imageName: "questionmark.folder", title: "Store Unavailable")
-    }
+#Preview {
+    PlaceholderView(imageName: "questionmark.folder", title: "Store Unavailable")
 }
 #endif

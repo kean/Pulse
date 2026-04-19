@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import CoreData
 import Pulse
@@ -11,23 +11,28 @@ import SwiftUI
 ///
 /// - warning: It's marked with `ObservableObject` to make it possible to be used
 /// with `@StateObject` and `@EnvironmentObject`, but it never changes.
-final class ConsoleEnvironment: ObservableObject {
-    let title: String
-    let store: LoggerStore
-    let index: LoggerStoreIndex
+package final class ConsoleEnvironment: ObservableObject {
+    package let title: String
+    package let store: LoggerStoreProtocol
+    package let index: LoggerStoreIndex
 
-    let filters: ConsoleFiltersViewModel
-    let logCountObserver: ManagedObjectsCountObserver
-    let taskCountObserver: ManagedObjectsCountObserver
+    package let filters: ConsoleFiltersViewModel
+    package let logCountObserver: ManagedObjectsCountObserver
+    package let taskCountObserver: ManagedObjectsCountObserver
 
-    let router = ConsoleRouter()
+    package let router = ConsoleRouter()
 
-    let initialMode: ConsoleMode
+    package let initialMode: ConsoleMode
 
-    @Published var mode: ConsoleMode
-    @Published var listOptions: ConsoleListOptions = .init()
+    /// A delegate that allows integrators to customize how individual tasks
+    /// are rendered. The console keeps a strong reference, so simple
+    /// configuration objects can be passed in without holding them elsewhere.
+    package var delegate: (any ConsoleDelegate)?
 
-    var bindingForNetworkMode: Binding<Bool> {
+    @Published package var mode: ConsoleMode
+    @Published package var listOptions: ConsoleListOptions = .init()
+
+    package var bindingForNetworkMode: Binding<Bool> {
         Binding(get: {
             self.mode == .network
         }, set: {
@@ -37,8 +42,13 @@ final class ConsoleEnvironment: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, mode: ConsoleMode = .all) {
+    package init(
+        store: LoggerStoreProtocol,
+        mode: ConsoleMode = .all,
+        delegate: (any ConsoleDelegate)? = nil
+    ) {
         self.store = store
+        self.delegate = delegate
         switch mode {
         case .all: self.title = "Console"
         case .logs: self.title = "Logs"
@@ -52,25 +62,29 @@ final class ConsoleEnvironment: ObservableObject {
         case .network: self.mode = .network
         }
 
-        func makeDefaultOptions() -> ConsoleDataSource.PredicateOptions {
-            var options = ConsoleDataSource.PredicateOptions()
-            options.filters.shared.sessions.selection = [store.session.id]
+        func makeDefaultOptions() -> ConsoleListPredicateOptions {
+            var options = ConsoleListPredicateOptions()
+            if let sessionID = store.currentSessionID {
+                options.sessions = [sessionID]
+            }
             return options
         }
 
-        self.index = LoggerStoreIndex(store: store)
+        if let store = store as? LoggerStore {
+            self.index = LoggerStoreIndex(store: store)
+        } else {
+            self.index = LoggerStoreIndex(context: store.backgroundContext)
+        }
         self.filters = ConsoleFiltersViewModel(options: makeDefaultOptions())
 
         self.logCountObserver = ManagedObjectsCountObserver(
             entity: LoggerMessageEntity.self,
-            context: store.viewContext,
-            sortDescriptior: NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: false)
+            context: store.viewContext
         )
 
         self.taskCountObserver = ManagedObjectsCountObserver(
             entity: NetworkTaskEntity.self,
-            context: store.viewContext,
-            sortDescriptior: NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)
+            context: store.viewContext
         )
 
         bind()
@@ -90,7 +104,7 @@ final class ConsoleEnvironment: ObservableObject {
         }.store(in: &cancellables)
     }
 
-    private func refreshCountObservers(_ options: ConsoleDataSource.PredicateOptions) {
+    private func refreshCountObservers(_ options: ConsoleListPredicateOptions) {
         func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
             ConsoleDataSource.makePredicate(mode: mode, options: options)
         }
@@ -98,7 +112,80 @@ final class ConsoleEnvironment: ObservableObject {
         taskCountObserver.setPredicate(makePredicate(for: .network))
     }
 
-    func removeAllLogs() {
+    /// Returns the display options to apply to the given network task,
+    /// consulting ``delegate`` and falling back to ``UserSettings/shared``.
+    @MainActor
+    package func listDisplayOptions(for task: NetworkTaskEntity) -> ConsoleListDisplaySettings {
+        delegate?.console(listDisplayOptionsFor: task) ?? UserSettings.shared.listDisplayOptions
+    }
+
+    /// Returns the text for a header/footer field, redacted through the
+    /// ``delegate`` when available. Numeric / enum fields (sizes, durations,
+    /// status codes, etc.) are passed through unchanged.
+    @MainActor
+    package func makeInfoText(for field: ConsoleListDisplaySettings.TaskField, task: NetworkTaskEntity) -> String? {
+        guard let value = task.makeInfoText(for: field) else { return nil }
+        return redact(value, field: field, task: task)
+    }
+
+    @MainActor
+    package func makeInfoItem(for field: ConsoleListDisplaySettings.TaskField, task: NetworkTaskEntity) -> NetworkTaskEntity.InfoItem? {
+        guard let value = makeInfoText(for: field, task: task) else { return nil }
+        return NetworkTaskEntity.InfoItem(field: field, value: value)
+    }
+
+    /// Returns the inspector's short title for a task, redacted through the
+    /// ``delegate`` when available.
+    @MainActor
+    package func shortTitle(for task: NetworkTaskEntity) -> String {
+        let options = listDisplayOptions(for: task)
+        let value = task.getShortTitle(options: options)
+        guard let delegate, !value.isEmpty else { return value }
+        let field: ConsoleRedactionField = (options.content.showTaskDescription &&
+                                            !(task.taskDescription ?? "").isEmpty) ? .taskDescription : .url
+        return delegate.console(redact: value, field: field, for: task)
+    }
+
+    /// Returns the main cell content string, redacted through the ``delegate``
+    /// when available.
+    @MainActor
+    package func formattedContent(for task: NetworkTaskEntity, settings: ConsoleListDisplaySettings.ContentSettings) -> String? {
+        guard let value = task.getFormattedContent(settings: settings) else { return nil }
+        guard let delegate else { return value }
+        let redactionField: ConsoleRedactionField
+        if settings.customText != nil {
+            redactionField = .custom
+        } else if settings.showTaskDescription,
+                  let description = task.taskDescription, !description.isEmpty {
+            redactionField = .taskDescription
+        } else {
+            redactionField = .url
+        }
+        return delegate.console(redact: value, field: redactionField, for: task)
+    }
+
+    @MainActor
+    private func redact(_ value: String, field: ConsoleListDisplaySettings.TaskField, task: NetworkTaskEntity) -> String {
+        guard let delegate else { return value }
+        let redactionField: ConsoleRedactionField
+        switch field {
+        case .url: redactionField = .url
+        case .host: redactionField = .host
+        case .requestHeaderField(let name): redactionField = .requestHeader(name)
+        case .responseHeaderField(let name): redactionField = .responseHeader(name)
+        case .taskDescription: redactionField = .taskDescription
+        case .custom: redactionField = .custom
+        case .method, .requestSize, .responseSize, .responseContentType,
+             .duration, .statusCode, .taskType:
+            return value
+        }
+        return delegate.console(redact: value, field: redactionField, for: task)
+    }
+
+    package func removeAllLogs() {
+        guard !store.isReadonly else {
+            return
+        }
         store.removeAll()
         index.clear()
 
@@ -108,7 +195,7 @@ final class ConsoleEnvironment: ObservableObject {
     }
 }
 
-public enum ConsoleMode: String {
+public enum ConsoleMode: String, Sendable {
     /// Displays both messages and network tasks with the ability
     /// to switch between the two modes.
     case all
@@ -119,12 +206,29 @@ public enum ConsoleMode: String {
 
     package var hasLogs: Bool { self == .all || self == .logs }
     package var hasNetwork: Bool { self == .all || self == .network }
+
+    package func formattedCount(_ count: Int) -> String {
+        let unit: String
+        switch self {
+        case .network: unit = count == 1 ? "Task" : "Tasks"
+        case .logs: unit = count == 1 ? "Log" : "Logs"
+        case .all: unit = count == 1 ? "Item" : "Items"
+        }
+        return "\(count) \(unit)"
+    }
+
+    package var entityName: String {
+        switch self {
+        case .all, .logs: return "\(LoggerMessageEntity.self)"
+        case .network: return "\(NetworkTaskEntity.self)"
+        }
+    }
 }
 
 // MARK: Environment
 
 private struct LoggerStoreKey: EnvironmentKey {
-    static let defaultValue: LoggerStore = .shared
+    static let defaultValue: LoggerStoreProtocol = LoggerStore.shared
 }
 
 private struct ConsoleRouterKey: EnvironmentKey {
@@ -132,7 +236,7 @@ private struct ConsoleRouterKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    package var store: LoggerStore {
+    package var store: LoggerStoreProtocol {
         get { self[LoggerStoreKey.self] }
         set { self[LoggerStoreKey.self] = newValue }
     }
@@ -144,15 +248,16 @@ extension EnvironmentValues {
 }
 
 extension View {
-    func injecting(_ environment: ConsoleEnvironment) -> some View {
-        self.background(ConsoleRouterView()) // important: order
-            .environmentObject(environment)
-            .environmentObject(environment.router)
-            .environmentObject(environment.index)
-            .environmentObject(environment.filters)
-            .environmentObject(UserSettings.shared)
-            .environment(\.router, environment.router)
-            .environment(\.store, environment.store)
-            .environment(\.managedObjectContext, environment.store.viewContext)
+    package func injecting(_ environment: ConsoleEnvironment) -> some View {
+        self.background(
+            ConsoleRouterView(router: environment.router)
+        )
+        // important: order
+        .environmentObject(environment)
+        .environmentObject(environment.filters)
+        .environmentObject(UserSettings.shared)
+        .environment(\.router, environment.router)
+        .environment(\.store, environment.store)
+        .environment(\.managedObjectContext, environment.store.viewContext)
     }
 }

@@ -1,15 +1,15 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
 struct ConsoleTimestampView: View {
-    let date: Date
+    let timestamp: String
 
     var body: some View {
-        Text(ConsoleMessageCell.timeFormatter.string(from: date))
+        Text(timestamp)
 #if os(tvOS)
             .font(.system(size: 21))
 #else
@@ -22,8 +22,9 @@ struct ConsoleTimestampView: View {
     }
 }
 
-struct MockBadgeView: View {
-    var body: some View {
+package struct MockBadgeView: View {
+    package init() {}
+    package var body: some View {
         Text("MOCK")
             .foregroundStyle(.background)
             .font(.caption2.weight(.semibold))

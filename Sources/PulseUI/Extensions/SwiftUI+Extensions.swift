@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Combine
@@ -60,6 +60,62 @@ extension View {
 #if os(iOS) || os(visionOS)
             .navigationBarTitleDisplayMode(.inline)
 #endif
+    }
+}
+
+// MARK: - BackportButtonRole
+
+package enum BackportButtonRole {
+    case cancel
+    case close
+    case confirm
+
+    package var title: String {
+        switch self {
+        case .cancel: "Cancel"
+        case .close: "Close"
+        case .confirm: "Done"
+        }
+    }
+}
+
+@ViewBuilder
+package func makeButton(role: BackportButtonRole, title: String? = nil, action: @escaping () -> Void) -> some View {
+    if #available(iOS 26, macOS 26, visionOS 26, tvOS 26, watchOS 26, *) {
+        if let title {
+            Button(title, role: ButtonRole(role), action: action)
+        } else {
+            Button(role: ButtonRole(role), action: action)
+        }
+    } else {
+        Button(title ?? role.title, action: action)
+    }
+}
+
+package struct ButtonClose: View {
+    @Environment(\.dismiss) private var dismiss
+
+    package let role: BackportButtonRole
+
+    package init(role: BackportButtonRole = .close) {
+        self.role = role
+    }
+
+    package var body: some View {
+        makeButton(role: role) {
+            dismiss()
+        }
+    }
+}
+
+@available(iOS 26, macOS 26, visionOS 26, tvOS 26, watchOS 26, *)
+private extension ButtonRole {
+    init(_ role: BackportButtonRole) {
+        switch role {
+        case .cancel: self = .cancel
+        case .close: self = .close
+        case .confirm: self = .confirm
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import CoreData
@@ -41,10 +41,18 @@ package final class LoggerStoreIndex: ObservableObject {
             self.files.insert(event.file)
             self.labels.insert(event.label)
         case .networkTaskCompleted(let event):
-            if let host = event.originalRequest.url.flatMap(getHost) {
-                var hosts = self.hosts
-                let (isInserted, _) = hosts.insert(host)
-                if isInserted { self.hosts = hosts }
+            if let url = event.originalRequest.url {
+                if let host = getHost(for: url) {
+                    var hosts = self.hosts
+                    let (isInserted, _) = hosts.insert(host)
+                    if isInserted { self.hosts = hosts }
+                }
+                let path = url.path
+                if !path.isEmpty {
+                    var paths = self.paths
+                    let (isInserted, _) = paths.insert(path)
+                    if isInserted { self.paths = paths }
+                }
             }
         default:
             break

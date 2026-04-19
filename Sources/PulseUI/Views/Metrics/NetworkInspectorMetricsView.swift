@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if !os(watchOS)
 
@@ -9,7 +9,7 @@ import Pulse
 
 // MARK: - View
 
-@available(iOS 16, visionOS 1, macOS 13, *)
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct NetworkInspectorMetricsView: View {
     let viewModel: NetworkInspectorMetricsViewModel
 
@@ -55,21 +55,19 @@ final class NetworkInspectorMetricsViewModel {
 // MARK: - Preview
 
 #if DEBUG
-@available(iOS 16, visionOS 1, macOS 13, *)
-struct NetworkInspectorMetricsView_Previews: PreviewProvider {
-    static var previews: some View {
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
+#Preview(traits: .fixedLayout(width: 500, height: 800)) {
 #if os(macOS)
+    NetworkInspectorMetricsView(viewModel: .init(
+        task: LoggerStore.preview.entity(for: .createAPI)
+    )!)
+#else
+    NavigationView {
         NetworkInspectorMetricsView(viewModel: .init(
             task: LoggerStore.preview.entity(for: .createAPI)
-        )!).previewLayout(.fixed(width: 500, height: 800))
-#else
-        NavigationView {
-            NetworkInspectorMetricsView(viewModel: .init(
-                task: LoggerStore.preview.entity(for: .createAPI)
-            )!)
-        }
-#endif
+        )!)
     }
+#endif
 }
 #endif
 

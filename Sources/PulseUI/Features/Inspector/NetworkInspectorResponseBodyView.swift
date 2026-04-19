@@ -1,14 +1,15 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
-#if !os(macOS)
-
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct NetworkInspectorResponseBodyView: View {
     let viewModel: NetworkInspectorResponseBodyViewModel
+
+    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
         contents
@@ -17,7 +18,10 @@ struct NetworkInspectorResponseBodyView: View {
 
     @ViewBuilder
     var contents: some View {
-        if let viewModel = viewModel.fileViewModel {
+        if viewModel.hasData, let custom = environment.delegate?.console(responseBodyViewFor: viewModel.task) {
+            custom
+                .onDisappear { self.viewModel.onDisappear() }
+        } else if let viewModel = viewModel.fileViewModel {
             FileViewer(viewModel: viewModel)
                 .onDisappear { self.viewModel.onDisappear() }
         } else if viewModel.task.type == .downloadTask {
@@ -36,8 +40,6 @@ struct NetworkInspectorResponseBodyView: View {
     }
 }
 
-#endif
-
 final class NetworkInspectorResponseBodyViewModel {
     private(set) lazy var fileViewModel = data.map { data in
         FileViewerViewModel(
@@ -46,6 +48,8 @@ final class NetworkInspectorResponseBodyViewModel {
             data: { data }
         )
     }
+
+    var hasData: Bool { data != nil }
 
     private var data: Data? {
         guard let data = task.responseBody?.data, !data.isEmpty else { return nil }

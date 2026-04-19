@@ -4,10 +4,10 @@ Learn how to enable and configure network logging and debugging.
 
 ## Overview
 
-Pulse works on the `URLSession` level, and it needs access to its callbacks to log network requests and capture network metrics. The framework is modular and provides multiple options that can accommodate almost any system. By the end of this article, you will have a system that:
+Pulse works at the `URLSession` level, and it needs access to its callbacks to log network requests and capture network metrics. The framework is modular and provides multiple options that can accommodate almost any system. By the end of this article, you will have a system that:
 
 - Captures network requests and metrics
-- Supports debugging features powered by Pulse Pro, such as mocking 
+- Supports debugging features powered by Pulse Pro, such as mocking
 
 ## Capture Network Requests
 
@@ -139,7 +139,7 @@ configuration.sensitiveDataFields = ["password"]
 let logger = NetworkLogger(configuration: configuration)
 ```
 
-You can then replace the default decoder with your custom instance:
+You can then replace the default logger with your custom instance:
 
 ```swift
 NetworkLogger.shared = logger
@@ -153,7 +153,7 @@ If the built-in configuration options don't cover all of your use cases, you can
 
 ### Trace in Xcode Console
 
-Pulse doesn't print anything in the Xcode Console by default, but it's easy to enable  logging for network requests. ``LoggerStore`` re-translates all of the log events that it processes using ``LoggerStore/events`` publisher that you can leverage.
+Pulse doesn't print anything in the Xcode Console by default, but it's easy to enable logging for network requests. ``LoggerStore`` re-translates all of the log events that it processes using ``LoggerStore/events`` publisher that you can leverage.
 
 ```swift
 func register(store: LoggerStore) {
@@ -174,10 +174,10 @@ private func process(event: LoggerStore.Event) {
 
 ## Network Debugging
 
-In addition to logging, Pulse provides network debugging features, such as logging. If you use the recommended ``URLSessionProxy``, these features are enabled automatically, and you don't need to do anything. In other cases, make sure to inject ``MockingURLProtocol`` in the set of URL protocols used by your `URLSession`:
+In addition to logging, Pulse provides network debugging features, such as mocking. If you use the recommended ``URLSessionProxy``, these features are enabled automatically, and you don't need to do anything. In other cases, make sure to inject ``MockingURLProtocol`` in the set of URL protocols used by your `URLSession`:
 
 ```swift
-let configuration = URLSesionConfiguration.default
+let configuration = URLSessionConfiguration.default
 configuration.protocolClasses = [MockingURLProtocol.self] + (configuration.protocolClasses ?? [])
 ```
 

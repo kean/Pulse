@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 
@@ -526,6 +526,7 @@ extension NetworkLogger {
         public var isImage: Bool { type.hasPrefix("image/") }
         public var isHTML: Bool { type.contains("html") }
         public var isEncodedForm: Bool { type == "application/x-www-form-urlencoded" }
+        public var isProtobuf: Bool { type.contains("protobuf") || type.contains("grpc") }
 
         public var lastComponent: String {
             type.components(separatedBy: "/").last ?? type

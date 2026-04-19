@@ -1,19 +1,23 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Pulse
 import CoreData
+import SwiftUI
 
 #if DEBUG || STANDALONE_PULSE_APP
 
 extension LoggerStore {
     package static let mock: LoggerStore = {
-        let store = makeMockStore()
+        var configuration = LoggerStore.Configuration()
+        configuration.isAutoStartingSession = false
+        let store = makeMockStore(configuration: configuration)
         _syncPopulateStore(store)
         return store
     }()
+
 
     package static let preview = makeMockStore()
 
@@ -22,8 +26,143 @@ extension LoggerStore {
     }
 }
 
+/// Sample ``ConsoleDelegate`` used by previews and demos. For GraphQL
+/// requests, it surfaces the operation name — conventionally stored on
+/// `URLSessionTask.taskDescription` for debugging — as the cell's main
+/// content via ``ConsoleListDisplaySettings/ContentSettings/customText``.
+@MainActor
+package final class MockConsoleDelegate: ConsoleDelegate {
+    package static let shared = MockConsoleDelegate()
+
+    package func console(listDisplayOptionsFor task: NetworkTaskEntity) -> ConsoleListDisplaySettings {
+        if task.url?.contains("/graphql") == true,
+           let operationName = task.taskDescription, !operationName.isEmpty {
+            var options = ConsoleListDisplaySettings()
+            options.content.showMethod = false
+            options.content.customText = operationName
+            options.footer.fields = [.url(components: [.host, .path])]
+            return options
+        }
+        return UserSettings.shared.listDisplayOptions
+    }
+
+    package func console(inspectorViewFor task: NetworkTaskEntity) -> AnyView? {
+        guard task.url?.contains("/graphql") == true,
+              let operationName = task.taskDescription, !operationName.isEmpty else {
+            return nil
+        }
+        return AnyView(
+            Section("GraphQL") {
+                HStack {
+                    Text("Operation")
+                    Spacer()
+                    Text(operationName).foregroundStyle(.secondary)
+                }
+            }
+        )
+    }
+
+    package func console(responseBodyViewFor task: NetworkTaskEntity) -> AnyView? {
+        guard task.response?.contentType?.isProtobuf == true,
+              let data = task.responseBody?.data, !data.isEmpty else {
+            return nil
+        }
+        return AnyView(MockProtobufResponseView(
+            typeName: task.response?.headers["X-Grpc-Message-Type"],
+            data: data
+        ))
+    }
+
+    package func console(redact value: String, field: ConsoleRedactionField, for task: NetworkTaskEntity) -> String {
+        switch field {
+        case .requestHeader("Authorization"), .requestHeader("Cookie"),
+             .responseHeader("Set-Cookie"):
+            return "***"
+        default:
+            return value
+        }
+    }
+
+    package func console(contextMenuFor task: NetworkTaskEntity) -> AnyView? {
+        guard task.url?.contains("/graphql") == true,
+              let operationName = task.taskDescription, !operationName.isEmpty else {
+            return nil
+        }
+        return AnyView(
+            Section("GraphQL") {
+                Button {
+#if canImport(UIKit) && !os(watchOS) && !os(tvOS)
+                    UIPasteboard.general.string = operationName
+#elseif canImport(AppKit)
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(operationName, forType: .string)
+#endif
+                } label: {
+                    Label("Copy Operation Name", systemImage: "doc.on.doc")
+                }
+            }
+        )
+    }
+}
+
+/// Stand-in for an integrator's protobuf-decoded response view. In a real
+/// app this would decode `data` using generated `SwiftProtobuf` types and
+/// render a field tree; here we just pretty-print the parsed fields so the
+/// demo shows what `responseBodyViewFor` looks like end-to-end.
+@MainActor
+private struct MockProtobufResponseView: View {
+    let typeName: String?
+    let data: Data
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                if let typeName {
+                    Text(typeName)
+                        .font(.system(.headline, design: .monospaced))
+                }
+                Text(decoded)
+                    .font(.system(.callout, design: .monospaced))
+#if !os(watchOS) && !os(tvOS)
+                    .textSelection(.enabled)
+#endif
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Divider()
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Raw (\(data.count) bytes)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(data.map { String(format: "%02x", $0) }.joined(separator: " "))
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(.secondary)
+#if !os(watchOS) && !os(tvOS)
+                        .textSelection(.enabled)
+#endif
+                }
+            }
+            .padding()
+        }
+    }
+
+    private var decoded: String {
+        """
+        {
+          id: 1567433
+          username: "kean"
+          email: "alex@example.com"
+          roles: ["owner", "maintainer"]
+          profile {
+            display_name: "Alex Kean"
+            followers: 354
+            verified: true
+          }
+        }
+        """
+    }
+}
+
 extension LoggerStore {
-    static let demo: LoggerStore = {
+    package static let demo: LoggerStore = {
         let store = LoggerStore.shared
         store.startPopulating()
         return store
@@ -51,11 +190,11 @@ private let cleanup: Void = {
     try! FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
 }()
 
-private func makeMockStore() -> LoggerStore {
+private func makeMockStore(configuration: LoggerStore.Configuration = .init()) -> LoggerStore {
     _ = cleanup
 
     let storeURL = rootURL.appendingPathComponent("\(UUID().uuidString).pulse")
-    return try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
+    return try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous], configuration: configuration)
 }
 
 private struct Logger {
@@ -158,6 +297,116 @@ private func _syncPopulateStore(_ store: LoggerStore) {
     }())
 
     let urlSession = URLSession(configuration: .default)
+    let now = Date()
+
+    // MARK: - Session 1: Startup & Browse (2 days ago)
+
+    store.startSession(.init(startDate: now.addingTimeInterval(-2 * 24 * 3600)), info: .current)
+
+    logger(named: "application")
+        .log(level: .info, "UIApplication.didFinishLaunching", metadata: [
+            "environment": .string("production")
+        ])
+
+    logger(named: "application")
+        .log(level: .info, "UIApplication.willEnterForeground")
+
+    logger(named: "session")
+        .log(level: .trace, "Instantiated Session")
+
+    logger(named: "auth")
+        .log(level: .trace, "Checking stored credentials")
+
+    logger(named: "auth")
+        .log(level: .debug, "Token expired, re-authenticating")
+
+    _logTask(.login, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "auth")
+        .log(level: .info, "Successfully authenticated user", metadata: [
+            "user_id": .string("12345"),
+            "method": .string("password")
+        ])
+
+    logger(named: "analytics")
+        .log(level: .debug, "Will navigate to Dashboard")
+
+    _logTask(.repos, urlSession: urlSession, logger: networkLogger)
+    _logTask(.octocat, urlSession: urlSession, logger: networkLogger)
+    _logTask(.searchRepos, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "analytics")
+        .log(level: .debug, "Will navigate to Notifications")
+
+    _logTask(.notifications, urlSession: urlSession, logger: networkLogger)
+    _logTask(.starRepo, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "cache")
+        .log(level: .trace, "Image cached to disk", metadata: [
+            "key": .string("octocat_avatar"),
+            "size_bytes": .string("6789")
+        ])
+
+    // MARK: - Session 2: API Issues (6 hours ago)
+
+    store.startSession(.init(startDate: now.addingTimeInterval(-6 * 3600)), info: .current)
+
+    logger(named: "application")
+        .log(level: .info, "UIApplication.didFinishLaunching")
+
+    logger(named: "application")
+        .log(level: .info, "UIApplication.willEnterForeground")
+
+    logger(named: "session")
+        .log(level: .trace, "Instantiated Session")
+
+    logger(named: "auth")
+        .log(level: .debug, "Using cached auth token")
+
+    logger(named: "analytics")
+        .log(level: .debug, "Will navigate to Profile")
+
+    _logTask(.profile, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "network")
+        .log(level: .warning, "Profile endpoint returned 404 — user profile may not exist")
+
+    _logTask(.pullRequests, urlSession: urlSession, logger: networkLogger)
+    _logTask(.issues, urlSession: urlSession, logger: networkLogger)
+    _logTask(.userOrgs, urlSession: urlSession, logger: networkLogger)
+    _logTask(.gists, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "sync")
+        .log(level: .info, "Starting data export")
+
+    _logTask(.uploadPulseArchive, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "sync")
+        .log(level: .info, "Data export completed", metadata: [
+            "archive_size": .string("21.8 MB"),
+            "duration_ms": .string("2890")
+        ])
+
+    logger(named: "api")
+        .log(level: .debug, "Creating new API token")
+
+    _logTask(.createAPI, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "api")
+        .log(level: .info, "API token created successfully")
+
+    logger(named: "api")
+        .log(level: .debug, "Updating repository metadata")
+
+
+    _logTask(.deleteRepo, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "network")
+        .log(level: .warning, "DELETE /repos/kean/deprecated-project returned 403 Forbidden")
+
+    // MARK: - Session 3: Latest Session (current)
+
+    store.startSession(.init(startDate: now.addingTimeInterval(-120)), info: .current)
 
     logger(named: "application")
         .log(level: .info, "UIApplication.didFinishLaunching", metadata: [
@@ -170,15 +419,71 @@ private func _syncPopulateStore(_ store: LoggerStore) {
     logger(named: "session")
         .log(level: .trace, "Instantiated Session")
 
+    logger(named: "database")
+        .log(level: .debug, "Running pending database migrations", metadata: [
+            "from_version": .string("12"),
+            "to_version": .string("14")
+        ])
+
+    logger(named: "database")
+        .log(level: .info, "Database migration completed")
+
     logger(named: "auth")
         .log(level: .trace, "Instantiated the new login request")
+
+    _logTask(.protoUser, urlSession: urlSession, logger: networkLogger)
+
+    _logTask(.downloadNuke, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "auth")
+        .log(level: .info, "Login successful")
 
     logger(named: "analytics")
         .log(level: .debug, "Will navigate to Dashboard")
 
-    for task in MockTask.allTasks {
-        _logTask(task, urlSession: urlSession, logger: networkLogger)
-    }
+    _logTask(.userEvents, urlSession: urlSession, logger: networkLogger)
+    _logTask(.followers, urlSession: urlSession, logger: networkLogger)
+    _logTask(.rateLimit, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "feed")
+        .log(level: .debug, "Loading repository feed")
+
+    _logTask(.releaseLatest, urlSession: urlSession, logger: networkLogger)
+    _logTask(.repoContributors, urlSession: urlSession, logger: networkLogger)
+    _logTask(.labels, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "analytics")
+        .log(level: .debug, "Will navigate to Profile")
+
+    _logTask(.updateProfile, urlSession: urlSession, logger: networkLogger)
+    _logTask(.graphQL, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "sync")
+        .log(level: .debug, "Initiating background sync")
+
+    _logTask(.createIssue, urlSession: urlSession, logger: networkLogger)
+    _logTask(.mergeRequest, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "sync")
+        .log(level: .info, "Background sync completed", metadata: [
+            "files_synced": .string("3"),
+            "total_size": .string("6.4 MB")
+        ])
+
+    logger(named: "analytics")
+        .log(level: .debug, "Will navigate to Settings")
+
+    _logTask(.rateLimitExceeded, urlSession: urlSession, logger: networkLogger)
+
+    _logTask(.patchRepo, urlSession: urlSession, logger: networkLogger)
+
+    logger(named: "api")
+        .log(level: .error, "Failed to decode response: keyNotFound(\"updated_at\", Swift.DecodingError.Context(codingPath: [], debugDescription: \"No value associated with key\"))")
+
+    logger(named: "network")
+        .log(level: .error, "API rate limit exceeded — retry after 60s")
+
+    _logTask(.serverError, urlSession: urlSession, logger: networkLogger)
 
     let stackTrace = """
         Replace this implementation with code to handle the error appropriately. fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.

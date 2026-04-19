@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import SwiftUI
@@ -11,7 +11,7 @@ package struct StatusLabelViewModel {
     package let tint: Color
     package let title: String
 
-    package init(task: NetworkTaskEntity, store: LoggerStore?) {
+    package init(task: NetworkTaskEntity, store: LoggerStoreProtocol?) {
         guard let state = task.state(in: store) else {
             self.systemImage = "questionmark.diamond.fill"
             self.tint = .secondary

@@ -1,12 +1,13 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2026 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS) || os(visionOS)
 
 import SwiftUI
 import Combine
 
+@available(iOS 18, tvOS 18, macOS 15, watchOS 11, visionOS 1, *)
 struct WrappedTextView: UIViewRepresentable {
     let viewModel: RichTextViewModel
 
@@ -16,6 +17,22 @@ struct WrappedTextView: UIViewRepresentable {
         var onLinkTapped: ((URL) -> Bool)?
         var cancellables: [AnyCancellable] = []
 
+        func textView(_ textView: UITextView, primaryActionFor textItem: UITextItem, defaultAction: UIAction) -> UIAction? {
+            guard case .link(let URL) = textItem.content else { return defaultAction }
+            if let onLinkTapped = onLinkTapped, onLinkTapped(URL) {
+                return nil
+            }
+            if let (title, message) = parseTooltip(URL) {
+                return UIAction { _ in
+                    let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+                    alert.addAction(.init(title: "Done", style: .cancel))
+                    UIApplication.keyWindow?.rootViewController?.present(alert, animated: true)
+                }
+            }
+            return defaultAction
+        }
+
+        @available(iOS, deprecated: 17, message: "Use primaryActionFor instead")
         func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
             if let onLinkTapped = onLinkTapped, onLinkTapped(URL) {
                 return false
@@ -32,13 +49,8 @@ struct WrappedTextView: UIViewRepresentable {
     }
 
     func makeUIView(context: Context) -> UXTextView {
-        let textView: UITextView
-        if #available(iOS 16, *) {
-            // Disables the new TextKit 2 which is extremely slow on iOS 16
-            textView = UITextView(usingTextLayoutManager: false)
-        } else {
-            textView = UITextView()
-        }
+        // Disables the new TextKit 2 which is extremely slow on iOS 16
+        let textView = UITextView(usingTextLayoutManager: false)
         configureTextView(textView)
         textView.delegate = context.coordinator
         textView.attributedText = viewModel.originalText
