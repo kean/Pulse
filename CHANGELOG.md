@@ -1,5 +1,11 @@
 # Pulse 5.x
 
+## Pulse 5.2.1
+
+*Apr 20, 2026*
+
+- Fix a crash on iOS 26 Simulator where `UIImage(named:)` raises `NSInternalInconsistencyException` ("Need an imageRef") for app icon assets that can't be rasterized for the current trait ([#364](https://github.com/kean/Pulse/issues/364))
+
 ## Pulse 5.2
 
 *Apr 19, 2026*

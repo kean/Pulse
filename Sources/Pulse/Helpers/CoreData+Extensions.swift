@@ -15,6 +15,13 @@ extension PulseObjCExceptionCatcher {
         }
         return try result!.get()
     }
+
+    /// Returns the result of `block`, or `nil` if it returns `nil` or raises
+    /// an Objective-C exception. Useful for UIKit APIs that raise exceptions
+    /// from otherwise-optional call sites (e.g. `UIImage(named:)` on iOS 26+).
+    public static func attempt<T>(_ block: () -> T?) -> T? {
+        (try? perform(block)) ?? nil
+    }
 }
 
 extension NSManagedObjectContext {
