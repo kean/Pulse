@@ -79,7 +79,7 @@ public struct RichTextView: View {
         if !isTextViewBarItemsHidden {
             Menu(content: {
                 AttributedStringShareMenu(shareItems: $shareItems) {
-                    viewModel.textStorage
+                    viewModel.originalText
                 }
             }, label: {
                 Image(systemName: "square.and.arrow.up")
