@@ -65,7 +65,6 @@ public final class RichTextViewModel: ObservableObject {
         didUpdateMatches(matches, string: textStorage)
         if context.matchIndex < matches.count {
             DispatchQueue.main.async {
-                self.textView?.layoutManager.allowsNonContiguousLayout = false // Remove this workaround
                 UIView.performWithoutAnimation {
                     self.updateMatchIndex(context.matchIndex)
                 }
