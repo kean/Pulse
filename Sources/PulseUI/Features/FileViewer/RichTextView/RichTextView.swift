@@ -58,7 +58,7 @@ public struct RichTextView: View {
 
         var body: some View {
             WrappedTextView(viewModel: viewModel)
-                .edgesIgnoringSafeArea([.bottom])
+                .edgesIgnoringSafeArea([.top, .bottom])
                 .overlay {
                     if isSearching || !viewModel.matches.isEmpty {
                         if #available(iOS 26, visionOS 26, *) {
