@@ -12,13 +12,13 @@ struct RichTextViewSearchToobar: View {
     @State private var isRealMenuShown = false
 
     var body: some View {
-        HStack(alignment: .center, spacing: 24) {
-            options
-            stepper
+        Group {
+            if #available(iOS 26, visionOS 26, *) {
+                glassBar
+            } else {
+                legacyBar
+            }
         }
-        .padding(12)
-        .background(Material.regular)
-        .cornerRadius(8)
         .onReceive(Keyboard.isHidden) { _ in
             // Show a non-interactive placeholder during animation,
             // then show the actual menu when navigation is settled.
@@ -33,7 +33,83 @@ struct RichTextViewSearchToobar: View {
         }
     }
 
-    private var options: some View {
+    private var matchCountText: String {
+        viewModel.matches.isEmpty ? "0 of 0" : "\(viewModel.selectedMatchIndex + 1) of \(viewModel.matches.count)"
+    }
+
+    // MARK: iOS 26 (Liquid Glass)
+
+    @available(iOS 26, visionOS 26, *)
+    private var glassBar: some View {
+        HStack(spacing: 2) {
+            navButton("chevron.left", action: viewModel.previousMatch)
+
+            Text(matchCountText)
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                // Reserve enough room for common counts so the chevrons don't
+                // shift as matches update; very large counts scale down.
+                .frame(minWidth: 64, alignment: .center)
+
+            navButton("chevron.right", action: viewModel.nextMatch)
+
+            moreMenu
+        }
+        .foregroundStyle(.primary)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 4)
+        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 26))
+    }
+
+    @available(iOS 26, visionOS 26, *)
+    private func navButton(_ systemName: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 17, weight: .medium))
+                .frame(width: 40, height: 40)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(viewModel.matches.isEmpty)
+    }
+
+    @available(iOS 26, visionOS 26, *)
+    @ViewBuilder
+    private var moreMenu: some View {
+        ZStack {
+            Image(systemName: "ellipsis")
+                .font(.system(size: 17, weight: .medium))
+                .opacity(isRealMenuShown ? 0 : 1)
+            if isRealMenuShown {
+                Menu(content: {
+                    StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
+                }, label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 17, weight: .medium))
+                        .frame(width: 40, height: 40)
+                        .contentShape(Rectangle())
+                })
+                .menuStyle(.borderlessButton)
+            }
+        }
+        .frame(width: 40, height: 40)
+    }
+
+    // MARK: Legacy (iOS < 26)
+
+    private var legacyBar: some View {
+        HStack(alignment: .center, spacing: 24) {
+            legacyOptions
+            legacyStepper
+        }
+        .padding(12)
+        .background(Material.regular)
+        .cornerRadius(8)
+    }
+
+    private var legacyOptions: some View {
         ZStack {
             Image(systemName: "ellipsis.circle")
                 .foregroundColor(.accentColor)
@@ -52,7 +128,7 @@ struct RichTextViewSearchToobar: View {
         }
     }
 
-    private var stepper: some View {
+    private var legacyStepper: some View {
         HStack(spacing: 12) {
             Button(action: viewModel.previousMatch) {
                 Image(systemName: "chevron.left.circle")

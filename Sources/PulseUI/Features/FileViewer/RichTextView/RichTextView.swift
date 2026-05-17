@@ -61,12 +61,24 @@ public struct RichTextView: View {
                 .edgesIgnoringSafeArea([.bottom])
                 .overlay {
                     if isSearching || !viewModel.matches.isEmpty {
-                        VStack {
-                            Spacer()
-                            HStack {
+                        if #available(iOS 26, visionOS 26, *) {
+                            VStack {
                                 Spacer()
-                                RichTextViewSearchToobar(viewModel: viewModel)
-                                    .padding()
+                                HStack {
+                                    Spacer()
+                                    RichTextViewSearchToobar(viewModel: viewModel)
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.bottom, 8)
+                            }
+                        } else {
+                            VStack {
+                                Spacer()
+                                HStack {
+                                    Spacer()
+                                    RichTextViewSearchToobar(viewModel: viewModel)
+                                        .padding()
+                                }
                             }
                         }
                     }
