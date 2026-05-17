@@ -1,5 +1,14 @@
 # Pulse 5.x
 
+## Pulse 5.2.2
+
+*May 17, 2026*
+
+- Fix SIGTRAP in NetworkTaskEntity.state(in:) when session UUID is NULL by @bdolewski in https://github.com/kean/Pulse/pull/368
+- Speed up text search in NetworkInspector for large response bodies by @rusik in https://github.com/kean/Pulse/pull/367
+- Recreate blobs directory after store schema migration by @rusik in https://github.com/kean/Pulse/pull/366
+- Improve Liquid Glass support
+
 ## Pulse 5.2.1
 
 *Apr 20, 2026*
