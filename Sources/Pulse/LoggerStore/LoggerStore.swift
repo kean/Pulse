@@ -172,6 +172,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     private static func removePreviousStore(at storeURL: URL) throws {
         try Files.removeItem(at: storeURL)
         try Files.createDirectory(at: storeURL, withIntermediateDirectories: true)
+        Files.createDirectoryIfNeeded(at: storeURL.appending(directory: blobsDirectoryName))
     }
 
     private func postInitialization() throws {
