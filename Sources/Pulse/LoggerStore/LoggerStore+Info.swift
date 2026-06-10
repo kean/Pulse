@@ -97,7 +97,10 @@ private func getAppIcon() -> Data? {
           // On iOS 26+, `UIImage(named:)` can raise `NSInternalInconsistencyException`
           // ("Need an imageRef") for assets that can't be rasterized for the current trait.
           let image = PulseObjCExceptionCatcher.attempt({ PlatformImage(named: lastIcon) }),
-          let thumbnail = Graphics.resize(image, to: CGSize(width: 44, height: 44)) else { return nil }
+          // App icons are always opaque per Apple's icon guidelines; resizing into a
+          // non-opaque context preserves an alpha channel that HEIF encoding will then
+          // warn about ("trying to save an opaque image with AlphaLast").
+          let thumbnail = Graphics.resize(image, to: CGSize(width: 44, height: 44), opaque: true) else { return nil }
     return Graphics.encode(thumbnail, compressionQuality: 0.9)
 }
 

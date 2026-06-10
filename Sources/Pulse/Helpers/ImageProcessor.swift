@@ -19,9 +19,9 @@ import ImageIO
 #endif
 
 enum Graphics {
-    static func resize(_ image: PlatformImage, to size: CGSize) -> PlatformImage? {
+    static func resize(_ image: PlatformImage, to size: CGSize, opaque: Bool = false) -> PlatformImage? {
 #if canImport(UIKit)
-        UIGraphicsBeginImageContextWithOptions(size, false, 1.0)
+        UIGraphicsBeginImageContextWithOptions(size, opaque, 1.0)
         image.draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
         let thumbnail = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
