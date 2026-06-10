@@ -1,5 +1,12 @@
 # Pulse 5.x
 
+## Pulse 5.2.3
+
+*Jun 10, 2026*
+
+- Fix: use opaque graphics context when resizing the app icon by @tsushanth in https://github.com/kean/Pulse/pull/371
+- Fix: RichTextView share/copy produces empty content when textView is nil by @mehmetozkn in https://github.com/kean/Pulse/pull/369
+
 ## Pulse 5.2.2
 
 *May 17, 2026*
