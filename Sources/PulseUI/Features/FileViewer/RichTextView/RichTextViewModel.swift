@@ -27,7 +27,7 @@ public final class RichTextViewModel: ObservableObject {
     public var isEmpty: Bool { originalText.length == 0 }
 
     weak var textView: UXTextView? // Not proper MVVM
-    var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(string: "") }
+    var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(attributedString: originalText) }
 
     private var isSearchingInBackground = false
     private var isSearchNeeded = false
