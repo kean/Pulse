@@ -79,9 +79,10 @@ public final class RichTextViewModel: ObservableObject {
     }
 
     func performUpdates(_ closure: (NSTextStorage) -> Void) {
-        textStorage.beginEditing()
-        closure(textStorage)
-        textStorage.endEditing()
+        let storage = textStorage
+        storage.beginEditing()
+        closure(storage)
+        storage.endEditing()
     }
 
     private func setSearchNeeded() {
@@ -94,7 +95,7 @@ public final class RichTextViewModel: ObservableObject {
         isSearchingInBackground = true
         isSearchNeeded = false
 
-        let string = textStorage
+        let string = NSAttributedString(attributedString: textStorage)
         let (searchTerm, options) = (searchTerm, searchOptions)
         let originalText = self.originalText
 
@@ -107,17 +108,17 @@ public final class RichTextViewModel: ObservableObject {
     }
 
     private func didUpdateMatches(_ newMatches: [SearchMatch], string: NSAttributedString) {
-        performUpdates { _ in
-            clearMatches()
+        performUpdates { storage in
+            clearMatches(in: storage)
 
-            if string.length != textStorage.length {
-                textStorage.setAttributedString(string)
+            if string.length != storage.length {
+                storage.setAttributedString(string)
             }
 
-            matches = newMatches
+            matches = newMatches.filter { isValid($0.range, in: storage) }
 
             for match in matches {
-                highlight(range: match.range)
+                highlight(range: match.range, in: storage)
             }
         }
 
@@ -144,12 +145,14 @@ public final class RichTextViewModel: ObservableObject {
     }
 
     private func didUpdateCurrentSelectedMatch(previousMatch: Int? = nil) {
-        guard !matches.isEmpty else { return }
+        let storage = textStorage
+        guard !matches.isEmpty, matches.indices.contains(selectedMatchIndex) else { return }
+        guard isValid(matches[selectedMatchIndex].range, in: storage) else { return }
 
         // Scroll to a slightly extended range so the match isn't pinned to the
         // top edge. Use native newline search instead of a per-character loop.
         var range = matches[selectedMatchIndex].range
-        let string = textStorage.string as NSString
+        let string = storage.string as NSString
         var searchStart = range.upperBound
         for _ in 0..<8 {
             guard searchStart < string.length else { break }
@@ -161,28 +164,43 @@ public final class RichTextViewModel: ObservableObject {
         textView?.scrollRangeToVisible(range)
 
         // Update highlights
-        if let previousMatch = previousMatch {
-            highlight(range: matches[previousMatch].range)
+        if let previousMatch = previousMatch, matches.indices.contains(previousMatch) {
+            highlight(range: matches[previousMatch].range, in: storage)
         }
-        highlight(range: matches[selectedMatchIndex].range, isFocused: true)
+        highlight(range: matches[selectedMatchIndex].range, in: storage, isFocused: true)
     }
 
-    private func clearMatches() {
-        for match in matches {
+    private func clearMatches(in storage: NSTextStorage) {
+        for match in matches where isValid(match.range, in: storage) {
             let range = match.range
-            textStorage.addAttribute(.foregroundColor, value: match.originalForegroundColor, range: range)
-            textStorage.removeAttribute(.backgroundColor, range: range)
+            storage.addAttribute(.foregroundColor, value: match.originalForegroundColor, range: range)
+            storage.removeAttribute(.backgroundColor, range: range)
             if let backgroundColor = match.originalBackgroundColor {
-                textStorage.addAttribute(.backgroundColor, value: backgroundColor, range: range)
+                storage.addAttribute(.backgroundColor, value: backgroundColor, range: range)
             }
         }
     }
 
-    private func highlight(range: NSRange, isFocused: Bool = false) {
-        textStorage.addAttributes([
+    private func highlight(range: NSRange, in storage: NSTextStorage, isFocused: Bool = false) {
+        guard isValid(range, in: storage) else { return }
+        storage.addAttributes([
             .backgroundColor: UXColor.systemBlue.withAlphaComponent(isFocused ? 0.8 : 0.3),
             .foregroundColor: UXColor.white
         ], range: range)
+    }
+
+    /// Returns `true` if `range` can be safely applied to the given string.
+    ///
+    /// Search results are produced from `originalText` on a background queue, but
+    /// highlights are applied later to the current text storage. The text storage
+    /// may have changed by then, so every saved match range has to be validated
+    /// before it is passed to `NSTextStorage`.
+    private func isValid(_ range: NSRange, in string: NSAttributedString) -> Bool {
+        range.location != NSNotFound &&
+        range.location >= 0 &&
+        range.length > 0 &&
+        range.location < string.length &&
+        range.length <= string.length - range.location
     }
 }
 
