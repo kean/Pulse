@@ -30,7 +30,7 @@ final class RichTextViewModel: ObservableObject {
     var isEmpty: Bool { originalText.length == 0 }
 
     weak var textView: UXTextView? // Not proper MVVM
-    var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(string: "") }
+    var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(attributedString: originalText) }
 
     private var prefilteredText: NSAttributedString?
     private var isSearchingInBackground = false
