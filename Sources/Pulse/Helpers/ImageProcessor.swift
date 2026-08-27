@@ -57,7 +57,7 @@ enum Graphics {
     }
 
     static func encode(_ image: PlatformImage, compressionQuality: CGFloat = 0.8) -> Data? {
-        guard let source = image.cgImage else {
+        guard let source = image.removingAlphaChannel()?.cgImage else {
             return nil
         }
         let data = NSMutableData()
@@ -100,3 +100,27 @@ extension NSImage {
     }
 }
 #endif
+
+extension PlatformImage {
+
+    func removingAlphaChannel() -> PlatformImage? {
+        guard let cgImage = self.cgImage else { return nil }
+        guard [.first, .last, .premultipliedFirst, .premultipliedLast].contains(cgImage.alphaInfo) else { return self }
+
+        let width = cgImage.width
+        let height = cgImage.height
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+
+        // Create a context with no alpha channel (noneSkipLast = RGBX)
+        let bitmapInfo = CGBitmapInfo.byteOrder32Big.union(CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipLast.rawValue))
+
+        guard let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0, space: colorSpace, bitmapInfo: bitmapInfo.rawValue) else {
+            return nil
+        }
+
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+        guard let newCGImage = context.makeImage() else { return nil }
+
+        return PlatformImage(cgImage: newCGImage)
+    }
+}
