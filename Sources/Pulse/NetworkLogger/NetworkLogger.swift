@@ -357,8 +357,8 @@ private extension URLSessionTask {
 nonisolated(unsafe) private var requestBodyKey: UInt8 = 0
 
 extension URLSessionTask {
-    /// A request body that isn't part of `originalRequest`, such as the data
-    /// passed to `uploadTask(with:from:)`.
+    /// A request body that isn't part of `originalRequest`: the data passed to
+    /// `uploadTask(with:from:)`, or a body captured from a streamed upload.
     package var pulse_requestBody: Data? {
         get { objc_getAssociatedObject(self, &requestBodyKey) as? Data }
         set { objc_setAssociatedObject(self, &requestBodyKey, newValue, .OBJC_ASSOCIATION_COPY_NONATOMIC) }
