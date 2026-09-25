@@ -49,6 +49,7 @@ final class URLSessionSwizzler {
 
     func enable() {
         swizzleURLSessionTaskResume()
+        swizzleUploadTaskFromData()
         // "__NSCFURLLocalSessionConnection"
         if let sessionClass = NSClassFromString(["__", "NS", "CFURL", "Local", "Session", "Connection"].joined()) {
             swizzleDataTaskDidReceiveData(baseClass: sessionClass)
@@ -141,5 +142,52 @@ final class URLSessionSwizzler {
             }
         }
         method_setImplementation(method, imp_implementationWithBlock(closure))
+    }
+
+    // - `uploadTask(with:from:)`, `uploadTask(with:from:completionHandler:)`, and
+    // `upload(for:from:delegate:)`. URLSession keeps these bodies out of
+    // `originalRequest.httpBody`, so attach them to the task instead.
+    private func swizzleUploadTaskFromData() {
+        typealias Handler = AnyObject // The completion handler block, passed through as is
+        do {
+            let selector = NSSelectorFromString("uploadTaskWithRequest:fromData:")
+            if let method = class_getInstanceMethod(URLSession.self, selector) {
+                typealias MethodSignature = @convention(c) (AnyObject, Selector, NSURLRequest, NSData?) -> URLSessionUploadTask
+                let original = unsafeBitCast(method_getImplementation(method), to: MethodSignature.self)
+                let block: @convention(block) (AnyObject, NSURLRequest, NSData?) -> URLSessionUploadTask = { [weak self] session, request, data in
+                    let task = original(session, selector, request, data)
+                    self?.logger.attachRequestBody(data as Data?, to: task)
+                    return task
+                }
+                method_setImplementation(method, imp_implementationWithBlock(block))
+            }
+        }
+        do {
+            let selector = NSSelectorFromString("uploadTaskWithRequest:fromData:completionHandler:")
+            if let method = class_getInstanceMethod(URLSession.self, selector) {
+                typealias MethodSignature = @convention(c) (AnyObject, Selector, NSURLRequest, NSData?, Handler?) -> URLSessionUploadTask
+                let original = unsafeBitCast(method_getImplementation(method), to: MethodSignature.self)
+                let block: @convention(block) (AnyObject, NSURLRequest, NSData?, Handler?) -> URLSessionUploadTask = { [weak self] session, request, data, handler in
+                    let task = original(session, selector, request, data, handler)
+                    self?.logger.attachRequestBody(data as Data?, to: task)
+                    return task
+                }
+                method_setImplementation(method, imp_implementationWithBlock(block))
+            }
+        }
+        do {
+            // "_uploadTaskWithRequest:fromData:delegate:completionHandler:" (used by `upload(for:from:delegate:)`)
+            let selector = NSSelectorFromString(["_", "upload", "TaskWithRequest:", "fromData:", "delegate:", "completionHandler:"].joined())
+            if let method = class_getInstanceMethod(URLSession.self, selector) {
+                typealias MethodSignature = @convention(c) (AnyObject, Selector, NSURLRequest, NSData?, AnyObject?, Handler?) -> URLSessionUploadTask
+                let original = unsafeBitCast(method_getImplementation(method), to: MethodSignature.self)
+                let block: @convention(block) (AnyObject, NSURLRequest, NSData?, AnyObject?, Handler?) -> URLSessionUploadTask = { [weak self] session, request, data, delegate, handler in
+                    let task = original(session, selector, request, data, delegate, handler)
+                    self?.logger.attachRequestBody(data as Data?, to: task)
+                    return task
+                }
+                method_setImplementation(method, imp_implementationWithBlock(block))
+            }
+        }
     }
 }
