@@ -176,11 +176,36 @@ package enum ErrorFormatter {
             } else if task.errorDomain == NetworkLogger.DecodingError.domain {
                 return "Decoding Failed"
             } else {
-                return "Error"
+                return localizedDescription(fromDebugDescription: task.errorDebugDescription)
+                    .flatMap { shortened($0) } ?? "Error"
             }
         } else {
             return StatusCodeFormatter.string(for: Int(task.statusCode))
         }
+    }
+
+    /// Extracts the localized description from an `NSError` debug description:
+    /// `Error Domain=<domain> Code=<code> "<description>" UserInfo={…}`.
+    private static func localizedDescription(fromDebugDescription string: String?) -> String? {
+        guard let string, string.hasPrefix("Error Domain="),
+              let open = string.firstIndex(of: "\"") else {
+            return nil
+        }
+        let rest = string[string.index(after: open)...]
+        guard let close = rest.range(of: "\" UserInfo=")?.lowerBound ?? rest.lastIndex(of: "\"") else {
+            return nil
+        }
+        let description = rest[..<close]
+        return description.isEmpty || description == "(null)" ? nil : String(description)
+    }
+
+    /// Returns the first line of the description, truncated to fit in a list.
+    private static func shortened(_ description: String, limit: Int = 40) -> String? {
+        let line = description.prefix(while: { !$0.isNewline }).trimmingCharacters(in: .whitespaces)
+        guard !line.isEmpty else {
+            return nil
+        }
+        return line.count > limit ? String(line.prefix(limit - 1)) + "…" : line
     }
 }
 
