@@ -443,6 +443,7 @@ extension LoggerStore {
             entity.requestBodySize = event.metrics?.transactions.last(where: {
                 $0.fetchType == .networkLoad
             })?.transferSize.requestBodyBytesSent ?? Int64(event.requestBody?.count ?? -1)
+            entity.responseBodySize = Int64(event.responseBody?.count ?? 0)
         default:
             break
         }
