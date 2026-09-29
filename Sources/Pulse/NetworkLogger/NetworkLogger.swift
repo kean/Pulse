@@ -250,7 +250,7 @@ public final class NetworkLogger: @unchecked Sendable {
             currentRequest: task.currentRequest.map(Request.init),
             response: task.response.map(Response.init),
             error: error.map(ResponseError.init),
-            requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
+            requestBody: originalRequest.httpBody ?? task.pulse_requestBody ?? originalRequest.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
             label: configuration.label,
@@ -300,6 +300,19 @@ public final class NetworkLogger: @unchecked Sendable {
             .redactingSensitiveResponseDataFields(sensitiveDataFields)
     }
 
+    /// The size limit of the request bodies that the store keeps: it keeps
+    /// the bodies smaller than this.
+    package var requestBodySizeLimit: Int {
+        min(Int(Int32.max), store.configuration.responseBodySizeLimit)
+    }
+
+    /// Attaches `body` to `task` as its request body, unless the store
+    /// wouldn't keep a body this large.
+    package func attachRequestBody(_ body: Data?, to task: URLSessionTask) {
+        guard let body, body.count < requestBodySizeLimit else { return }
+        task.pulse_requestBody = body
+    }
+
     // MARK: - Private
 
     private var tasks: [TaskKey: TaskContext] = [:]
@@ -338,6 +351,17 @@ public final class NetworkLogger: @unchecked Sendable {
 private extension URLSessionTask {
     var url: String? {
         originalRequest?.url?.absoluteString
+    }
+}
+
+nonisolated(unsafe) private var requestBodyKey: UInt8 = 0
+
+extension URLSessionTask {
+    /// A request body that isn't part of `originalRequest`: the data passed to
+    /// `uploadTask(with:from:)`, or a body captured from a streamed upload.
+    package var pulse_requestBody: Data? {
+        get { objc_getAssociatedObject(self, &requestBodyKey) as? Data }
+        set { objc_setAssociatedObject(self, &requestBodyKey, newValue, .OBJC_ASSOCIATION_COPY_NONATOMIC) }
     }
 }
 

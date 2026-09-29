@@ -64,7 +64,9 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
     }
 
     public func uploadTask(with request: URLRequest, from bodyData: Data) -> URLSessionUploadTask {
-        session.uploadTask(with: request, from: bodyData)
+        let task = session.uploadTask(with: request, from: bodyData)
+        logger.attachRequestBody(bodyData, to: task)
+        return task
     }
 
     public func uploadTask(with request: URLRequest, fromFile fileURL: URL) -> URLSessionUploadTask {
@@ -155,6 +157,7 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
             }
             completionHandler(data, response, error)
         }
+        logger.attachRequestBody(bodyData, to: task)
         box.value = task
         return task
     }
@@ -239,7 +242,7 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
     public func upload(for request: URLRequest, fromFile fileURL: URL, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
         let delegate = URLSessionProxyDelegate(logger: logger, delegate: delegate)
         do {
-            let (data, response) = try await session.upload(for: request, fromFile: fileURL)
+            let (data, response) = try await session.upload(for: request, fromFile: fileURL, delegate: delegate)
             if let task = delegate.createdTask.value as? URLSessionUploadTask {
                 logger.logDataTask(task, didReceive: data)
                 logger.logTask(task, didCompleteWithError: nil)
@@ -255,8 +258,9 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
 
     public func upload(for request: URLRequest, from bodyData: Data, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
         let delegate = URLSessionProxyDelegate(logger: logger, delegate: delegate)
+        delegate.requestBody = bodyData
         do {
-            let (data, response) = try await session.upload(for: request, from: bodyData)
+            let (data, response) = try await session.upload(for: request, from: bodyData, delegate: delegate)
             if let task = delegate.createdTask.value as? URLSessionUploadTask {
                 logger.logDataTask(task, didReceive: data)
                 logger.logTask(task, didCompleteWithError: nil)
