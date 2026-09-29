@@ -258,6 +258,81 @@ public final class NetworkLogger: @unchecked Sendable {
         )))
     }
 
+    // MARK: Logging (Without URLSessionTask)
+
+    /// Logs the creation of a task that isn't backed by a `URLSessionTask`,
+    /// such as a gRPC call made over SwiftNIO.
+    ///
+    /// The task is displayed as pending until you call
+    /// ``logTaskCompleted(taskId:taskType:request:response:error:requestBody:responseBody:metrics:label:taskDescription:)``
+    /// with the same `taskId`.
+    ///
+    /// - parameters:
+    ///   - taskId: A unique identifier of the task.
+    ///   - taskType: The type of the task.
+    ///   - request: The original request.
+    ///   - label: A custom label. If `nil`, uses ``Configuration/label``.
+    ///   - taskDescription: A custom task description.
+    public func logTaskCreated(
+        taskId: UUID,
+        taskType: TaskType = .dataTask,
+        request: URLRequest,
+        label: String? = nil,
+        taskDescription: String? = nil
+    ) {
+        send(.networkTaskCreated(LoggerStore.Event.NetworkTaskCreated(
+            taskId: taskId,
+            taskType: taskType,
+            createdAt: Date(),
+            originalRequest: Request(request),
+            currentRequest: Request(request),
+            label: label ?? configuration.label,
+            taskDescription: taskDescription
+        )))
+    }
+
+    /// Logs the completion of a task previously registered using
+    /// ``logTaskCreated(taskId:taskType:request:label:taskDescription:)``.
+    ///
+    /// - parameters:
+    ///   - taskId: The identifier passed to `logTaskCreated`.
+    ///   - taskType: The type of the task.
+    ///   - request: The original request.
+    ///   - response: The response, if any.
+    ///   - error: The error, if the task failed.
+    ///   - requestBody: The request body.
+    ///   - responseBody: The response body.
+    ///   - metrics: The task metrics. Use it to record the task duration.
+    ///   - label: A custom label. If `nil`, uses ``Configuration/label``.
+    ///   - taskDescription: A custom task description.
+    public func logTaskCompleted(
+        taskId: UUID,
+        taskType: TaskType = .dataTask,
+        request: URLRequest,
+        response: URLResponse?,
+        error: Error?,
+        requestBody: Data?,
+        responseBody: Data?,
+        metrics: Metrics?,
+        label: String? = nil,
+        taskDescription: String? = nil
+    ) {
+        send(.networkTaskCompleted(LoggerStore.Event.NetworkTaskCompleted(
+            taskId: taskId,
+            taskType: taskType,
+            createdAt: Date(),
+            originalRequest: Request(request),
+            currentRequest: Request(request),
+            response: response.map(Response.init),
+            error: error.map(ResponseError.init),
+            requestBody: requestBody,
+            responseBody: responseBody,
+            metrics: metrics,
+            label: label ?? configuration.label,
+            taskDescription: taskDescription
+        )))
+    }
+
     private func send(_ event: LoggerStore.Event) {
         guard !isFilteringNeeded || filter(event) else {
             return

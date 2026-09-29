@@ -90,6 +90,32 @@ Alternatively, if you don't have access to `URLSessionTask`, you can store the r
 LoggerStore.shared.storeRequest(urlRequest, response: urlResponse, ...)
 ```
 
+If the requests don't go through `URLSession` at all, for example, gRPC calls made over SwiftNIO, log the start and the end of each task using an identifier you generate. The task is displayed as pending until it completes, and it goes through the logger's filters and redaction:
+
+```swift
+let taskId = UUID()
+let startDate = Date() // When the call starts
+NetworkLogger.shared.logTaskCreated(taskId: taskId, request: urlRequest)
+
+// Later, when the call finishes:
+let metrics = NetworkLogger.Metrics(
+    taskInterval: DateInterval(start: startDate, end: Date()),
+    redirectCount: 0,
+    transactions: [] // There are no URLSession transactions to report
+)
+NetworkLogger.shared.logTaskCompleted(
+    taskId: taskId,
+    request: urlRequest,
+    response: urlResponse,
+    error: error,
+    requestBody: requestBody,
+    responseBody: responseBody,
+    metrics: metrics
+)
+```
+
+The metrics record when the task started and how long it took. `transactions` stays empty because only `URLSession` produces transaction metrics, so the console shows the task's duration but no timing breakdown.
+
 ## Configure Logging
 
 ### Record Decoding Errors
