@@ -136,7 +136,7 @@ public final class NetworkLogger: @unchecked Sendable {
         func process(_ pattern: String, options: [Regex.Options]) -> Regex? {
             do {
                 let pattern = configuration.isRegexEnabled ? pattern : expandingWildcards(pattern)
-                return try Regex(pattern)
+                return try Regex(pattern, Regex.Options(options))
             } catch {
                 debugPrint("Failed to parse pattern: \(pattern) \(error)")
                 return nil
