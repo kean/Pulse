@@ -13,11 +13,15 @@ struct RichTextViewSearchToobar: View {
 
     var body: some View {
         Group {
-            if #available(iOS 26, visionOS 26, *) {
+#if os(iOS)
+            if #available(iOS 26, *) {
                 glassBar
             } else {
                 legacyBar
             }
+#else
+            legacyBar
+#endif
         }
         .onReceive(Keyboard.isHidden) { _ in
             // Show a non-interactive placeholder during animation,
@@ -39,7 +43,8 @@ struct RichTextViewSearchToobar: View {
 
     // MARK: iOS 26 (Liquid Glass)
 
-    @available(iOS 26, visionOS 26, *)
+#if os(iOS)
+    @available(iOS 26, *)
     private var glassBar: some View {
         HStack(spacing: 2) {
             navButton("chevron.left", action: viewModel.previousMatch)
@@ -63,7 +68,7 @@ struct RichTextViewSearchToobar: View {
         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 26))
     }
 
-    @available(iOS 26, visionOS 26, *)
+    @available(iOS 26, *)
     private func navButton(_ systemName: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: systemName)
@@ -75,7 +80,7 @@ struct RichTextViewSearchToobar: View {
         .disabled(viewModel.matches.isEmpty)
     }
 
-    @available(iOS 26, visionOS 26, *)
+    @available(iOS 26, *)
     @ViewBuilder
     private var moreMenu: some View {
         ZStack {
@@ -96,8 +101,9 @@ struct RichTextViewSearchToobar: View {
         }
         .frame(width: 40, height: 40)
     }
+#endif
 
-    // MARK: Legacy (iOS < 26)
+    // MARK: Legacy (iOS < 26 and visionOS)
 
     private var legacyBar: some View {
         HStack(alignment: .center, spacing: 24) {
