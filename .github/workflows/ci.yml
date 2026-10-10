@@ -29,6 +29,23 @@ jobs:
         run: |
           .scripts/build.sh -s "Pulse" -d "OS=26.2,name=iPhone 17 Pro"
           .scripts/build.sh -s "PulseUI" -d "OS=26.2,name=iPhone 17 Pro"
+  visionos-build:
+    name: Build (${{ matrix.destination }}, Xcode 26.2)
+    runs-on: macOS-26
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
+    strategy:
+      matrix:
+        destination:
+          - 'generic/platform=visionOS'
+          - 'generic/platform=visionOS Simulator'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Package
+        env:
+          DESTINATION: ${{ matrix.destination }}
+        run: xcodebuild build -scheme Pulse-Package -destination "$DESTINATION" CODE_SIGNING_ALLOWED=NO
   macos-latest:
     name: Unit Tests (macOS, Xcode 26.2)
     runs-on: macOS-26
