@@ -9,7 +9,12 @@ import SwiftUI
 struct RichTextViewSearchToobar: View {
     @ObservedObject var viewModel: RichTextViewModel
 
+#if os(iOS)
     @State private var isRealMenuShown = false
+#else
+    // Keep the menu interactive without waiting for UIKit keyboard notifications.
+    @State private var isRealMenuShown = true
+#endif
 
     var body: some View {
         Group {
