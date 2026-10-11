@@ -11,19 +11,19 @@ public final class UserSettings: ObservableObject {
     public static let shared = UserSettings()
 
     /// The console default mode.
-    @AppStorage("com.github.kean.pulse.console.mode")
+    @AppStorage("com_github_kean_pulse_console_mode")
     public var mode: ConsoleMode = .network
 
     /// The line limit for messages in the console. By default, `3`.
-    @AppStorage("com.github.kean.pulse.consoleCellLineLimit")
+    @AppStorage("com_github_kean_pulse_console_cell_line_limit")
     public var lineLimit: Int = 3
 
     /// Enables link detection in the response viewier. By default, `false`.
-    @AppStorage("com.github.kean.pulse.linkDetection")
+    @AppStorage("com_github_kean_pulse_link_detection")
     public var isLinkDetectionEnabled = false
 
     /// The default sharing output type. By default, ``ShareStoreOutput/store``.
-    @AppStorage("com.github.kean.pulse.sharingOutput")
+    @AppStorage("com_github_kean_pulse_sharing_output")
     public var sharingOutput: ShareStoreOutput = .store
 
     // Deprecated in Pulse 5.1.
@@ -35,7 +35,7 @@ public final class UserSettings: ObservableObject {
 
     /// If `true`, the network inspector will show the current request by default.
     /// If `false`, show the original request.
-    @AppStorage("com.github.kean.pulse.showCurrentRequest")
+    @AppStorage("com_github_kean_pulse_show_current_request")
     public var isShowingCurrentRequest = true
 
     /// The allowed sharing options.
@@ -44,11 +44,11 @@ public final class UserSettings: ObservableObject {
         set { rawAllowedShareStoreOutputs = encode(newValue) ?? "[]" }
     }
 
-    @AppStorage("com.github.kean.pulse.allowedShareStoreOutputs")
+    @AppStorage("com_github_kean_pulse_allowed_share_store_outputs")
     var rawAllowedShareStoreOutputs: String = "[]"
 
     /// If enabled, the console stops showing the remote logging option.
-    @AppStorage("com.github.kean.pulse.isRemoteLoggingAllowed")
+    @AppStorage("com_github_kean_pulse_is_remote_logging_allowed")
     public var isRemoteLoggingHidden = false
 
     /// Task cell display options.
@@ -69,7 +69,7 @@ public final class UserSettings: ObservableObject {
 
     var cachedDisplayOptions: ConsoleListDisplaySettings?
 
-    @AppStorage("com.github.kean.pulse.DisplayOptions")
+    @AppStorage("com_github_kean_pulse_display_options")
     var rawDisplayOptions: String = "{}"
 }
 
