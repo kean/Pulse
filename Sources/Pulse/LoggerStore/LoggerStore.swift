@@ -1240,6 +1240,14 @@ extension LoggerStore {
 
 extension LoggerStore {
     private func deleteEntities(for fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
+        if options.contains(.inMemory) {
+            try deleteEntitiesInMemory(for: fetchRequest)
+        } else {
+            try deleteEntitiesUsingBatchRequest(for: fetchRequest)
+        }
+    }
+
+    private func deleteEntitiesUsingBatchRequest(for fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         deleteRequest.resultType = .resultTypeObjectIDs
 
@@ -1251,6 +1259,44 @@ extension LoggerStore {
         viewContext.perform {
             NSManagedObjectContext.mergeChanges(fromRemoteContextSave: [NSDeletedObjectsKey: ids], into: [self.viewContext])
         }
+    }
+
+    private func deleteEntitiesInMemory(for fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
+        guard let objectFetchRequest = fetchRequest.copy() as? NSFetchRequest<NSFetchRequestResult> else {
+            assertionFailure("Failed to copy fetch request")
+            return
+        }
+        objectFetchRequest.resultType = []
+
+        var caughtError: Swift.Error?
+
+        backgroundContext.performAndWait {
+            do {
+                let objects = try backgroundContext.fetch(objectFetchRequest) as? [NSManagedObject] ?? []
+                guard !objects.isEmpty else { return }
+
+                var deletedIDs: [NSManagedObjectID] = []
+                deletedIDs.reserveCapacity(objects.count)
+
+                for object in objects {
+                    deletedIDs.append(object.objectID)
+                    backgroundContext.delete(object)
+                }
+
+                try backgroundContext.save()
+
+                viewContext.perform {
+                    NSManagedObjectContext.mergeChanges(
+                        fromRemoteContextSave: [NSDeletedObjectsKey: deletedIDs],
+                        into: [self.viewContext]
+                    )
+                }
+            } catch {
+                caughtError = error
+            }
+        }
+
+        if let caughtError { throw caughtError }
     }
 
     private func save(_ manifest: Manifest) throws {
