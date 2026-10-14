@@ -4,6 +4,7 @@
 
 import Foundation
 import Pulse
+import CoreData
 
 private enum HARDateFormatter {
     static var formatter: ISO8601DateFormatter = {
@@ -13,44 +14,68 @@ private enum HARDateFormatter {
     }()
 }
 
-struct HARDocument: Encodable {
-    private let log: Log
-    init(store: LoggerStore) throws {
-        var entries: [Entry] = []
-        var pages: [Page] = []
-        try Dictionary(grouping: store.tasks(context: store.backgroundContext), by: \.url).values.forEach { networkTasks in
-            let pageId = "page_\(pages.count)"
-            pages.append(
-                .init(
-                    id: pageId,
-                    startedDateTime: HARDateFormatter.formatter.string(from: networkTasks[.zero].createdAt),
-                    title: networkTasks[.zero].url ?? ""
-                )
-            )
-            entries.append(contentsOf: networkTasks.map { .init(entity: $0, pageId: pageId) })
+enum HARDocument {
+    /// Writes the network tasks associated with the given entities as a HAR
+    /// document.
+    ///
+    /// The entries are encoded and written one at a time, so only a single
+    /// request and response body are kept in memory regardless of the number
+    /// of tasks.
+    ///
+    /// - important: Must be called on the queue of the given context.
+    ///
+    /// - returns: The size of the written document.
+    static func write(_ objectIDs: [NSManagedObjectID], context: NSManagedObjectContext, to url: URL) throws -> Int64 {
+        guard FileManager.default.createFile(atPath: url.path, contents: nil) else {
+            throw CocoaError(.fileWriteUnknown)
         }
-        try store.messages(context: store.backgroundContext).forEach { message in
-            if let task = message.task {
-                entries.append(.init(entity: task, pageId: "page_\(pages.count)"))
+        let handle = try FileHandle(forWritingTo: url)
+        defer { try? handle.close() }
+
+        let encoder = JSONEncoder()
+        var pages: [Page] = []
+        var pageIDs: [String: String] = [:]
+        var writtenTaskIDs = Set<NSManagedObjectID>()
+
+        try handle.write(contentsOf: Data(#"{"log":{"version":"1.2","creator":{"name":"Pulse HAR generation tool","version":"0.1"},"entries":["#.utf8))
+        for objectID in objectIDs {
+            try autoreleasepool {
+                // A task and the message it is attached to resolve to the same entry.
+                guard let object = try? context.existingObject(with: objectID),
+                      let task = LoggerEntity(object).task,
+                      writtenTaskIDs.insert(task.objectID).inserted else {
+                    return
+                }
+                let title = task.url ?? ""
+                let pageId: String
+                if let id = pageIDs[title] {
+                    pageId = id
+                } else {
+                    pageId = "page_\(pages.count)"
+                    pageIDs[title] = pageId
+                    pages.append(.init(
+                        id: pageId,
+                        startedDateTime: HARDateFormatter.formatter.string(from: task.createdAt),
+                        title: title
+                    ))
+                }
+                let entry = try encoder.encode(Entry(entity: task, pageId: pageId))
+                if writtenTaskIDs.count > 1 {
+                    try handle.write(contentsOf: Data(",".utf8))
+                }
+                try handle.write(contentsOf: entry)
+                context.refresh(task, mergeChanges: false)
+                context.refresh(object, mergeChanges: false)
             }
         }
-        log = .init(
-            version: "1.2",
-            creator: ["name": "Pulse HAR generation tool", "version": "0.1"],
-            pages: pages,
-            entries: entries
-        )
+        try handle.write(contentsOf: Data(#"],"pages":"#.utf8))
+        try handle.write(contentsOf: encoder.encode(pages))
+        try handle.write(contentsOf: Data("}}".utf8))
+        return Int64(try handle.offset())
     }
 }
 
 extension HARDocument {
-    struct Log: Encodable {
-        let version: String
-        let creator: [String: String]
-        var pages: [Page]
-        var entries: [Entry]
-    }
-
     struct Page: Encodable {
         let id: String
         let pageTimings: PageTimings
