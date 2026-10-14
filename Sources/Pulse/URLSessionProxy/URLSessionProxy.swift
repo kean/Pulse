@@ -239,7 +239,7 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
     public func upload(for request: URLRequest, fromFile fileURL: URL, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
         let delegate = URLSessionProxyDelegate(logger: logger, delegate: delegate)
         do {
-            let (data, response) = try await session.upload(for: request, fromFile: fileURL)
+            let (data, response) = try await session.upload(for: request, fromFile: fileURL, delegate: delegate)
             if let task = delegate.createdTask.value as? URLSessionUploadTask {
                 logger.logDataTask(task, didReceive: data)
                 logger.logTask(task, didCompleteWithError: nil)
@@ -256,7 +256,7 @@ public final class URLSessionProxy: URLSessionProtocol, @unchecked Sendable {
     public func upload(for request: URLRequest, from bodyData: Data, delegate: (any URLSessionTaskDelegate)?) async throws -> (Data, URLResponse) {
         let delegate = URLSessionProxyDelegate(logger: logger, delegate: delegate)
         do {
-            let (data, response) = try await session.upload(for: request, from: bodyData)
+            let (data, response) = try await session.upload(for: request, from: bodyData, delegate: delegate)
             if let task = delegate.createdTask.value as? URLSessionUploadTask {
                 logger.logDataTask(task, didReceive: data)
                 logger.logTask(task, didCompleteWithError: nil)
