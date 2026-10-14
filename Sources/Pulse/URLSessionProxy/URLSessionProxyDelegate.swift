@@ -43,8 +43,12 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
 
     let createdTask = Mutex<URLSessionTask?>(nil)
 
+    /// The body of an `upload(for:from:)` call, attached to the task on creation.
+    var requestBody: Data?
+
     public func urlSession(_ session: Foundation.URLSession, didCreateTask task: URLSessionTask) {
         createdTask.value = task
+        logger.attachRequestBody(requestBody, to: task)
         logger.logTaskCreated(task)
         if #available(iOS 16, tvOS 16, macOS 13, watchOS 9, *) {
             taskDelegate?.urlSession?(session, didCreateTask: task)
